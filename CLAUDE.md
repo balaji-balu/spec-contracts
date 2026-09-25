@@ -18,6 +18,8 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
   `rubrics/`, `judge/prompt.md`, `schemas/`, `cases/` (7 cases), and `runner/score.py` (prototype).
 - `packages/spec-lint/`: the TypeScript linter (M1 step 1). `src/rules/` has one file per rule family, and `test/cases.ts` lists the fixtures and planted defects.
 - `packages/pi-spec-tools/`: the pi package agents load. It has `validate_artifact`, `trace_link`, `term_lookup`, `kb_search` and `kb_get`. `extensions/` registers the tools and `src/` holds their logic. Tests drive a real pi session with pi's faux provider, so no model key is needed. `trace_link` needs `SPEC_STEP` (and `SPEC_RUN`) in the environment (workflow.md §4).
+- `packages/step-runner/`: `run-step <case-dir>` runs one agent step in a clean temp workspace, pinned by `pipeline.lock.yaml`. It writes the headers, sets `SPEC_STEP`/`SPEC_RUN`, blocks writes outside the step's files, repairs on lint errors, and saves `runs/<case>/<run-id>/`. It stands in for the reconciler in M1.
+- `agents/<step>/prompt.md` + `AGENTS.md`, `skills/<name>/SKILL.md`, `pipeline.lock.yaml`: what a step runs with. After editing an AGENTS.md, run `npm run lock -w step-runner -- --update`.
 - `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
 - `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `spec-pipeline-roadmap.html` at the repo root.
 
@@ -49,6 +51,7 @@ Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
   - the judge fixtures are clean;
   - the planted-defect copies are caught;
   - `EXPECTED-SCORE.md` files match.
+- Never tune prompts, skills or AGENTS.md to an eval case's `expected.yaml`. Keep their examples in unrelated domains, or the suites stop measuring anything.
 - Never edit `examples/` or `evals/cases/` to make a tool pass. They are fixtures. If a fixture is wrong, say so.
 - Rule codes (for example `D9`, `L2`) must appear in the linter output exactly as in `validation-rules.md`.
 - Keep pi extensions small and dependency-light. pi's value is minimalism.
@@ -65,6 +68,8 @@ npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-r
 npm test -w spec-lint              # parity + planted + git-aware + rule tests
 npm test -w pi-spec-tools          # tool unit tests + faux-model pi sessions
 pi -e ./packages/pi-spec-tools     # try the tools in an interactive pi session (set SPEC_STEP for trace_link)
+npx run-step evals/cases/seeded/SD-RA-0001-refund   # real req-analysis run (openai/gpt-5.5, about $1 and 3 min)
+npm run lock -w step-runner [-- --update]           # check pipeline.lock.yaml (or refresh AGENTS.md hashes)
 npm run typecheck -w spec-lint
 npm run parity:check -w spec-lint  # re-runs the Python prototype and diffs it against test/parity/prototype-baseline.json
 ```

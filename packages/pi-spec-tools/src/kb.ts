@@ -5,7 +5,7 @@ import { loadConfig } from "spec-lint";
 import { findDomainRoot } from "./validate-artifact.ts";
 
 /** Pinned in artifact headers as `produced_by.extensions.kb_search` / `kb_get`. */
-export const KB_VERSION = "0.1.0";
+export const KB_VERSION = "1.0.0";
 
 export interface KbDoc {
   /** `kb:<doc>@<version>` or `const:ART-n`: the exact string an artifact puts in `sources`. */

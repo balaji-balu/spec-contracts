@@ -2,7 +2,7 @@ import { openDomain, type TermInfo } from "spec-lint";
 import { findDomainRoot } from "./validate-artifact.ts";
 
 /** Pinned in artifact headers as `produced_by.extensions.term_lookup`. */
-export const TERM_LOOKUP_VERSION = "0.1.0";
+export const TERM_LOOKUP_VERSION = "1.0.0";
 
 export interface TermLookupParams {
   /** Exact term name (case-sensitive, as validation-rules §5 resolves it). */

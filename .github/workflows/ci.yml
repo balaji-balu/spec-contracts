@@ -40,6 +40,21 @@ jobs:
       - run: npm run typecheck -w pi-spec-tools
       - run: npm test -w pi-spec-tools # includes a real pi session driven by pi's faux provider
 
+  step-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck -w step-runner
+      - run: npm run lock -w step-runner # pipeline.lock.yaml matches prompts, skills, tool versions and AGENTS.md hashes
+      - run: npm test -w step-runner # the runner end to end, with pi's faux provider as the model
+
   prototype-parity:
     # Re-runs the Python prototype and checks the recorded baseline is current. Remove with the prototype.
     runs-on: ubuntu-latest
