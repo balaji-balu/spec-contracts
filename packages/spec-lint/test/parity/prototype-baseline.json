@@ -54,9 +54,9 @@
     ],
     "S6 duplicate ID": [
       "S6: dup DES-3",
+      "T1: ('ADR-1', 'decides', 'DES-4')",
       "T1: ('DES-4', 'realizes', 'REQ-003')",
-      "T1: ('DES-4', 'realizes', 'REQ-101')",
-      "T1: ('ADR-1', 'decides', 'DES-4')"
+      "T1: ('DES-4', 'realizes', 'REQ-101')"
     ],
     "S8 AC under the wrong REQ": [
       "S8: REQ-002 bad AC AC-003.2: Given a Re",
@@ -91,8 +91,8 @@
     "D1 unknown context": [
       "D1: REQ-002 Billing",
       "D2: REQ-002 term 'Order Reference' in Billing",
-      "D2: REQ-002 term 'Refund' in Billing",
-      "D2: REQ-002 term 'Payment' in Billing"
+      "D2: REQ-002 term 'Payment' in Billing",
+      "D2: REQ-002 term 'Refund' in Billing"
     ],
     "D3 proposed term": [
       "D3/D4: DES-1 Shipment",

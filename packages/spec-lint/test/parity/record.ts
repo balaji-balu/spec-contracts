@@ -18,7 +18,8 @@ function runPrototype(root: string, spec: string): string[] {
   });
   if (r.status !== 0) throw new Error(`prototype failed on ${spec}:\n${r.stderr}`);
   const lines = r.stdout.replace(/\r/g, "").split("\n").filter((l) => l.trim());
-  return lines.filter((l) => l !== "clean" && !l.startsWith("blocks="));
+  // Sorted: the prototype's order depends on directory listing and set iteration, which differ by OS.
+  return lines.filter((l) => l !== "clean" && !l.startsWith("blocks=")).sort();
 }
 
 const baseline: { note: string; fixtures: Record<string, string[]>; planted: Record<string, string[]> } = {
@@ -37,9 +38,17 @@ for (const p of PLANTED) {
 }
 const text = `${JSON.stringify(baseline, null, 2)}\n`;
 if (process.argv.includes("--check")) {
-  const same = readFileSync(OUT, "utf8").replace(/\r/g, "") === text;
-  console.log(same ? "prototype baseline: no diff" : "prototype baseline: DIFFERS from the committed file");
-  process.exit(same ? 0 : 1);
+  const committed = JSON.parse(readFileSync(OUT, "utf8")) as typeof baseline;
+  const diffs: string[] = [];
+  for (const group of ["fixtures", "planted"] as const) {
+    for (const name of new Set([...Object.keys(committed[group]), ...Object.keys(baseline[group])])) {
+      const a = JSON.stringify(committed[group][name] ?? null);
+      const b = JSON.stringify(baseline[group][name] ?? null);
+      if (a !== b) diffs.push(`${group}/${name}\n  committed: ${a}\n  prototype: ${b}`);
+    }
+  }
+  console.log(diffs.length ? `prototype baseline: DIFFERS from the committed file\n${diffs.join("\n")}` : "prototype baseline: no diff");
+  process.exit(diffs.length ? 1 : 0);
 }
 writeFileSync(OUT, text);
 console.log(`wrote ${OUT}`);
