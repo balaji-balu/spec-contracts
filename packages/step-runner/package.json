@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "description": "Runs one agent step in a clean workspace, pinned by pipeline.lock.yaml (M1: no reconciler yet; the suite runner builds on it).",
   "type": "module",
-  "bin": { "run-step": "bin/run-step.js" },
+  "bin": {
+    "run-step": "bin/run-step.js"
+  },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "node --import tsx --test --test-force-exit test/*.test.ts",
-    "lock": "node --import tsx src/lock-cli.ts"
+    "lock": "node --import tsx src/lock-cli.ts",
+    "demo": "node --import tsx src/demo.ts"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "0.85.1",
@@ -21,5 +24,7 @@
     "@types/node": "^22.10.0",
     "typescript": "^5.7.2"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

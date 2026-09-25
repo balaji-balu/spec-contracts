@@ -70,7 +70,8 @@ npm test -w spec-lint              # parity + planted + git-aware + rule tests
 npm test -w pi-spec-tools          # tool unit tests + faux-model pi sessions
 pi -e ./packages/pi-spec-tools     # try the tools in an interactive pi session (set SPEC_STEP for trace_link)
 docker compose -f gateway/litellm/docker-compose.yml up -d   # start the litellm gateway (needs gateway/litellm/.env; UI at http://localhost:4000/ui)
-npx run-step evals/cases/seeded/SD-RA-0001-refund   # real req-analysis run through litellm (openai/gpt-5.5, about $1 and 3 min)
+npm run demo -w step-runner -- --verbose            # watch the whole step flow with a scripted model: no key, no Docker, no cost
+npx run-step evals/cases/seeded/SD-RA-0001-refund   # real req-analysis run through litellm (openai/gpt-5.5, about $1 and 3 min) (add --verbose to see model text and tool results)
 npm run lock -w step-runner [-- --update]           # check pipeline.lock.yaml (or refresh AGENTS.md hashes)
 npm run typecheck -w spec-lint
 npm run parity:check -w spec-lint  # re-runs the Python prototype and diffs it against test/parity/prototype-baseline.json

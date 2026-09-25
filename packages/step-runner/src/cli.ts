@@ -1,26 +1,39 @@
 /**
- * run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>]
+ * run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>] [--direct] [--verbose]
  * Runs one agent step on an eval case, pinned by pipeline.lock.yaml, and writes runs/<case>/<run-id>/.
+ * It narrates every stage as it happens; --verbose also shows model text, tool results and the prompt.
  */
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { formatDiagnostic } from "spec-lint";
 import { checkLock } from "./lock.ts";
+import { consoleNarrator } from "./narrate.ts";
 import { runStep, type RunResult } from "./run.ts";
 import { loadCase } from "./workspace.ts";
+
+const USAGE = [
+  "usage: run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>] [--direct] [--verbose]",
+  "  --direct   call the model provider without the litellm gateway (recorded in run.json)",
+  "  --verbose  show model text, tool results and the prompt, not just one line each",
+].join("\n");
 
 const repo = resolve(import.meta.dirname, "..", "..", "..");
 const { values: v, positionals } = parseArgs({
   allowPositionals: true,
-  options: { step: { type: "string" }, "run-id": { type: "string" }, out: { type: "string" }, direct: { type: "boolean" }, help: { type: "boolean", short: "h" } },
+  options: {
+    step: { type: "string" },
+    "run-id": { type: "string" },
+    out: { type: "string" },
+    direct: { type: "boolean" },
+    verbose: { type: "boolean", short: "v" },
+    help: { type: "boolean", short: "h" },
+  },
 });
 if (v.help || positionals.length !== 1) {
-  console.error(
-    "usage: run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>] [--direct]\n" +
-      "  --direct  call the model provider without the litellm gateway (recorded in run.json)",
-  );
+  console.error(USAGE);
   process.exit(v.help ? 0 : 2);
 }
+
 function gatewayLine(r: RunResult): string {
   const g = r.gateway;
   if (g.kind === "none") return `gateway: none (${g.reason})`;
@@ -36,7 +49,9 @@ if (lockErrors.length) {
 }
 const caseDir = resolve(positionals[0]);
 const step = v.step ?? loadCase(caseDir).start_at;
-const r = await runStep({ repo, caseDir, step, runId: v["run-id"], outDir: v.out, direct: v.direct, onEvent: (l) => console.log(l) });
+const narrate = consoleNarrator((l) => console.log(l), !!process.stdout.isTTY);
+const r = await runStep({ repo, caseDir, step, runId: v["run-id"], outDir: v.out, direct: v.direct, verbose: v.verbose, narrate });
+console.log("");
 for (const d of r.lint.diagnostics.filter((x) => x.severity !== "I")) console.log(formatDiagnostic(d));
 console.log(
   [
