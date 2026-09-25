@@ -39,6 +39,7 @@ docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → recon
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
 packages/spec-lint/              # the linter (TypeScript): CLI + library
 packages/pi-spec-tools/          # pi package: the tools agents call (validate_artifact, trace_link, term_lookup, kb_search, kb_get)
+gateway/litellm/                 # the litellm gateway every model call goes through (docker compose, config.yaml, .env.example)
 packages/step-runner/            # run-step: one agent step on an eval case, pinned by pipeline.lock.yaml (stands in for the reconciler in M1)
 agents/<step>/                   # prompt.md (task + mode preambles) and the step's AGENTS.md
 skills/<name>/SKILL.md           # pi skills the steps load
@@ -102,3 +103,4 @@ then **eval gate** (rubric/judge; thresholds defined when we design the eval har
 | D17 | Agents fix every E and every G except open findings routed to someone else; those are what the gate is for (AGENTS.md "Format") | decided |
 | D18 | The M1 org KB is plain Markdown files (`kb_doc`/`version` frontmatter) behind a `KbStore` interface that a Typegraph store can implement later. `kb_get` also serves `const:ART-n`, and KB text reaches the model fenced as data | decided |
 | D19 | The M1 `req-analysis` generator is `openai/gpt-5.5` (thinking: high). It is provisional: step 7 compares at least two models before the choice is final | decided |
+| D20 | All model calls go through a local litellm proxy (`gateway/litellm`, pinned image, spend logs in its own Postgres). Each call is tagged with its step, run and case; `run-step` records litellm's tokens and spend in `run.json`, and stops if the gateway is down unless `--direct` is given | decided |

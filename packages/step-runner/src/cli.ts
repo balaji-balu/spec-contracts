@@ -6,18 +6,29 @@ import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { formatDiagnostic } from "spec-lint";
 import { checkLock } from "./lock.ts";
-import { runStep } from "./run.ts";
+import { runStep, type RunResult } from "./run.ts";
 import { loadCase } from "./workspace.ts";
 
 const repo = resolve(import.meta.dirname, "..", "..", "..");
 const { values: v, positionals } = parseArgs({
   allowPositionals: true,
-  options: { step: { type: "string" }, "run-id": { type: "string" }, out: { type: "string" }, help: { type: "boolean", short: "h" } },
+  options: { step: { type: "string" }, "run-id": { type: "string" }, out: { type: "string" }, direct: { type: "boolean" }, help: { type: "boolean", short: "h" } },
 });
 if (v.help || positionals.length !== 1) {
-  console.error("usage: run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>]");
+  console.error(
+    "usage: run-step <case-dir> [--step <step>] [--run-id <id>] [--out <dir>] [--direct]\n" +
+      "  --direct  call the model provider without the litellm gateway (recorded in run.json)",
+  );
   process.exit(v.help ? 0 : 2);
 }
+function gatewayLine(r: RunResult): string {
+  const g = r.gateway;
+  if (g.kind === "none") return `gateway: none (${g.reason})`;
+  const u = g.usage;
+  if (!u?.complete) return `litellm: spend logs not complete yet (${u?.calls ?? 0} call(s) so far); see Logs at ${g.baseUrl}/ui, tag run:${r.runId}`;
+  return `litellm: ${u.calls} call(s), ${u.totalTokens} tokens (prompt ${u.promptTokens}, completion ${u.completionTokens}), spend $${u.spend.toFixed(4)} · tag run:${r.runId}`;
+}
+
 const lockErrors = checkLock(repo);
 if (lockErrors.length) {
   console.error(`pipeline.lock.yaml does not match the repository (run: npm run lock -w step-runner -- --update):\n${lockErrors.join("\n")}`);
@@ -25,13 +36,14 @@ if (lockErrors.length) {
 }
 const caseDir = resolve(positionals[0]);
 const step = v.step ?? loadCase(caseDir).start_at;
-const r = await runStep({ repo, caseDir, step, runId: v["run-id"], outDir: v.out, onEvent: (l) => console.log(l) });
+const r = await runStep({ repo, caseDir, step, runId: v["run-id"], outDir: v.out, direct: v.direct, onEvent: (l) => console.log(l) });
 for (const d of r.lint.diagnostics.filter((x) => x.severity !== "I")) console.log(formatDiagnostic(d));
 console.log(
   [
     `${r.ok ? "OK" : "FAILED"} ${r.caseId} ${r.step} ${r.runId} · ${r.model} · attempts ${r.attempts}`,
     `lint: ${r.lint.counts.E} E, ${r.lint.counts.G} G, ${r.lint.counts.W} W · headers ${r.headersIntact ? "intact" : "CHANGED"}${r.blockedWrites.length ? ` · blocked: ${r.blockedWrites.join(", ")}` : ""}`,
     `tokens ${r.tokens.total} (in ${r.tokens.input}, out ${r.tokens.output}) · cost $${r.cost.toFixed(4)} · ${(r.durationMs / 1000).toFixed(1)} s`,
+    gatewayLine(r),
     `output: ${r.runDir}`,
   ].join("\n"),
 );

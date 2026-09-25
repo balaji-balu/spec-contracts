@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml, parseDocument } from "yaml";
 import { TOOLS } from "pi-spec-tools/src/registry.ts";
+import type { GatewayLock } from "./gateway.ts";
 
 export interface StepLock {
   model: string;
@@ -16,6 +17,7 @@ export interface StepLock {
 
 export interface Lock {
   harness: { name: "pi"; version: string };
+  gateway?: GatewayLock;
   steps: Record<string, StepLock>;
   eval_judge?: { model: string; prompt: string; rubrics: Record<string, string> };
   limits: { repair_attempts: number; analysis_rounds: number; eval_retries: number; back_edges: number };

@@ -1,0 +1,30 @@
+# Local litellm gateway: every model call from pi goes through it (CLAUDE.md, README D20).
+# Start: docker compose -f gateway/litellm/docker-compose.yml up -d   (needs gateway/litellm/.env, see .env.example)
+# UI:    http://localhost:4000/ui   (log in with UI_USERNAME / UI_PASSWORD from .env) → Logs, Usage
+name: spec-contracts-litellm
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm-database:v1.102.1
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports: ["127.0.0.1:4000:4000"]
+    volumes: ["./config.yaml:/app/config.yaml:ro"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://litellm:litellm@db:5432/litellm
+      STORE_MODEL_IN_DB: "False"
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+  db:
+    # Private to this compose network: no host port, so it can't clash with a local Postgres on 5432.
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: litellm, POSTGRES_PASSWORD: litellm, POSTGRES_DB: litellm}
+    volumes: ["litellm-db:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+volumes:
+  litellm-db: {}

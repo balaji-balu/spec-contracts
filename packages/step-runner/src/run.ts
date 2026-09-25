@@ -3,10 +3,11 @@ import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { mkdtempSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
-import type { Model } from "@earendil-works/pi-ai";
+import type { Api, Model } from "@earendil-works/pi-ai";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { formatDiagnostic, lint, NullGit, type LintResult } from "spec-lint";
 import { TOOLS } from "pi-spec-tools/src/registry.ts";
+import { checkGateway, fetchGatewayUsage, gatewayKey, gatewayTags, registerGatewayModel, type GatewayUsage } from "./gateway.ts";
 import { loadLock, promptPath, type Lock } from "./lock.ts";
 import { headerBlock, loadCase, materialise, type Workspace } from "./workspace.ts";
 
@@ -25,6 +26,10 @@ export interface RunOptions {
   model?: Model<any>;
   /** Called with each tool call and result, for progress output. */
   onEvent?: (line: string) => void;
+  /** Call the provider directly instead of through the gateway. Recorded in run.json. */
+  direct?: boolean;
+  /** Gateway URL instead of the lock's base_url (for tests, or a gateway on another host). */
+  gatewayUrl?: string;
 }
 
 export interface RunResult {
@@ -44,6 +49,10 @@ export interface RunResult {
   tokens: { input: number; output: number; cacheRead: number; cacheWrite: number; total: number };
   cost: number;
   durationMs: number;
+  /** How model calls were routed, and what the gateway recorded for this run. */
+  gateway:
+    | { kind: "litellm"; baseUrl: string; tags: string[]; usage?: GatewayUsage & { complete: boolean } }
+    | { kind: "none"; reason: string };
 }
 
 export function newRunId(now = new Date()): string {
@@ -133,8 +142,26 @@ export async function runStep(o: RunOptions): Promise<RunResult> {
 
   const modelRuntime = o.modelRuntime ?? (await ModelRuntime.create());
   const [provider, ...rest] = s.model.split("/");
-  const model = o.model ?? modelRuntime.getModel(provider, rest.join("/"));
+  // Every model call goes through the gateway (README D20), unless a test injects a model or --direct is given.
+  const g = lock.gateway && (o.gatewayUrl ? { ...lock.gateway, base_url: o.gatewayUrl } : lock.gateway);
+  const tags = gatewayTags({ step: o.step, runId, caseId: evalCase.id });
+  let gateway: RunResult["gateway"];
+  let key = "";
+  let model: Model<Api> | undefined;
+  if (o.model) {
+    model = o.model;
+    gateway = { kind: "none", reason: "model injected by the caller" };
+  } else if (o.direct || !g) {
+    model = modelRuntime.getModel(provider, rest.join("/"));
+    gateway = { kind: "none", reason: o.direct ? "--direct" : "no gateway in pipeline.lock.yaml" };
+  } else {
+    await checkGateway(g);
+    key = gatewayKey(repo, g);
+    model = registerGatewayModel(modelRuntime, g, key, s.model, tags);
+    gateway = { kind: "litellm", baseUrl: g.base_url, tags };
+  }
   if (!model) throw new Error(`model ${s.model} is not available in pi (check \`pi --list-models\` and \`pi auth check --provider ${provider}\`)`);
+  log(gateway.kind === "litellm" ? `model: ${s.model} via litellm at ${gateway.baseUrl} (tags: ${tags.join(", ")})` : `model: ${s.model}, direct (${gateway.reason})`);
 
   const saved = { step: process.env.SPEC_STEP, run: process.env.SPEC_RUN };
   process.env.SPEC_STEP = o.step;
@@ -177,6 +204,10 @@ export async function runStep(o: RunOptions): Promise<RunResult> {
   }
   const stats = session.getSessionStats();
   session.dispose();
+  if (gateway.kind === "litellm" && g) {
+    log("reading this run's calls back from litellm's spend logs …");
+    gateway.usage = await fetchGatewayUsage(g, key, `run:${runId}`, stats.assistantMessages, { since: new Date(started) });
+  }
 
   const headersIntact = headersBefore.every(([f, h]) => existsSync(f) && headerBlock(f) === h);
   // Outputs: the spec folder as the step left it, the lint result, and the run summary. The session JSONL is already in runDir.
@@ -197,6 +228,7 @@ export async function runStep(o: RunOptions): Promise<RunResult> {
     tokens,
     cost: stats.cost,
     durationMs: Date.now() - started,
+    gateway,
   };
   const { lint: _l, ...summary } = run;
   writeFileSync(join(runDir, "run.json"), `${JSON.stringify({ ...summary, lint: { counts: result.counts, blocking: result.blocking } }, null, 2)}\n`);
