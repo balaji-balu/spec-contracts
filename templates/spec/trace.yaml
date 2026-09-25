@@ -1,0 +1,19 @@
+# Single link layer for the spec. Written only through the trace_link tool.
+# Direction is always downstream -> upstream. Allowed rels: validation-rules.md §3.
+header:
+  artifact: trace
+  id: SPEC-0000
+  version: 1
+  status: draft
+  upstream:
+    intent: {id: SPEC-0000, version: 1}
+  produced_by:
+    step: reconciler
+    harness: {name: pi, version: <x.y.z>}
+    model: none
+    prompt: none@0.0.0
+    template: trace@1.0.0
+    run_id: <run-id>
+
+links: []
+# - {from: REQ-001, rel: derives-from, to: GOAL-1, by: req-generation, run: <run-id>}

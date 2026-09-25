@@ -1,0 +1,89 @@
+sequenceDiagram
+  autonumber
+  actor USER as User (requester)
+  actor BA as BA (business analyst)
+  actor ARCH as Architect (senior)
+  participant UI as UI (thin client)
+  participant REC as Reconciler (orchestrator)
+  participant GIT as Git / PR (workflow state)
+  participant AGENT as pi agent (one per step)
+  participant DDD as DDD agent (pi)
+  participant VERIFY as Verify (spec-lint)
+  participant EVAL as Eval judge (rubric + articles)
+  participant KB as Org KB (constitution)
+  Note over USER,KB: P1 Intent (19 Sep)
+  USER->>UI: Types the raw intent
+  UI->>REC: New spec request
+  REC->>GIT: Branch spec/SPEC-0001/intent + template
+  REC->>AGENT: [Intent] Start session (create)
+  AGENT->>KB: [Intent] kb_search - refund policy, provider refunds
+  KB-->>AGENT: refund-policy v4 · provider doc v7 · constitution v3
+  AGENT->>USER: [Intent] ask_user Q-1 - what does 'quickly' mean?
+  USER-->>AGENT: Refund must start within 1 hour
+  AGENT->>AGENT: [Intent] Writes intent.md · validate_artifact ✓
+  REC->>VERIFY: spec-lint intent.md
+  VERIFY-->>REC: ✓ Clean · no open Q (F6) · CON-1 cites KB (K2)
+  REC->>EVAL: Intent rubric + ART-1
+  EVAL-->>REC: ✓ Pass 0.86
+  REC->>DDD: ddd-seed
+  DDD-->>REC: Proposed terms → glossary
+  REC->>GIT: status in-review · PR 11 · ready-for-review
+  BA->>UI: Approves intent
+  REC->>GIT: Re-verify · status approved · merge
+  Note over USER,KB: P2 Requirements (19–20 Sep)
+  REC->>AGENT: [Req analysis] Round 1
+  AGENT-->>REC: RAF-1..4 · RAF-4 boundary is a blocker
+  REC->>VERIFY: spec-lint
+  VERIFY-xREC: ✕ Gate F1 - blocker RAF-4 still open
+  par In parallel - route - ddd and route - human findings resolve at the same time
+  REC->>DDD: ddd-strategic for RAF-2, RAF-4
+  DDD-->>REC: Refund, Order Reference · Ordering → Payments map
+  REC->>UI: needs-input - RAF-1
+  BA->>UI: /answer RAF-1 - whole Order only
+  end
+  REC->>AGENT: [Req analysis] Round 2
+  AGENT-->>REC: No new findings · ART-2, ART-5 apply
+  REC->>AGENT: [Req generation] Create (attempt 1)
+  AGENT-->>REC: requirements.md + trace links
+  loop Verify → repair - deterministic · ≤ 3 attempts
+  REC->>VERIFY: spec-lint
+  VERIFY-xREC: ✕ L5 'quickly' · D5 'reimbursement' · L2 two 'shall'
+  REC->>AGENT: [Req generation] Repair (attempt 2) with error list
+  REC->>VERIFY: spec-lint
+  VERIFY-->>REC: ✓ Clean
+  end
+  loop Eval → revise - judgment · ≤ 2 retries
+  REC->>EVAL: Rubric + ART-2, ART-5
+  EVAL-xREC: ✕ ART-2 - REQ-002 has no duplicate-trigger AC
+  REC->>AGENT: [Req generation] Revise with judge rationale
+  AGENT-->>REC: Adds AC-002.2 (no second Refund)
+  REC->>EVAL: Re-verify + re-eval
+  EVAL-->>REC: ✓ Pass 0.91
+  end
+  REC->>GIT: PR 12 in-review · BA + architect (domain/ changed)
+  ARCH->>UI: Approves domain changes
+  BA->>UI: Approves requirements
+  REC->>GIT: Merge · glossary v2 on main
+  Note over USER,KB: P3 Design (21–22 Sep)
+  REC->>AGENT: [Design analysis] Round 1
+  AGENT->>KB: [Design analysis] kb_get provider doc v7
+  KB-->>AGENT: Refund API limit - 20 per second
+  AGENT-->>REC: DAF-1 rate-limit risk · DAF-2 duplicates
+  REC->>UI: needs-input - DAF-1 (2 options)
+  ARCH->>UI: /answer DAF-1 - durable refund queue
+  REC->>DDD: ddd-tactical
+  DDD-->>REC: Orders, Refunds aggregates · cml_check ✓
+  REC->>AGENT: [Design generation] Create
+  AGENT-->>REC: DES-1..4 · ADR-1 · realizes links
+  REC->>VERIFY: spec-lint
+  VERIFY-->>REC: ✓ Clean · coverage C5–C8 · no boundary violation (D9)
+  REC->>EVAL: Rubric + ART-2..5
+  EVAL-->>REC: ✓ Pass 0.88
+  REC->>GIT: PR 15 in-review
+  ARCH->>UI: Approves design
+  REC->>GIT: Merge
+  Note over USER,KB: P4 Verify & handoff (22 Sep →)
+  REC->>VERIFY: Whole-spec verify on main
+  VERIFY-->>REC: ✓ C1–C9 ✓ · no stale pins · metrics.json
+  REC->>GIT: Tag SPEC-0001/v1.1-ready
+  GIT-->>EVAL: Execution loop feeds lagging signals back

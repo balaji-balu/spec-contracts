@@ -1,0 +1,47 @@
+/*---
+artifact: domain-strategic
+id: domain
+title: Strategic domain model
+version: 1
+status: approved
+produced_by:
+  step: ddd-strategic
+  harness: {name: pi, version: 0.9.0}
+  model: anthropic/claude-sonnet-5
+  prompt: ddd-strategic@1.0.0
+  skills: {contextmapper-ddd: 1.0.0}
+  extensions: {validate_artifact: 1.0.0, cml_check: 1.0.0}
+  template: domain-strategic@1.0.0
+  run_id: run-0001-04
+approved_by:
+  - {name: arch-ravi, role: architect, at: "2026-09-20T10:12:00+05:30", pr: "#12"}
+---*/
+
+import "./contexts/Ordering.cml"
+import "./contexts/Payments.cml"
+
+Domain Commerce {
+  domainVisionStatement = "Sell goods online and settle the money for them correctly."
+
+  Subdomain OrderManagement {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Take, change and cancel Customer Orders until they ship."
+  }
+
+  Subdomain PaymentProcessing {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Capture and return money through external payment providers."
+  }
+}
+
+ContextMap CommerceMap {
+  type = SYSTEM_LANDSCAPE
+  state = TO_BE
+
+  contains Ordering, Payments
+
+  // Ordering publishes order facts; Payments translates them into its own model.
+  Ordering [U,OHS,PL]->[D,ACL] Payments {
+    implementationTechnology = "Domain events"
+  }
+}

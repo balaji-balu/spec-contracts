@@ -1,0 +1,36 @@
+id: G-0001-refund
+suite: golden
+title: Automatic refund on pre-shipment cancellation, end to end
+targets: [intent, req-analysis, ddd-strategic, req-generation, design-analysis, ddd-tactical, design-generation]
+start_at: intent
+stop_after: design-generation
+inputs:
+  raw_intent: >-
+    Customers who cancel before we ship keep emailing support to get their money back. Refunds should
+    just happen automatically when they cancel, and they should get it back quickly. Support is drowning.
+  constitution: ../../../../examples/org/constitution.md
+  kb: [inputs/kb/finance-refund-policy.md, inputs/kb/payments-provider-integration.md]
+sim_reviewer:
+  answers:
+    - {match: "(?i)quick|how soon|latency|within", answer: "The refund must be started within 1 hour of the cancellation. Arrival depends on the bank.", as: user}
+    - {match: "(?i)partial", answer: "Whole-order cancellation only. Partial cancellation is a separate spec.", as: ba}
+    - {match: "(?i)rate.?limit|throughput|spike", answer: "Use a durable refund queue with rate-limited workers.", as: architect}
+  fallback: persona
+  persona: >-
+    Priya, business analyst at an online retailer. Answers in one or two sentences. Never invents numbers:
+    if asked for one that is not scripted, replies "not decided - please record it as an assumption".
+  approve: after-eval-pass
+expected:
+  reference: ../../../../examples/specs/SPEC-0001
+  metric_floors:
+    goal_coverage: 1.0
+    ears_rate: 1.0
+    testable_ac_rate: 1.0
+    must_miss: 0
+    ref_coverage: 0.85
+    boundary_violations: 0
+    questions_asked_min: 1
+notes: >-
+  The reference is the approved SPEC-0001 in examples/. Its domain (examples/domain) is the reference for
+  ddd-strategic and ddd-tactical: the Ordering and Payments contexts, TERM-005 Refund and TERM-008 Order Reference.
+  fixtures/sample-run holds one plausible agent output used to test the scorer. It is not the reference.

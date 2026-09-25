@@ -1,0 +1,17 @@
+id: JF-REQ-0002-good
+suite: judge
+title: The approved SPEC-0001 requirements; the judge must pass them (control against an over-strict judge)
+targets: [eval-judge]
+start_at: eval-judge
+stop_after: eval-judge
+inputs:
+  artifacts: [spec/intent.md, spec/requirements-analysis.md, spec/requirements.md, spec/trace.yaml]
+  domain: ../../../../examples/domain
+  constitution: ../../../../examples/org/constitution.md
+expected:
+  verdict: pass
+  judge_verdicts:
+    - {criterion: RQ-1, min_score: 4, max_score: 5}
+    - {criterion: RQ-2, min_score: 4, max_score: 5}
+    - {criterion: CONST-ART-2, min_score: 4, max_score: 5}
+notes: An unmodified copy of examples/specs/SPEC-0001.

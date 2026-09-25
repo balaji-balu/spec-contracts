@@ -1,0 +1,32 @@
+id: CS-0001-refund
+suite: consistency
+title: Same refund need, three phrasings
+targets: [intent, req-analysis, req-generation]
+start_at: intent
+stop_after: req-generation
+inputs:
+  raw_intent_variants:
+    - >-
+      Customers who cancel before we ship keep emailing support to get their money back. Refunds should
+      just happen automatically when they cancel, and they should get it back quickly. Support is drowning.
+    - >-
+      Support spends hours every week manually refunding orders that were cancelled before dispatch.
+      We want those refunds to be automatic and fast, so customers stop chasing us.
+    - >-
+      When someone cancels an order we haven't sent yet, they should get their money back without talking
+      to anyone. Right now it is all manual and slow, and it is the top ticket category.
+  constitution: ../../../../examples/org/constitution.md
+  kb: [../../golden/G-0001-refund/inputs/kb/finance-refund-policy.md, ../../golden/G-0001-refund/inputs/kb/payments-provider-integration.md]
+sim_reviewer:
+  answers:
+    - {match: "(?i)quick|fast|how soon|within", answer: "Start the refund within 1 hour of the cancellation.", as: user}
+    - {match: "(?i)partial", answer: "Whole-order cancellation only.", as: ba}
+  fallback: persona
+  persona: Same persona as G-0001-refund.
+  approve: after-eval-pass
+expected:
+  reference: ../../../../examples/specs/SPEC-0001
+  metric_floors: {goal_stability: 0.8, req_stability: 0.75, score_spread_max: 0.15}
+notes: >-
+  Variant 2 says "dispatch" and variant 3 says "sent". Both must land on the glossary term Shipment.
+  A run that coins a new term fails D2 in verify and costs a repair attempt, which the report shows.

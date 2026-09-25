@@ -1,0 +1,61 @@
+rubric: design-analysis
+version: 1.0.0
+grounding: "Evans (boundaries under pressure); Ford (architectural characteristics drive decisions)"
+scale: {1: fails, 2: weak, 3: acceptable, 4: good, 5: exemplary}
+constitution: auto
+criteria:
+  - id: DA-1
+    name: Feasibility grounded in facts
+    question: Are feasibility and NFR risks grounded in cited limits (KB, provider docs) rather than guesses?
+    anchors:
+      1: A risk rests on an invented number, or a real KB limit is ignored
+      3: Grounded, but one limit is assumed without a citation
+      5: Every limit that matters is cited, and every must-NFR is assessed against it
+    evidence: List each limit and its source
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: DA-2
+    name: Real options
+    question: Where a decision is needed, are the options genuinely different, with honest trade-offs?
+    anchors:
+      1: A single option, or a straw-man alternative
+      3: Two real options, with a trade-off missing
+      5: Viable options, each with its cost, risk and reversibility
+    evidence: Quote the options for the most important finding
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: DA-3
+    name: Boundary pressure noticed
+    question: Did it detect where requirements push against the context map (shared data, chatty integration, a term used across contexts)?
+    anchors:
+      1: An obvious boundary issue is missed
+      3: Noticed, but routed as self when it needs ddd or requirements
+      5: Every boundary pressure is raised with the right route
+    evidence: Name each cross-context dependency and the finding for it
+    weight: 3
+    hard_fail: false
+    status: advisory
+  - id: DA-4
+    name: Honest routing and back-edges
+    question: Are requirement changes routed to requirements rather than silently designed around?
+    anchors:
+      1: The design silently weakens a requirement
+      3: Routed, with an unclear recommendation
+      5: Every requirement pressure is a requirement-change finding with a recommendation
+    evidence: Quote any silent workaround
+    weight: 2
+    hard_fail: true
+    status: advisory
+  - id: DA-5
+    name: Proportionate concern
+    question: Does it avoid inventing scale or complexity the requirements don't justify?
+    anchors:
+      1: Recommends distributed or heavyweight tech with no requirement behind it
+      3: Some speculative concerns, but the recommendation stays proportionate
+      5: Every concern ties to a REQ, NFR or KB fact
+    evidence: Quote any speculative concern
+    weight: 2
+    hard_fail: false
+    status: advisory

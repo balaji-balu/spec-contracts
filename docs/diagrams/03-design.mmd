@@ -1,0 +1,29 @@
+sequenceDiagram
+  autonumber
+  actor ARCH as Architect (senior)
+  participant UI as UI (thin client)
+  participant REC as Reconciler (orchestrator)
+  participant GIT as Git / PR (workflow state)
+  participant AGENT as pi agent (one per step)
+  participant DDD as DDD agent (pi)
+  participant VERIFY as Verify (spec-lint)
+  participant EVAL as Eval judge (rubric + articles)
+  participant KB as Org KB (constitution)
+  Note over ARCH,KB: P3 Design (21–22 Sep)
+  REC->>AGENT: [Design analysis] Round 1
+  AGENT->>KB: [Design analysis] kb_get provider doc v7
+  KB-->>AGENT: Refund API limit - 20 per second
+  AGENT-->>REC: DAF-1 rate-limit risk · DAF-2 duplicates
+  REC->>UI: needs-input - DAF-1 (2 options)
+  ARCH->>UI: /answer DAF-1 - durable refund queue
+  REC->>DDD: ddd-tactical
+  DDD-->>REC: Orders, Refunds aggregates · cml_check ✓
+  REC->>AGENT: [Design generation] Create
+  AGENT-->>REC: DES-1..4 · ADR-1 · realizes links
+  REC->>VERIFY: spec-lint
+  VERIFY-->>REC: ✓ Clean · coverage C5–C8 · no boundary violation (D9)
+  REC->>EVAL: Rubric + ART-2..5
+  EVAL-->>REC: ✓ Pass 0.88
+  REC->>GIT: PR 15 in-review
+  ARCH->>UI: Approves design
+  REC->>GIT: Merge

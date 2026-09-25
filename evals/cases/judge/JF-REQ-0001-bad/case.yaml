@@ -1,0 +1,18 @@
+id: JF-REQ-0001-bad
+suite: judge
+title: Lint-clean but defective requirements; the judge must send them back
+targets: [eval-judge]
+start_at: eval-judge
+stop_after: eval-judge
+inputs:
+  artifacts: [spec/intent.md, spec/requirements-analysis.md, spec/requirements.md, spec/trace.yaml]
+  domain: ../../../../examples/domain
+  constitution: ../../../../examples/org/constitution.md
+expected:
+  verdict: revise
+  judge_verdicts:
+    - {criterion: RQ-1, max_score: 3, why: "AC-001.1 no longer verifies the 'publish to Payments' clause of REQ-001"}
+    - {criterion: RQ-2, max_score: 2, why: "REQ-004 prescribes a Kafka topic with no constraint behind it"}
+    - {criterion: CONST-ART-2, max_score: 2, why: "REQ-002 moves money with no AC for a duplicate trigger"}
+    - {criterion: RQ-3, min_score: 3, max_score: 5, why: "Coverage of goals is otherwise intact. The judge should not penalise everything"}
+notes: Derived from examples/specs/SPEC-0001 with three edits. The whole folder passes spec-lint.

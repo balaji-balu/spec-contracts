@@ -1,0 +1,72 @@
+rubric: intent
+version: 1.0.0
+grounding: "Robertson & Robertson: the work before the product; outcomes over features"
+scale: {1: fails, 2: weak, 3: acceptable, 4: good, 5: exemplary}
+constitution: auto          # adds one CONST-<ART-n> criterion per article whose applies_to includes intent
+criteria:
+  - id: IN-1
+    name: Faithful to the user's words
+    question: Does the artifact capture everything in Raw intent and add nothing the user, the KB or an answered Q did not provide?
+    anchors:
+      1: A stated need is missing, or a goal/constraint appears with no source
+      3: Everything is captured, but one item is reworded so its meaning shifts
+      5: Every GOAL/CON/NG traces to Raw intent, a Q answer or a cited KB doc, with meaning preserved
+    evidence: Quote the Raw intent phrase for each GOAL, or name the item with no source
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: IN-2
+    name: Outcomes, not features
+    question: Are goals outcomes for stakeholders rather than solutions or features?
+    anchors:
+      1: Goals are features ("add a refund button")
+      3: Mostly outcomes, but one goal prescribes a solution
+      5: Every goal is an observable change for a named stakeholder, with no solution implied
+    evidence: Quote each GOAL statement that prescribes a solution
+    weight: 3
+    hard_fail: false
+    status: advisory
+  - id: IN-3
+    name: Boundaries hunted
+    question: Were non-goals and assumptions actively looked for, rather than filled in as boilerplate?
+    anchors:
+      1: The NG/ASM are trivial or generic ("not in scope - other things")
+      3: At least one real NG and one real ASM, but an obvious neighbouring scope is not addressed
+      5: The NGs cut the adjacent scope a reader would most likely assume, and the ASMs carry an honest risk_if_false
+    evidence: Name the adjacent scope you expected and whether an NG covers it
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: IN-4
+    name: Success is measurable and tied to goals
+    question: Could someone decide, with data, whether each must-goal was achieved?
+    anchors:
+      1: No SC for a must-goal, or targets with no number
+      3: Every must-goal has an SC, but a measured_by is vague or not obtainable
+      5: Every SC has a number, a unit, a timeframe and a data source that exists
+    evidence: Quote each SC target and measured_by
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: IN-5
+    name: Asked instead of guessed
+    question: Where the intent was vague about numbers, policies or limits, did the agent ask, or cite the KB, rather than invent?
+    anchors:
+      1: A number or policy appears with no Q answer or KB source
+      3: Key vagueness was asked about, but a secondary number was assumed and not listed as an ASM
+      5: Every number/policy comes from a Q answer or KB citation, and every open vagueness is a Q or an ASM
+    evidence: List each number/policy and its source
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: IN-6
+    name: Stakeholders complete
+    question: Are the affected people, the people who approve and the people who pay all present?
+    anchors:
+      1: The primary user or the approver is missing
+      3: Primary and approver are present, but an affected secondary group is missing
+      5: Every group the goals and constraints mention is a STK with a clear interest
+    evidence: Name any group mentioned in the text but missing from Stakeholders
+    weight: 1
+    hard_fail: false
+    status: advisory

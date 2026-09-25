@@ -1,0 +1,11 @@
+{
+  "artifact": {"kind": "requirements", "id": "SPEC-0001", "version": 1},
+  "rubric": "requirements@1.0.0",
+  "criteria": [
+    {"id": "RQ-1", "score": 2, "evidence": [{"ref": "AC-001.1", "quote": "Then the Order is marked cancelled"}], "rationale": "REQ-001 requires publishing the Cancellation, but no AC checks publication.", "defect": "Add an AC that verifies the Cancellation is published to Payments."},
+    {"id": "RQ-2", "score": 1, "evidence": [{"ref": "REQ-004", "quote": "shall place every Refund on a Kafka topic named refunds.v1"}], "rationale": "Prescribes a technology and a topic name with no constraint behind it.", "defect": "Restate as behaviour, or move the choice to design as an ADR."},
+    {"id": "RQ-3", "score": 4, "evidence": [{"ref": "GOAL-1", "quote": "refunded without contacting support"}], "rationale": "Goals, constraint and resolved findings are all reflected."},
+    {"id": "CONST-ART-2", "score": 2, "evidence": [{"ref": "REQ-002", "quote": "shall issue a Refund of the full captured Payment"}], "rationale": "Moves money but has no AC for a duplicate order-cancelled notice.", "defect": "Add an AC: a duplicate notice produces no second Refund."}
+  ],
+  "verdict": "revise"
+}

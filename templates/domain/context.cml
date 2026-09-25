@@ -1,0 +1,52 @@
+/*---
+artifact: domain-context
+id: domain:<BoundedContext>
+title: <BoundedContext>
+version: 1
+status: draft
+upstream:
+  glossary: {version: 1}
+produced_by:
+  step: ddd-strategic
+  harness: {name: pi, version: <x.y.z>}
+  model: <provider/model-id>
+  prompt: ddd-strategic@1.0.0
+  skills: {contextmapper-ddd: 1.0.0}
+  extensions: {validate_artifact: 1.0.0, cml_check: 1.0.0}
+  template: domain-context@1.0.0
+  run_id: <run-id>
+---*/
+
+// Saved as domain/contexts/<BoundedContext>.cml. Declares exactly ONE BoundedContext (D12).
+//
+// Two layers in one file:
+//   1. Context header (the BoundedContext line, type, domainVisionStatement, responsibilities):
+//      created by ddd-strategic in the requirements phase.
+//   2. Aggregates / entities / value objects / events: added ONLY by ddd-tactical in the
+//      design phase (D15).
+// Element names must match accepted glossary TERMs for this context (or TERM.cml when it differs).
+
+BoundedContext <BoundedContext> implements <Subdomain> {
+  type = FEATURE
+  domainVisionStatement = "<one sentence, business language>"
+  responsibilities = "<Responsibility>", "<Responsibility>"
+
+  // ---- tactical layer (design phase) ----
+  Aggregate <AggregateName> {
+    Entity <RootEntity> {
+      aggregateRoot
+      - <RootEntity>Id id
+      - <ValueObject> <attribute>
+    }
+    ValueObject <RootEntity>Id {
+      String value key
+    }
+    ValueObject <ValueObject> {
+      String <field>
+    }
+    DomainEvent <SomethingHappened> {
+      - <RootEntity>Id id
+      Date occurredAt
+    }
+  }
+}

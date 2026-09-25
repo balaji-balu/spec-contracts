@@ -1,0 +1,19 @@
+id: SD-RA-0001-refund
+suite: seeded
+title: Requirements analysis on an intent with five planted defects
+targets: [req-analysis]
+start_at: req-analysis
+stop_after: req-analysis
+inputs:
+  artifacts: [inputs/intent.md]
+  domain: ../../../../examples/domain
+  constitution: ../../../../examples/org/constitution.md
+  kb: [../../golden/G-0001-refund/inputs/kb/finance-refund-policy.md, ../../golden/G-0001-refund/inputs/kb/payments-provider-integration.md]
+sim_reviewer:
+  fallback: defer        # nobody answers, so every finding stays as raised in round 1
+  approve: never
+expected:
+  findings: expected.yaml
+notes: >-
+  The input intent is lint-clean (verify passes). Every defect is semantic.
+  fixtures/sample-run is one plausible agent output, used to test the scorer. The expected result is in fixtures/sample-run/EXPECTED-SCORE.md.

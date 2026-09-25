@@ -1,0 +1,351 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0"><title>Spec Pipeline Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --band:#E8EBE6; --grp:rgba(62,74,68,.035);
+  --ink:#18211D; --ink2:#46524C; --muted:#78837D; --line:#C9D0CB;
+  --sys:#2B6A8A; --sys-t:#E1EDF3; --human:#A15F12; --human-t:#F7EBDA;
+  --agent:#6450A6; --agent-t:#ECE8F6; --on-agent:#FFFFFF; --gate:#3E4A44; --gate-t:#E5E9E6;
+  --kb:#357652; --kb-t:#E1EFE6; --pass:#2B7A47; --pass-t:#E0F0E5; --fail:#B2352D; --fail-t:#F8E1DE;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111513; --surface:#1A201D; --band:#1F2623; --grp:rgba(174,185,179,.04);
+    --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+    --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --human-t:#33281A;
+    --agent:#AA99E2; --agent-t:#29243A; --on-agent:#15121F; --gate:#B0BBB5; --gate-t:#252C28;
+    --kb:#7DC79C; --kb-t:#1C2F24; --pass:#6CC58C; --pass-t:#1B2F22; --fail:#EE7C71; --fail-t:#3A1F1C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111513; --surface:#1A201D; --band:#1F2623; --grp:rgba(174,185,179,.04);
+  --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+  --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --human-t:#33281A;
+  --agent:#AA99E2; --agent-t:#29243A; --on-agent:#15121F; --gate:#B0BBB5; --gate-t:#252C28;
+  --kb:#7DC79C; --kb-t:#1C2F24; --pass:#6CC58C; --pass-t:#1B2F22; --fail:#EE7C71; --fail-t:#3A1F1C;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto}
+header{padding-block:44px 28px;border-bottom:1px solid var(--line)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.06em;color:var(--sys);text-transform:uppercase}
+h1{font:800 clamp(34px,6vw,54px)/1.02 var(--display);font-stretch:82%;letter-spacing:-.01em;margin:14px 0 14px;text-wrap:balance}
+.lede{max-width:66ch;color:var(--ink2);font-size:17px;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin:26px 0 0;padding:0;list-style:none}
+.facts li{display:flex;flex-direction:column;gap:2px}
+.facts b{font:600 22px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.facts span{font-size:12px;color:var(--muted)}
+.facts .f-next b{color:var(--sys)}
+section.block{padding-block:40px 8px}
+h2{font:750 26px/1.15 var(--display);font-stretch:88%;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--ink2);max-width:70ch;margin:0 0 20px}
+.principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 26px;margin:0;padding:0;list-style:none}
+.principles li{padding-left:14px;border-left:2px solid var(--sys);font-size:14px;color:var(--ink2)}
+.principles b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.scroll svg{display:block}
+.hint{font-size:12px;color:var(--muted);margin:8px 2px 0}
+/* flow svg */
+svg text{font-family:var(--body)}
+.fl rect{stroke-width:1.3}
+.fl.done rect{fill:var(--pass-t);stroke:var(--pass)} .fl.done .fc{fill:var(--pass)}
+.fl.next rect{fill:var(--sys-t);stroke:var(--sys);stroke-width:2.2} .fl.next .fc{fill:var(--sys)}
+.fl.plan rect{fill:var(--surface);stroke:var(--line)} .fl.plan .fc{fill:var(--muted)}
+.fl.side rect{fill:var(--agent-t);stroke:var(--agent)} .fl.side .fc{fill:var(--agent)}
+.fl.later rect{fill:var(--band);stroke:var(--line);stroke-dasharray:4 4} .fl.later .fc{fill:var(--muted)}
+.fc{font:500 11px var(--mono)}
+.ft{font-size:13.5px;font-weight:600;fill:var(--ink)}
+.fs{font-size:11px;fill:var(--ink2)}
+.fa{fill:none;stroke:var(--ink2);stroke-width:1.4}
+.fa.dash{stroke-dasharray:5 4;stroke:var(--muted)}
+.mk{fill:var(--ink2)} .mk2{fill:var(--muted)}
+.now{font:600 10.5px var(--mono);fill:var(--sys);letter-spacing:.08em}
+/* milestones */
+.ms{display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;display:grid;gap:14px}
+.card.next{border-color:var(--sys);box-shadow:0 0 0 1px var(--sys) inset}
+.card-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.code{font:500 13px var(--mono);color:var(--sys)}
+.card h3{font:750 21px/1.2 var(--display);font-stretch:88%;margin:0}
+.pill{font:500 10.5px/1 var(--mono);padding:4px 8px;border-radius:10px;letter-spacing:.03em}
+.p-done{background:var(--pass-t);color:var(--pass)} .p-next{background:var(--sys-t);color:var(--sys)} .p-plan{background:var(--band);color:var(--muted)} .p-side{background:var(--agent-t);color:var(--agent)}
+.effort{margin-left:auto;font:400 12px var(--mono);color:var(--muted)}
+.proves{margin:0;color:var(--ink2);max-width:74ch}
+.proves b{color:var(--ink);font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 28px}
+.cols h4{font:600 11px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.cols ul{margin:0;padding-left:18px;font-size:14px;color:var(--ink2)}
+.cols li{margin:3px 0}
+.cols li::marker{color:var(--line)}
+.exit li::marker{content:"✓  ";color:var(--pass)}
+.people{font-size:13px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-wrap:wrap;gap:6px 22px}
+.people b{color:var(--human);font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tablewrap{overflow-x:auto}
+th,td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.m{font-family:var(--mono);white-space:nowrap;color:var(--sys)}
+code{font:13px var(--mono);color:var(--ink)}
+.later{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 24px;margin:0;padding:0;list-style:none}
+.later li{font-size:14px;color:var(--ink2)}
+.later b{display:block;color:var(--ink);font-weight:600}
+.note{font-size:13px;color:var(--muted);max-width:74ch}
+:focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">spec-contracts · intent → requirements → design</div>
+  <h1>Spec Pipeline Roadmap</h1>
+  <p class="lede">How the pipeline goes from contracts on paper to specs your teams build from. Each milestone is a thin slice
+  that ends in something running and evaluated on real cases, so every step can change the next. Nothing is built that
+  can't yet be measured.</p>
+  <ul class="facts">
+    <li><b>7</b><span>milestones, M0–M6</span></li>
+    <li><b>1</b><span>done (M0 contracts + evals)</span></li>
+    <li class="f-next"><b>M1</b><span>next: one real agent</span></li>
+    <li><b>6</b><span>decisions to make along the way</span></li>
+  </ul>
+</header>
+
+<section class="block" id="principles">
+  <h2>How the roadmap is cut</h2>
+  <ul class="principles">
+    <li><b>Riskiest judgment first</b>Requirements analysis is the step most likely to be wrong and the cheapest to measure, since seeded recall needs no human. So it goes first.</li>
+    <li><b>Every milestone ends in an eval</b>Exit criteria are suite results from <code>evals/thresholds.yaml</code>, not "feature complete".</li>
+    <li><b>Humans are budgeted</b>BA and architect time goes to labelling and approvals, and it is named in each milestone so it can be planned.</li>
+    <li><b>Decide when first needed</b>Open decisions carry the milestone that forces them. Until then they stay open.</li>
+  </ul>
+</section>
+
+<section class="block" id="flow">
+  <h2>Sequence</h2>
+  <p class="sub">The critical path runs M1 → M3 → M4 → M5 → M6. M2, the judge, runs alongside M1 because the requirements phase can't gate on a judge nobody has calibrated.</p>
+  <div class="scroll">
+<svg viewBox="0 0 1040 300" width="1040" height="300" role="img" aria-labelledby="flow-t" xmlns="http://www.w3.org/2000/svg">
+  <title id="flow-t">Milestone dependencies from M0 to M6 and the later platform horizon</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk"/></marker>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk2"/></marker>
+  </defs>
+  <g class="fl done"><rect x="16" y="40" width="130" height="76" rx="10"/><text x="30" y="62" class="fc">M0 · DONE</text><text x="30" y="84" class="ft">Contracts</text><text x="30" y="102" class="fs">+ eval harness</text></g>
+  <text x="166" y="30" class="now">NOW ▾</text>
+  <g class="fl next"><rect x="166" y="40" width="140" height="76" rx="10"/><text x="180" y="62" class="fc">M1 · NEXT</text><text x="180" y="84" class="ft">One real agent</text><text x="180" y="102" class="fs">req-analysis on pi</text></g>
+  <g class="fl side"><rect x="166" y="170" width="140" height="76" rx="10"/><text x="180" y="192" class="fc">M2 · PARALLEL</text><text x="180" y="214" class="ft">Trusted judge</text><text x="180" y="232" class="fs">calibration round 1</text></g>
+  <g class="fl plan"><rect x="330" y="40" width="150" height="76" rx="10"/><text x="344" y="62" class="fc">M3</text><text x="344" y="84" class="ft">Requirements</text><text x="344" y="102" class="fs">phase end to end · reconciler v0</text></g>
+  <g class="fl plan"><rect x="504" y="40" width="140" height="76" rx="10"/><text x="518" y="62" class="fc">M4</text><text x="518" y="84" class="ft">Design phase</text><text x="518" y="102" class="fs">+ back-edges</text></g>
+  <g class="fl plan"><rect x="668" y="40" width="140" height="76" rx="10"/><text x="682" y="62" class="fc">M5</text><text x="682" y="84" class="ft">Pilot</text><text x="682" y="102" class="fs">real specs, one team</text></g>
+  <g class="fl plan"><rect x="832" y="40" width="190" height="76" rx="10"/><text x="846" y="62" class="fc">M6</text><text x="846" y="84" class="ft">Execution handoff</text><text x="846" y="102" class="fs">plan → code → QA, lagging loop</text></g>
+  <g class="fl later"><rect x="504" y="170" width="518" height="100" rx="12"/><text x="520" y="194" class="fc">LATER · PLATFORM HORIZON</text>
+    <text x="520" y="218" class="fs">Control plane · Typegraph KG as trace store · product loop (drift)</text>
+    <text x="520" y="238" class="fs">Reverse engineering (code → spec) · live C4 views · multi-team domain</text>
+    <text x="520" y="258" class="fs">Enterprise level (deferred by choice)</text></g>
+  <path class="fa" d="M146 78 H160" marker-end="url(#ar)"/>
+  <path class="fa" d="M306 78 H324" marker-end="url(#ar)"/>
+  <path class="fa" d="M480 78 H498" marker-end="url(#ar)"/>
+  <path class="fa" d="M644 78 H662" marker-end="url(#ar)"/>
+  <path class="fa" d="M808 78 H826" marker-end="url(#ar)"/>
+  <path class="fa" d="M130 116 V208 H160" marker-end="url(#ar)"/>
+  <path class="fa" d="M306 208 H405 V122" marker-end="url(#ar)"/>
+  <text x="314" y="228" class="fs">the gate needs a calibrated judge</text>
+  <path class="fa dash" d="M927 116 V164" marker-end="url(#ar2)"/>
+</svg>
+  </div>
+  <p class="hint">Scroll sideways on narrow screens.</p>
+</section>
+
+<section class="block" id="milestones">
+  <h2>Milestones</h2>
+  <p class="sub">Effort figures are rough, in focused weeks for two engineers. They're there to size the milestones against each other, not to commit to dates.</p>
+  <div class="ms">
+
+  <article class="card">
+    <div class="card-h"><span class="code">M0</span><h3>Contracts and eval harness</h3><span class="pill p-done">done</span><span class="effort">this conversation</span></div>
+    <p class="proves"><b>Proves</b> the pipeline can be specified precisely enough to verify mechanically and evaluate consistently.</p>
+    <div class="cols">
+      <div><h4>Delivered</h4><ul>
+        <li>Header schema, block grammar, 60+ validation rules, reconciler workflow</li>
+        <li>Templates, AGENTS.md, sample constitution, SPEC-0001 worked example</li>
+        <li>Scenario walkthrough (page, Excalidraw, Mermaid)</li>
+        <li>Eval design, 5 rubrics, judge contract, thresholds, 7 cases</li>
+        <li>Prototype linter and scorer (Python)</li>
+      </ul></div>
+      <div><h4>Carried forward</h4><ul>
+        <li>D6, D7 and D8–D13 are still "proposed"</li>
+        <li>Prototypes are throwaway. The real tools are TypeScript pi extensions</li>
+        <li>Nothing has run against a real model yet</li>
+      </ul></div>
+    </div>
+  </article>
+
+  <article class="card next">
+    <div class="card-h"><span class="code">M1</span><h3>One real agent</h3><span class="pill p-next">next</span><span class="effort">≈ 2–3 weeks</span></div>
+    <p class="proves"><b>Proves</b> a pi agent can do real requirements analysis inside the contracts, and that we can measure how well it does. No reconciler yet: the agent is driven straight from the pi SDK.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li><code>spec-lint</code> in TypeScript: the full rule set, git-aware pins (H3/H4), shipped both as the <code>validate_artifact</code> pi extension and as a CLI</li>
+        <li>pi extensions: <code>trace_link</code>, <code>term_lookup</code>, and <code>kb_search</code>/<code>kb_get</code> over a file-based KB</li>
+        <li>req-analysis prompt and skill, AGENTS.md, and the first <code>pipeline.lock.yaml</code></li>
+        <li>litellm gateway in front of every call, with traces and cost per run</li>
+        <li>Scorer ported to TypeScript and a suite runner for k = 3</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>SD-RA-0001 at release thresholds: blocker recall 1.0 and recall.all ≥ 0.85, worst of 3 runs</li>
+        <li>One more seeded case written from a real past spec</li>
+        <li>A baseline report committed, with cost and tokens per run</li>
+        <li>Lint prototype retired</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>BA</b> ≈ ½ day: write the second seeded case from a spec they know went wrong</span><span><b>Decide:</b> generator model, KB location</span></div>
+  </article>
+
+  <article class="card">
+    <div class="card-h"><span class="code">M2</span><h3>A judge you can trust</h3><span class="pill p-side">parallel with M1</span><span class="effort">≈ 1–2 weeks + labelling</span></div>
+    <p class="proves"><b>Proves</b> the eval gate's scores agree with your BA and architect well enough to block on, starting with the requirements rubrics.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li>Judge pi session: rubric loader, constitution articles turned into criteria, output validated against the schema</li>
+        <li>Labelling sheet: artifacts stripped of provenance, scored blind with the same anchors</li>
+        <li>Calibration report: κ per criterion, bias checks, advisory or calibrated status</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>JF-REQ-0001 sent back and JF-REQ-0002 passed, 3 runs out of 3</li>
+        <li>RQ-1, RQ-3 and CONST-ART-2 calibrated (κ ≥ 0.6 and ≥ 0.8 × human ceiling)</li>
+        <li>Every other criterion recorded as advisory, with its κ</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>BA + architect</b> ≈ 2 days each: label 30 requirements and 30 requirements-analysis artifacts</span><span><b>Decide:</b> judge model (must differ from the generator)</span></div>
+  </article>
+
+  <article class="card">
+    <div class="card-h"><span class="code">M3</span><h3>Requirements phase, end to end</h3><span class="pill p-plan">planned</span><span class="effort">≈ 4–6 weeks</span></div>
+    <p class="proves"><b>Proves</b> the reconciler can carry a spec from the user's words to approved requirements with real PRs, real people and the gates in place.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li>Reconciler v0: state derivation, next-step rules 0–11, branches and PRs, commit trailers, loop limits</li>
+        <li>Comment commands (<code>/answer</code>, <code>/accept-risk</code>, <code>/revise</code>…) and CODEOWNERS gates</li>
+        <li>Intent agent over pi RPC with <code>ask_user</code>. The first UI is PR comments plus a chat CLI</li>
+        <li>DDD agent (strategic) with <code>cml_check</code> running ContextMapper in CI</li>
+        <li>Eval mode with the simulated reviewer</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>G-0001 through requirements: ref_coverage ≥ 0.85, must_miss 0</li>
+        <li>CS-0001 req_stability ≥ 0.75. ADV-0001 passes every assertion</li>
+        <li>One new real spec, not the refund case, taken to approved requirements with your BA</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>BA</b> ≈ 1 day: drive a real spec through PRs</span><span><b>Decide:</b> git host, one PR per phase vs per spec (D7), stale pins block or warn</span></div>
+  </article>
+
+  <article class="card">
+    <div class="card-h"><span class="code">M4</span><h3>Design phase</h3><span class="pill p-plan">planned</span><span class="effort">≈ 3–4 weeks</span></div>
+    <p class="proves"><b>Proves</b> the pipeline produces designs an architect approves, keeps the boundaries intact, and can send problems back to requirements.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li>Design-analysis, DDD (tactical) and design-generation agents</li>
+        <li>Back-edges: <code>/confirm</code>, blocked-by labels, change-request mode, re-run on stale pins</li>
+        <li>Boundary check (D9) and CML generators (PlantUML) for review</li>
+        <li>Design and design-analysis rubrics calibrated with the architect</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>SD-DA-0001 at release thresholds, including the rate-limit trap</li>
+        <li>SPEC-0001 fully regenerated by the pipeline and approved by the architect</li>
+        <li>One back-edge exercised end to end on a case</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>Architect</b> ≈ 2–3 days: labelling plus approving real designs</span><span><b>Decide:</b> domain/ ownership model (D6)</span></div>
+  </article>
+
+  <article class="card">
+    <div class="card-h"><span class="code">M5</span><h3>Pilot with one team</h3><span class="pill p-plan">planned</span><span class="effort">≈ 4–6 weeks, mostly calendar</span></div>
+    <p class="proves"><b>Proves</b> the pipeline helps on real work, with the runtime gate live, a thin UI, and costs within budget.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li>UI v1: a thin client with the artifact, findings and metrics panes, where buttons map to PR actions</li>
+        <li>Metrics dashboard over <code>metrics.json</code> and the litellm traces</li>
+        <li>Monthly drift re-labelling for the judge</li>
+        <li>Suites grown from pilot misses</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>3–5 real specs approved through the pipeline</li>
+        <li>BA and architect time-to-approve measured and accepted</li>
+        <li>Cost and wall time within <code>budgets</code></li>
+        <li>Pilot retro, with D6–D13 settled</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>One team</b>: BA, architect, 2–3 requesters</span><span><b>Decide:</b> promote the proposed decisions, or change them</span></div>
+  </article>
+
+  <article class="card">
+    <div class="card-h"><span class="code">M6</span><h3>Execution handoff and the lagging loop</h3><span class="pill p-plan">planned</span><span class="effort">≈ 6–8 weeks</span></div>
+    <p class="proves"><b>Proves</b> good-scoring specs actually lead to less rework, which closes the measurement loop you asked for at the start.</p>
+    <div class="cols">
+      <div><h4>Build</h4><ul>
+        <li>Plan → code → QA consumes only tagged specs and adds <code>implements</code>/<code>tests</code> links</li>
+        <li>Lagging signals attributed to IDs: clarification requests, spec-rooted rework, escaped defects</li>
+        <li>Correlation report between leading metrics and lagging-signal density</li>
+        <li>Flywheel: every spec-rooted miss proposes a seeded case</li>
+      </ul></div>
+      <div class="exit"><h4>Exit criteria</h4><ul>
+        <li>Pilot specs implemented through the loop</li>
+        <li>First evidence of which leading metrics predict rework, and which ones to drop</li>
+        <li>At least 5 curated cases added from real misses</li>
+      </ul></div>
+    </div>
+    <div class="people"><span><b>QA lead</b>: root-cause tagging (spec vs code)</span><span><b>Decide:</b> execution harness shape (same reconciler or a separate loop)</span></div>
+  </article>
+  </div>
+</section>
+
+<section class="block" id="decisions">
+  <h2>Decisions and when they're due</h2>
+  <p class="sub">Each one has a current lean and the milestone that forces it.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Decision</th><th>Due</th><th>Options</th><th>Current lean</th></tr></thead>
+    <tbody>
+      <tr><td>Generator model(s) per step</td><td class="m">M1</td><td>One model everywhere, or per step (a stronger model for analysis)</td><td>Per step, all through litellm, chosen by suite results</td></tr>
+      <tr><td>KB location</td><td class="m">M1</td><td>Files in a KB repo · Typegraph · both</td><td>Files first, with Typegraph behind the same <code>kb_search</code> interface later</td></tr>
+      <tr><td>Judge model</td><td class="m">M2</td><td>Any model outside the generator's family</td><td>Pick by calibration κ, not by leaderboard</td></tr>
+      <tr><td>Git host</td><td class="m">M3</td><td>GitHub · GitLab · self-hosted</td><td>Whatever your teams already review in</td></tr>
+      <tr><td>PR granularity (D7)</td><td class="m">M3</td><td>One PR per phase · one per spec with labels</td><td>Per phase, for clean approvals and history</td></tr>
+      <tr><td>Stale pins (H4)</td><td class="m">M3</td><td>Block review · warn only</td><td>Warn during M3 and block from the pilot on</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="risks">
+  <h2>Risks to watch</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Risk</th><th>Early signal</th><th>Response</th></tr></thead>
+    <tbody>
+      <tr><td>Labelling time for BA and architect runs out</td><td>M2 labelling slips past a week</td><td>Calibrate only hard-fail criteria first. Everything else stays advisory</td></tr>
+      <tr><td>Contracts feel heavy to the BA</td><td>Time-to-approve rises and <code>/revise</code> gets used for format issues</td><td>Tune rules to warnings, and let the agent absorb the format while humans judge content</td></tr>
+      <tr><td>ContextMapper toolchain friction in CI</td><td>Java or CLI issues block <code>cml_check</code></td><td>Containerise it once in M3, and fall back to a parse-only check</td></tr>
+      <tr><td>Model updates shift behaviour</td><td>The baseline report moves with no lock change</td><td>Pin model versions in the lock and re-run the suites on any provider update</td></tr>
+      <tr><td><code>domain/</code> merge conflicts across specs</td><td>Escalations from concurrent glossary edits</td><td>Serialise domain changes through the architect, and consider domain-only PRs</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="later">
+  <h2>Later: the platform horizon</h2>
+  <p class="sub">These come from the wider platform vision and follow once the spec pipeline is proven. Each gets its own contracts-first pass.</p>
+  <ul class="later">
+    <li><b>Control plane</b>Policy, permissions, agent registry and governance above the reconciler.</li>
+    <li><b>Typegraph as the trace store</b><code>trace.yaml</code> stays the source, synced into the knowledge graph for querying intent-to-code links.</li>
+    <li><b>Product loop</b>The long-running agent that watches requirements, design and code for drift and flags it to a human.</li>
+    <li><b>Reverse engineering</b>Code → spec, using the same contracts, so existing systems can join the pipeline.</li>
+    <li><b>Live architecture views</b>C4 and deployment diagrams generated from CML and design artifacts.</li>
+    <li><b>Enterprise level</b>Deferred by choice until system and architecture levels are proven.</li>
+  </ul>
+  <p class="note">Effort figures assume two engineers who already know pi and TypeScript. Treat them as relative sizes. Real dates come after M1, once there is a baseline.</p>
+</section>
+</div>
+</body></html>

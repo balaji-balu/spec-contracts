@@ -1,0 +1,56 @@
+/*---
+artifact: domain-context
+id: domain:Payments
+title: Payments
+version: 2
+status: approved
+upstream:
+  glossary: {version: 2}
+produced_by:
+  step: ddd-tactical
+  harness: {name: pi, version: 0.9.0}
+  model: anthropic/claude-sonnet-5
+  prompt: ddd-tactical@1.0.0
+  skills: {contextmapper-ddd: 1.0.0}
+  extensions: {validate_artifact: 1.0.0, cml_check: 1.0.0}
+  template: domain-context@1.0.0
+  run_id: run-0001-11
+approved_by:
+  - {name: arch-ravi, role: architect, at: "2026-09-22T16:40:00+05:30", pr: "#15"}
+---*/
+
+BoundedContext Payments implements PaymentProcessing {
+  type = FEATURE
+  domainVisionStatement = "Captures and returns money, and never needs to understand Orders."
+  responsibilities = "Payments", "Refunds"
+
+  Aggregate Refunds {
+    Entity Refund {
+      aggregateRoot
+      - RefundId id
+      - OrderReference orderReference
+      - PaymentMethod paymentMethod
+      int amountMinor
+      String status
+      int attempts
+    }
+    ValueObject RefundId {
+      String value key
+    }
+    ValueObject OrderReference {
+      String value key
+    }
+    ValueObject PaymentMethod {
+      String providerToken
+    }
+    DomainEvent RefundIssued {
+      - RefundId refundId
+      - OrderReference orderReference
+      Date issuedAt
+    }
+    DomainEvent RefundFailed {
+      - RefundId refundId
+      String reason
+    }
+  }
+}

@@ -1,0 +1,50 @@
+/*---
+artifact: domain-strategic
+id: domain
+title: Strategic domain model
+version: 1
+status: draft
+produced_by:
+  step: ddd-strategic
+  harness: {name: pi, version: <x.y.z>}
+  model: <provider/model-id>
+  prompt: ddd-strategic@1.0.0
+  skills: {contextmapper-ddd: 1.0.0}
+  extensions: {validate_artifact: 1.0.0, cml_check: 1.0.0}
+  template: domain-strategic@1.0.0
+  run_id: <run-id>
+---*/
+
+// Strategic layer: subdomains + context map. Owns BOUNDARIES.
+// Each BoundedContext is declared exactly once, in contexts/<Context>.cml, and imported here
+// (CML rejects duplicate BoundedContext names).
+// Adding/removing an import, a Subdomain or a relationship = a boundary change = bump of this file.
+
+import "./contexts/<UpstreamContext>.cml"
+import "./contexts/<DownstreamContext>.cml"
+
+Domain <DomainName> {
+  domainVisionStatement = "<one sentence>"
+
+  Subdomain <CoreSubdomain> {
+    type = CORE_DOMAIN
+    domainVisionStatement = "<one sentence>"
+  }
+
+  Subdomain <SupportingSubdomain> {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "<one sentence>"
+  }
+}
+
+ContextMap <DomainName>Map {
+  type = SYSTEM_LANDSCAPE
+  state = TO_BE
+
+  contains <UpstreamContext>, <DownstreamContext>
+
+  // The arrow points upstream -> downstream. Roles: OHS/PL upstream, ACL/CF downstream.
+  <UpstreamContext> [U,OHS,PL]->[D,ACL] <DownstreamContext> {
+    implementationTechnology = "<e.g. domain events>"
+  }
+}

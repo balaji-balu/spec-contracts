@@ -1,0 +1,45 @@
+sequenceDiagram
+  autonumber
+  actor BA as BA (business analyst)
+  actor ARCH as Architect (senior)
+  participant UI as UI (thin client)
+  participant REC as Reconciler (orchestrator)
+  participant GIT as Git / PR (workflow state)
+  participant AGENT as pi agent (one per step)
+  participant DDD as DDD agent (pi)
+  participant VERIFY as Verify (spec-lint)
+  participant EVAL as Eval judge (rubric + articles)
+  Note over BA,EVAL: P2 Requirements (19–20 Sep)
+  REC->>AGENT: [Req analysis] Round 1
+  AGENT-->>REC: RAF-1..4 · RAF-4 boundary is a blocker
+  REC->>VERIFY: spec-lint
+  VERIFY-xREC: ✕ Gate F1 - blocker RAF-4 still open
+  par In parallel - route - ddd and route - human findings resolve at the same time
+  REC->>DDD: ddd-strategic for RAF-2, RAF-4
+  DDD-->>REC: Refund, Order Reference · Ordering → Payments map
+  REC->>UI: needs-input - RAF-1
+  BA->>UI: /answer RAF-1 - whole Order only
+  end
+  REC->>AGENT: [Req analysis] Round 2
+  AGENT-->>REC: No new findings · ART-2, ART-5 apply
+  REC->>AGENT: [Req generation] Create (attempt 1)
+  AGENT-->>REC: requirements.md + trace links
+  loop Verify → repair - deterministic · ≤ 3 attempts
+  REC->>VERIFY: spec-lint
+  VERIFY-xREC: ✕ L5 'quickly' · D5 'reimbursement' · L2 two 'shall'
+  REC->>AGENT: [Req generation] Repair (attempt 2) with error list
+  REC->>VERIFY: spec-lint
+  VERIFY-->>REC: ✓ Clean
+  end
+  loop Eval → revise - judgment · ≤ 2 retries
+  REC->>EVAL: Rubric + ART-2, ART-5
+  EVAL-xREC: ✕ ART-2 - REQ-002 has no duplicate-trigger AC
+  REC->>AGENT: [Req generation] Revise with judge rationale
+  AGENT-->>REC: Adds AC-002.2 (no second Refund)
+  REC->>EVAL: Re-verify + re-eval
+  EVAL-->>REC: ✓ Pass 0.91
+  end
+  REC->>GIT: PR 12 in-review · BA + architect (domain/ changed)
+  ARCH->>UI: Approves domain changes
+  BA->>UI: Approves requirements
+  REC->>GIT: Merge · glossary v2 on main

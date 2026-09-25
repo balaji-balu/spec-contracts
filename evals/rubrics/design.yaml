@@ -1,0 +1,83 @@
+rubric: design
+version: 1.0.0
+grounding: "Ousterhout (deep modules, information hiding); Evans (model integrity, ACL); Ford (fitness functions, evolvability)"
+scale: {1: fails, 2: weak, 3: acceptable, 4: good, 5: exemplary}
+constitution: auto
+criteria:
+  - id: DS-1
+    name: Requirements genuinely realized
+    question: For each must-REQ, does the linked DES actually achieve it, including its ACs, not merely link to it?
+    anchors:
+      1: A must-REQ's AC can't be satisfied by the linked elements
+      3: Achieved, but one AC depends on an unstated behaviour
+      5: Walking each AC through the DES shows how it is satisfied
+    evidence: Walk the hardest AC through the design
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: DS-2
+    name: Deep modules
+    question: Does each component hide significant complexity behind a small interface, with no pass-through or shallow components?
+    anchors:
+      1: Several shallow components that just forward calls, or leaky interfaces exposing internals
+      3: Mostly deep, with one shallow or leaky element
+      5: Every component has a simple interface over substantial hidden decisions
+    evidence: Name the shallowest element and what it hides
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: DS-3
+    name: Model integrity
+    question: Do aggregates enforce real invariants, do contexts keep their own language, and are translations at the boundary (ACL/OHS) where the map says?
+    anchors:
+      1: One context uses another's model directly, or an aggregate has no invariant
+      3: Sound, with one invariant stated only in prose
+      5: Every invariant sits in one aggregate, and every boundary crossing is a published contract with its translation
+    evidence: Name each aggregate's invariant and each boundary crossing
+    weight: 3
+    hard_fail: false
+    status: advisory
+  - id: DS-4
+    name: NFRs have tactics and fitness functions
+    question: Does every NFR have a design tactic and a way to verify it continuously (a fitness function)?
+    anchors:
+      1: An NFR has no tactic
+      3: Tactics exist, but no NFR can be verified continuously
+      5: Every NFR has a tactic and a named automated check (metric, alert, test)
+    evidence: For each NFR, name the tactic and its check
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: DS-5
+    name: Decisions recorded
+    question: Are significant, hard-to-reverse choices captured as ADRs with real alternatives and consequences?
+    anchors:
+      1: A significant choice (storage, integration style, queueing) appears with no ADR
+      3: ADRs exist, with thin consequences
+      5: Every one-way-door decision has an ADR whose consequences include its cost
+    evidence: List the significant choices and their ADRs
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: DS-6
+    name: Proportionate and evolvable
+    question: Is the design as simple as the requirements allow, and easy to change in the directions the intent suggests?
+    anchors:
+      1: Speculative generality or distributed machinery (brokers, microservices) without a requirement
+      3: Mostly proportionate, with one component that isn't needed yet
+      5: Nothing unjustified, and the likely next change touches one context
+    evidence: Name any element without a requirement behind it
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: DS-7
+    name: Failure and operability
+    question: Are failure modes, retries, idempotency and observability designed, not assumed?
+    anchors:
+      1: The failure path for a must-REQ is undesigned
+      3: Designed, but with no observability for it
+      5: Every failure path has handling, a signal and an owner
+    evidence: Walk one failure path end to end
+    weight: 2
+    hard_fail: false
+    status: advisory

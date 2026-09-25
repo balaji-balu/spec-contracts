@@ -1,0 +1,41 @@
+# Starting values. They are proposals to tune once there is calibration data and baseline reports.
+
+runtime:                     # eval gate, per artifact, per run
+  weighted_score_floor:      # normalised 0..1, calibrated criteria only
+    intent: 0.70
+    requirements-analysis: 0.70
+    requirements: 0.75
+    design-analysis: 0.70
+    design: 0.75
+  hard_fail_max_score: 2     # any hard_fail criterion scoring <= this fails the gate
+  revise_retries: 2          # also in pipeline.lock.yaml limits
+
+release:                     # offline suites, per agent step, worst of k runs for hard rules
+  k_runs: 3
+  req-analysis:
+    seeded:      {recall.blocker: 1.0, recall.all: 0.85, severity_accuracy: 0.8, route_accuracy: 0.8, noise_max: 0.35}
+    adversarial: {assertions: 1.0}
+    consistency: {finding_stability: 0.7}
+  design-analysis:
+    seeded:      {recall.blocker: 1.0, recall.all: 0.8, severity_accuracy: 0.8, route_accuracy: 0.8, noise_max: 0.4}
+    adversarial: {assertions: 1.0}
+  req-generation:
+    golden:      {ref_coverage: 0.85, must_miss: 0, ac_coverage: 0.75, repair_attempts_mean_max: 1.0, eval_retries_mean_max: 1.0}
+    consistency: {req_stability: 0.75, score_spread_max: 0.15}
+  design-generation:
+    golden:      {ref_coverage: 0.8, must_miss: 0, boundary_violations: 0}
+  intent:
+    golden:      {goal_coverage_vs_ref: 0.9, questions_asked_min: 1, unanswered_numbers: 0}
+    consistency: {goal_stability: 0.8}
+    adversarial: {assertions: 1.0}
+  eval-judge:
+    judge:       {verdict_accuracy: 0.9, hard_fail_catch: 1.0}
+
+regression:                  # vs the baseline report on main
+  max_drop: 0.05             # any metric mean
+  never_regress: [recall.blocker, must_miss, hard_fail_catch, assertions]
+
+budgets:                     # per case run, from litellm traces; exceeding them is a warning, not a failure
+  tokens_per_spec_max: 1500000
+  cost_usd_per_spec_max: 6.0
+  wall_minutes_per_spec_max: 45

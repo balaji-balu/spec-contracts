@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/spec-contracts/header.schema.json",
+  "title": "Artifact header",
+  "description": "YAML frontmatter carried by every artifact. Markdown artifacts use '---' frontmatter; CML files carry the same YAML inside a leading '/*--- ... ---*/' comment; trace.yaml carries it under the top-level 'header' key.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact",
+    "id",
+    "version",
+    "status",
+    "produced_by"
+  ],
+  "properties": {
+    "artifact": {
+      "enum": [
+        "intent",
+        "requirements-analysis",
+        "requirements",
+        "design-analysis",
+        "design",
+        "trace",
+        "glossary",
+        "domain-strategic",
+        "domain-context",
+        "constitution"
+      ]
+    },
+    "id": {
+      "description": "SPEC-nnnn for spec artifacts; 'domain' for glossary/domain-strategic; 'domain:<BoundedContext>' for domain-context. 'org' for the constitution.",
+      "type": "string",
+      "pattern": "^(SPEC-[0-9]{4}|domain|domain:[A-Z][A-Za-z0-9]*|org)$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "version": {
+      "description": "Monotonic per artifact. Bumped by the reconciler on every approved change, never by an agent.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "in-review",
+        "approved",
+        "superseded"
+      ]
+    },
+    "round": {
+      "description": "Analysis artifacts only: analyse→resolve iteration counter (reconciler-managed).",
+      "type": "integer",
+      "minimum": 1
+    },
+    "upstream": {
+      "description": "Exact versions this artifact was built from. Keys are artifact kinds; domain-context keys are 'domain-context:<Name>'.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(constitution|intent|requirements-analysis|requirements|design-analysis|design|glossary|domain-strategic|domain-context:[A-Z][A-Za-z0-9]*)$": {
+          "$ref": "#/$defs/pin"
+        }
+      }
+    },
+    "produced_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step",
+        "harness",
+        "model",
+        "prompt",
+        "template",
+        "run_id"
+      ],
+      "properties": {
+        "step": {
+          "enum": [
+            "intent",
+            "ddd-seed",
+            "req-analysis",
+            "ddd-strategic",
+            "req-generation",
+            "design-analysis",
+            "ddd-tactical",
+            "design-generation",
+            "reconciler",
+            "human",
+            "ui"
+          ]
+        },
+        "harness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "const": "pi"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "model": {
+          "type": "string",
+          "description": "Provider-qualified model id, e.g. anthropic/<model-id>."
+        },
+        "prompt": {
+          "$ref": "#/$defs/versionedRef",
+          "description": "pi prompt template name@semver."
+        },
+        "skills": {
+          "type": "object",
+          "description": "pi skills loaded for the step, name → semver.",
+          "additionalProperties": {
+            "$ref": "#/$defs/semver"
+          }
+        },
+        "extensions": {
+          "type": "object",
+          "description": "pi extensions (tools) loaded for the step, name → semver.",
+          "additionalProperties": {
+            "$ref": "#/$defs/semver"
+          }
+        },
+        "template": {
+          "$ref": "#/$defs/versionedRef",
+          "description": "Artifact template name@semver."
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Reconciler run id; the pi session JSONL is stored under this id outside git."
+        },
+        "context_files": {
+          "type": "object",
+          "description": "pi context files loaded into the session (AGENTS.md at each level), path → short sha256. Pinned like skills.",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{12,64}$"
+          }
+        }
+      }
+    },
+    "approved_by": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "role",
+          "at",
+          "pr"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "ba",
+              "architect",
+              "product-owner"
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pr": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "supersedes": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Previous version this one replaces."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "approved"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "approved_by"
+        ],
+        "properties": {
+          "approved_by": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "artifact": {
+            "enum": [
+              "requirements-analysis",
+              "design-analysis"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "round",
+          "upstream"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "artifact": {
+            "enum": [
+              "requirements",
+              "design",
+              "trace"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "upstream"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "artifact": {
+            "enum": [
+              "intent",
+              "requirements-analysis",
+              "requirements",
+              "design-analysis",
+              "design"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "upstream"
+        ],
+        "properties": {
+          "upstream": {
+            "required": [
+              "constitution"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "versionedRef": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+@[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

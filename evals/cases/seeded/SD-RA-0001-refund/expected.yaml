@@ -1,0 +1,37 @@
+# Planted defects in inputs/intent.md. The analysis agent should raise a finding for each one.
+# Matching rules: scoring.md §A.
+findings:
+  - id: EF-1
+    about: GOAL-2 (store credit / voucher) conflicts with CON-1 and the finance policy (refund to the original method only)
+    types: [conflict, constitution-conflict]
+    affects_any: [GOAL-2, CON-1]
+    min_severity: blocker
+    routes: [human]
+  - id: EF-2
+    about: GOAL-3 keeps full card numbers on file, which violates ART-5 (personal data minimisation) and card-scheme rules
+    types: [constitution-conflict, conflict]
+    affects_any: [GOAL-3]
+    min_severity: blocker
+    routes: [human]
+  - id: EF-3
+    about: SC-1 target "a significant improvement" is not measurable, and no baseline is given
+    types: [untestable, ambiguity]
+    affects_any: [SC-1]
+    min_severity: major
+    routes: [human]
+  - id: EF-4
+    about: '"Before it ships" is ambiguous for Orders that ship in several Shipments (partly shipped Orders)'
+    types: [ambiguity, gap]
+    affects_any: [GOAL-1]
+    min_severity: major
+    routes: [human]
+  - id: EF-5
+    about: '"store credit" and "voucher" are used interchangeably and are not in the glossary'
+    types: [terminology]
+    affects_any: [GOAL-2]
+    min_severity: minor
+    routes: [ddd]
+not_defects:
+  # Traps: plausible-looking items that are fine. Flagging them counts as noise.
+  - NG-1 is a legitimate non-goal
+  - ASM-1 is correctly sourced from the KB

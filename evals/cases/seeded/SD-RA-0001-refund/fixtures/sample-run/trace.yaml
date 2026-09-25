@@ -1,0 +1,22 @@
+header:
+  artifact: trace
+  id: SPEC-9001
+  version: 1
+  status: draft
+  upstream:
+    intent: {id: SPEC-9001, version: 1}
+    requirements-analysis: {id: SPEC-9001, version: 1}
+  produced_by:
+    step: reconciler
+    harness: {name: pi, version: 0.9.0}
+    model: none
+    prompt: none@0.0.0
+    template: trace@1.0.0
+    run_id: sample-sd-ra-0001-k1
+links:
+  - {from: RAF-1, rel: affects, to: GOAL-2, by: req-analysis, run: sample-sd-ra-0001-k1}
+  - {from: RAF-1, rel: affects, to: CON-1, by: req-analysis, run: sample-sd-ra-0001-k1}
+  - {from: RAF-2, rel: affects, to: GOAL-3, by: req-analysis, run: sample-sd-ra-0001-k1}
+  - {from: RAF-3, rel: affects, to: SC-1, by: req-analysis, run: sample-sd-ra-0001-k1}
+  - {from: RAF-4, rel: affects, to: GOAL-2, by: req-analysis, run: sample-sd-ra-0001-k1}
+  - {from: RAF-5, rel: affects, to: NG-1, by: req-analysis, run: sample-sd-ra-0001-k1}

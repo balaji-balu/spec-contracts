@@ -1,0 +1,35 @@
+flowchart LR
+  user((User)) --> UI
+  rev((BA / Sr. architect)) --> UI
+  UI["UI<br/>thin client"] -->|commands, chat relay| R
+  subgraph ENG[Orchestrator / engine]
+    R["Reconciler<br/>stateless loop"]
+    V["Verify<br/>spec-lint"]
+    EV["Eval gate<br/>LLM judge"]
+  end
+  R <-->|branches, commits, PRs| GIT[("Git repo<br/>specs/ + domain/<br/>= workflow state")]
+  R -->|one pi session per step| AG
+  R --> V
+  R --> EV
+  subgraph AG[pi agent steps]
+    IA[Intent] --> RA[Requirement analysis] --> RG[Requirement generation] --> DA[Design analysis] --> DG[Design generation]
+    DDD[DDD agent]
+    RA -.->|route: ddd| DDD
+    DA -.->|route: ddd| DDD
+    IA -.->|seed terms| DDD
+  end
+  subgraph CFG[Pinned per step]
+    AGM[AGENTS.md]
+    SK["skill(s)"]
+    TP["template(s)"]
+    PR[prompts]
+  end
+  CFG -.-> AG
+  subgraph KB[Org KB - read only]
+    CON[constitution.md]
+    DOCS[policies, systems, provider docs]
+  end
+  AG -->|kb_search / kb_get| KB
+  EV -.->|scores articles| CON
+  GIT -->|tag SPEC-n ready| EXE["plan → code → QA<br/>execution loop"]
+  EXE -.->|lagging signals| EV

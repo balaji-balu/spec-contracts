@@ -1,0 +1,29 @@
+# Planted defects in inputs/requirements.md (lint-clean). Matching rules: scoring.md §A.
+findings:
+  - id: EF-1
+    about: REQ-101 promises funds in the Customer's account within 1 minute. Settlement is the bank's (Q-1 answer, provider doc), so it is infeasible
+    types: [infeasible, nfr-risk, requirement-change]
+    affects_any: [REQ-101, AC-101.1]
+    min_severity: major
+    routes: [requirements, architect]
+  - id: EF-2
+    about: REQ-004 has Payments read the Ordering database, which violates ART-3 (contexts integrate only through published contracts)
+    types: [constitution-conflict, boundary-challenge, requirement-change]
+    affects_any: [REQ-004, AC-004.1]
+    min_severity: blocker
+    routes: [requirements, architect]
+  - id: EF-3
+    about: REQ-002 moves money but has no AC for a duplicate order-cancelled notice (ART-2), and delivery is at-least-once
+    types: [constitution-conflict, gap, requirement-change]
+    affects_any: [REQ-002, AC-002.1]
+    min_severity: major
+    routes: [requirements, architect]
+  - id: EF-4
+    about: REQ-005 retries forever, which contradicts REQ-003 (alert Finance after 3 rejections) and the finance policy
+    types: [conflict, requirement-change]
+    affects_any: [REQ-005, REQ-003, AC-005.1, AC-003.1]
+    min_severity: major
+    routes: [requirements, architect]
+not_defects:
+  - REQ-102 (refund to the original Payment Method) is correct and sourced from CON-1
+  - The provider rate limit of 20 per second is ample for peak volume (about 3.3 cancellations per second), so rate limiting alone is not a blocker

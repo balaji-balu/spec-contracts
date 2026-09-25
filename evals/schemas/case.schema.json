@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Eval case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "suite", "title", "targets", "inputs", "expected"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^(G|SD-RA|SD-DA|JF-[A-Z]+|CS|ADV)-[0-9]{4}(-[a-z0-9-]+)?$"},
+    "suite": {"enum": ["golden", "seeded", "judge", "consistency", "adversarial"]},
+    "title": {"type": "string"},
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"enum": ["intent", "req-analysis", "ddd-strategic", "req-generation", "design-analysis", "ddd-tactical", "design-generation", "eval-judge"]}
+    },
+    "start_at": {
+      "description": "Step the run starts at. Earlier artifacts come from inputs and are treated as approved.",
+      "enum": ["intent", "req-analysis", "req-generation", "design-analysis", "design-generation", "eval-judge"]
+    },
+    "stop_after": {"enum": ["intent", "req-analysis", "req-generation", "design-analysis", "design-generation", "eval-judge"]},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "raw_intent": {"type": "string"},
+        "raw_intent_variants": {"type": "array", "items": {"type": "string"}, "minItems": 2},
+        "artifacts": {"type": "array", "items": {"type": "string"}, "description": "Paths (relative to the case) of pre-approved spec artifacts"},
+        "domain": {"type": "string", "description": "Path to a domain/ folder (glossary + CML)"},
+        "constitution": {"type": "string"},
+        "kb": {"type": "array", "items": {"type": "string"}, "description": "Paths of KB documents served by kb_search/kb_get"}
+      }
+    },
+    "sim_reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["match", "answer"],
+            "properties": {
+              "match": {"type": "string", "description": "Regex matched against the question or finding text"},
+              "answer": {"type": "string"},
+              "as": {"enum": ["user", "ba", "architect"]}
+            }
+          }
+        },
+        "fallback": {"enum": ["persona", "defer"], "description": "For unscripted questions: an LLM persona answers, or the question is deferred (counted)"},
+        "persona": {"type": "string"},
+        "approve": {"enum": ["after-eval-pass", "never"]}
+      }
+    },
+    "expected": {
+      "type": "object",
+      "description": "Suite-specific. seeded: findings (path to expected.yaml). golden: reference folder + metric floors. judge: criterion verdicts. adversarial: assertions.",
+      "additionalProperties": false,
+      "properties": {
+        "findings": {"type": "string"},
+        "reference": {"type": "string"},
+        "metric_floors": {"type": "object"},
+        "judge_verdicts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["criterion", "max_score"],
+            "properties": {
+              "criterion": {"type": "string"},
+              "max_score": {"type": "integer", "minimum": 1, "maximum": 5},
+              "min_score": {"type": "integer", "minimum": 1, "maximum": 5},
+              "why": {"type": "string"}
+            }
+          }
+        },
+        "verdict": {"enum": ["pass", "revise"]},
+        "assertions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "check"],
+            "properties": {
+              "id": {"type": "string"},
+              "check": {"type": "string", "description": "Machine check expression evaluated by the runner, or 'judge:' + question"},
+              "why": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "notes": {"type": "string"}
+  }
+}

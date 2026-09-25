@@ -1,0 +1,21 @@
+{
+  "case": "SD-RA-0001-refund",
+  "run": "sample-run",
+  "metrics": {
+    "recall.blocker": 0.5,
+    "recall.all": 0.8,
+    "severity_accuracy": 0.75,
+    "route_accuracy": 0.75,
+    "noise": 0.2
+  },
+  "matches": {
+    "EF-1": "RAF-1",
+    "EF-3": "RAF-3",
+    "EF-5": "RAF-4",
+    "EF-2": "RAF-2"
+  },
+  "extras": [
+    "RAF-5"
+  ],
+  "pass": false
+}

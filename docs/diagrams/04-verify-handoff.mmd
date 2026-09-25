@@ -1,0 +1,11 @@
+sequenceDiagram
+  autonumber
+  participant REC as Reconciler (orchestrator)
+  participant GIT as Git / PR (workflow state)
+  participant VERIFY as Verify (spec-lint)
+  participant EVAL as Eval judge (rubric + articles)
+  Note over REC,EVAL: P4 Verify & handoff (22 Sep →)
+  REC->>VERIFY: Whole-spec verify on main
+  VERIFY-->>REC: ✓ C1–C9 ✓ · no stale pins · metrics.json
+  REC->>GIT: Tag SPEC-0001/v1.1-ready
+  GIT-->>EVAL: Execution loop feeds lagging signals back

@@ -1,0 +1,42 @@
+/*---
+artifact: domain-context
+id: domain:Ordering
+title: Ordering
+version: 2
+status: approved
+upstream:
+  glossary: {version: 2}
+produced_by:
+  step: ddd-tactical
+  harness: {name: pi, version: 0.9.0}
+  model: anthropic/claude-sonnet-5
+  prompt: ddd-tactical@1.0.0
+  skills: {contextmapper-ddd: 1.0.0}
+  extensions: {validate_artifact: 1.0.0, cml_check: 1.0.0}
+  template: domain-context@1.0.0
+  run_id: run-0001-11
+approved_by:
+  - {name: arch-ravi, role: architect, at: "2026-09-22T16:40:00+05:30", pr: "#15"}
+---*/
+
+BoundedContext Ordering implements OrderManagement {
+  type = FEATURE
+  domainVisionStatement = "Owns the life of an Order from placement to Shipment or Cancellation."
+  responsibilities = "Orders", "Cancellation"
+
+  Aggregate Orders {
+    Entity Order {
+      aggregateRoot
+      - OrderId id
+      String status
+      Date shippedAt
+    }
+    ValueObject OrderId {
+      String value key
+    }
+    DomainEvent OrderCancelled {
+      - OrderId orderId
+      Date cancelledAt
+    }
+  }
+}

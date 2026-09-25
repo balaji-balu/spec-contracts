@@ -1,0 +1,566 @@
+<title>Spec Pipeline Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --band:#E8EBE6; --grp:rgba(62,74,68,.035);
+  --ink:#18211D; --ink2:#46524C; --muted:#78837D; --line:#C9D0CB;
+  --sys:#2B6A8A; --sys-t:#E1EDF3; --human:#A15F12; --human-t:#F7EBDA;
+  --agent:#6450A6; --agent-t:#ECE8F6; --on-agent:#FFFFFF; --gate:#3E4A44; --gate-t:#E5E9E6;
+  --kb:#357652; --kb-t:#E1EFE6; --pass:#2B7A47; --pass-t:#E0F0E5; --fail:#B2352D; --fail-t:#F8E1DE;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111513; --surface:#1A201D; --band:#1F2623; --grp:rgba(174,185,179,.04);
+    --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+    --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --human-t:#33281A;
+    --agent:#AA99E2; --agent-t:#29243A; --on-agent:#15121F; --gate:#B0BBB5; --gate-t:#252C28;
+    --kb:#7DC79C; --kb-t:#1C2F24; --pass:#6CC58C; --pass-t:#1B2F22; --fail:#EE7C71; --fail-t:#3A1F1C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111513; --surface:#1A201D; --band:#1F2623; --grp:rgba(174,185,179,.04);
+  --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+  --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --human-t:#33281A;
+  --agent:#AA99E2; --agent-t:#29243A; --on-agent:#15121F; --gate:#B0BBB5; --gate-t:#252C28;
+  --kb:#7DC79C; --kb-t:#1C2F24; --pass:#6CC58C; --pass-t:#1B2F22; --fail:#EE7C71; --fail-t:#3A1F1C;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto}
+header{padding-block:44px 28px;border-bottom:1px solid var(--line)}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.06em;color:var(--sys);text-transform:uppercase}
+h1{font:800 clamp(34px,6vw,54px)/1.02 var(--display);font-stretch:82%;letter-spacing:-.01em;margin:14px 0 14px;text-wrap:balance}
+.lede{max-width:64ch;color:var(--ink2);font-size:17px;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin:26px 0 0;padding:0;list-style:none}
+.facts li{display:flex;flex-direction:column;gap:2px}
+.facts b{font:600 22px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.facts span{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.facts .f-fail b{color:var(--fail)} .facts .f-human b{color:var(--human)}
+section.block{padding-block:40px 8px}
+h2{font:750 26px/1.15 var(--display);font-stretch:88%;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--ink2);max-width:68ch;margin:0 0 20px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);-webkit-overflow-scrolling:touch}
+.scroll svg{display:block}
+.hint{font-size:12px;color:var(--muted);margin:8px 2px 0}
+.changes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 28px;margin:22px 0 0;padding:0;list-style:none}
+.changes li{padding-left:14px;border-left:2px solid var(--line);font-size:14px;color:var(--ink2)}
+.changes b{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 14px;padding:0;list-style:none;font-size:13px;color:var(--ink2)}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend svg{flex:none}
+/* ---------- swimlane svg */
+svg text{font-family:var(--body)}
+.life{stroke:var(--line);stroke-width:1;stroke-dasharray:2 5}
+.head rect{stroke-width:1.2}
+.r-human rect{fill:var(--human-t);stroke:var(--human)} .r-human .h1t{fill:var(--human)}
+.r-sys rect{fill:var(--sys-t);stroke:var(--sys)} .r-sys .h1t{fill:var(--sys)}
+.r-agent rect{fill:var(--agent-t);stroke:var(--agent)} .r-agent .h1t{fill:var(--agent)}
+.r-gate rect{fill:var(--gate-t);stroke:var(--gate)} .r-gate .h1t{fill:var(--gate)}
+.r-kb rect{fill:var(--kb-t);stroke:var(--kb)} .r-kb .h1t{fill:var(--kb)}
+.h1t{font-size:12.5px;font-weight:600;text-anchor:middle}
+.h2t{font-size:10px;fill:var(--muted);text-anchor:middle}
+.band rect{fill:var(--band)}
+.bcode{font:500 12px var(--mono);fill:var(--sys)}
+.bname{font:750 17px var(--display);font-stretch:88%;fill:var(--ink)}
+.bdate{font:400 11px var(--mono);fill:var(--muted)}
+.bsum{font-size:12px;fill:var(--ink2)}
+.bl{font-size:9px;letter-spacing:.07em;text-transform:uppercase;fill:var(--muted);text-anchor:middle}
+.grp rect{fill:var(--grp);stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}
+.g-repair rect,.g-revise rect{stroke:var(--fail)}
+.gt{font-size:11px;font-weight:600;fill:var(--ink2)} .gs{font-weight:400;fill:var(--muted)}
+.arr{fill:none;stroke:var(--ink2);stroke-width:1.3}
+.a-reply{stroke-dasharray:5 4}
+.a-pass{stroke:var(--pass);stroke-width:1.7;stroke-dasharray:5 4}
+.a-fail{stroke:var(--fail);stroke-width:1.8}
+.a-human{stroke:var(--human);stroke-width:1.8}
+.a-self{stroke:var(--agent)}
+.mk-sys{fill:var(--ink2)} .mk-pass{fill:var(--pass)} .mk-fail{fill:var(--fail)} .mk-human{fill:var(--human)} .mk-agent{fill:var(--agent)} .mk-gate{fill:var(--gate)} .mk-exec{fill:var(--muted)}
+.chip rect{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.c-pass rect{fill:var(--pass-t);stroke:var(--pass)} .c-fail rect{fill:var(--fail-t);stroke:var(--fail)} .c-human rect{fill:var(--human-t);stroke:var(--human)}
+.chip rect.tag{fill:var(--agent);stroke:none}
+.tagt{font-size:9.5px;font-weight:600;letter-spacing:.04em;fill:var(--on-agent);text-anchor:middle}
+.ct{font-size:12px;fill:var(--ink)}
+.num circle{fill:var(--bg);stroke:var(--line)}
+.num text{font:500 10.5px var(--mono);fill:var(--ink2);text-anchor:middle}
+/* ---------- architecture svg */
+.ag rect{fill:var(--band)}
+.agt{font:700 13.5px var(--display);font-stretch:90%;fill:var(--ink)} .agt.small{font:600 11px var(--body);fill:var(--ink2)}
+.ags{font-size:11px;fill:var(--muted);text-anchor:end}
+.ab rect{stroke-width:1.2}
+.abt{font-size:12.5px;font-weight:600;fill:var(--ink);text-anchor:middle}
+.abs{font-size:10.5px;fill:var(--muted);text-anchor:middle}
+.r-cfg rect{fill:var(--surface);stroke:var(--line)} .r-agent .abt{font-size:12px} .r-cfg .abt{font:500 11.5px var(--mono)} .r-exec rect{fill:var(--surface);stroke:var(--ink2);stroke-dasharray:4 3}
+.aa{fill:none;stroke:var(--ink2);stroke-width:1.3} .aa.dash{stroke-dasharray:5 4;stroke:var(--muted)}
+.al{font-size:10.5px;fill:var(--muted);text-anchor:middle} .al.st{text-anchor:start} .al.en{text-anchor:end}
+/* ---------- steps */
+.phases{display:grid;gap:34px}
+.ph-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ph-code{font:500 12px var(--mono);color:var(--sys)}
+.ph-head h3{font:750 21px/1.2 var(--display);font-stretch:88%;margin:0}
+.ph-date{font:400 12px var(--mono);color:var(--muted)}
+.ph-sum{color:var(--ink2);margin:10px 0 14px;max-width:70ch}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:8px 22px}
+ol.steps li{position:relative;padding:8px 0 8px 40px;border-bottom:1px dashed var(--line);min-width:0}
+ol.steps li::before{content:attr(value);position:absolute;left:0;top:9px;width:28px;height:22px;border-radius:11px;background:var(--surface);border:1px solid var(--line);font:500 11px/20px var(--mono);text-align:center;color:var(--ink2)}
+.sl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.route{font-size:12px;color:var(--muted)}
+.what{margin:2px 0 0;font-size:14px;font-weight:500}
+.det{margin:4px 0 0;font-size:13px;color:var(--ink2)}
+.pill{font:500 10.5px/1 var(--mono);padding:3px 7px;border-radius:10px;letter-spacing:.03em}
+.p-pass{background:var(--pass-t);color:var(--pass)} .p-fail{background:var(--fail-t);color:var(--fail)} .p-human{background:var(--human-t);color:var(--human)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tablewrap{overflow-x:auto}
+th,td{text-align:left;padding:9px 12px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+code{font:13px var(--mono);color:var(--ink)}
+.files{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.files li{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:4px 18px;font-size:14px;color:var(--ink2)}
+.files code{overflow-wrap:anywhere}
+@media (max-width:640px){ .files li{grid-template-columns:1fr} header{padding-block:28px 22px} }
+a{color:var(--sys)}
+:focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">SPEC-0001 · automatic refund on pre-shipment cancellation</div>
+  <h1>Spec Pipeline Walkthrough</h1>
+  <p class="lede">One spec, followed from the words a user types into the UI to a tagged spec the execution loop can build.
+  It shows every agent step, every verify and eval gate, and every human decision. The artifacts it produces are the ones in <code>examples/</code>.</p>
+  <ul class="facts">
+    <li><b>66</b><span>steps in 4 phases</span></li>
+    <li><b>6</b><span>verify runs</span></li>
+    <li class="f-fail"><b>2</b><span>verify failures</span></li>
+    <li><b>4</b><span>eval runs</span></li>
+    <li class="f-fail"><b>1</b><span>eval failure</span></li>
+    <li class="f-human"><b>7</b><span>human inputs (answers + approvals)</span></li>
+  </ul>
+</header>
+
+<section class="block" id="platform">
+  <h2>The platform</h2>
+  <p class="sub">Your redrawn sketch, with the wiring the scenario relies on. The engine owns control flow, pi agents own judgment inside a step, and git holds the state.</p>
+  <div class="scroll"><svg class="arch" viewBox="0 0 1000 510" width="1000" height="510" role="img" aria-labelledby="arch-t" xmlns="http://www.w3.org/2000/svg"><title id="arch-t">Platform components and how they connect</title><defs><marker id="am-sys" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-sys"/></marker><marker id="am-human" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-human"/></marker><marker id="am-agent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-agent"/></marker><marker id="am-gate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-gate"/></marker><marker id="am-exec" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-exec"/></marker></defs><g class="ag"><rect x="318" y="24" width="236" height="214" rx="14"/><text x="332" y="46" class="agt">Orchestrator / engine</text></g><g class="ag"><rect x="598" y="24" width="384" height="318" rx="14"/><text x="612" y="46" class="agt">pi agent steps</text><text x="968" y="46" class="ags">one session each</text></g><g class="ag"><rect x="598" y="372" width="384" height="124" rx="14"/><text x="612" y="394" class="agt">Org KB</text><text x="968" y="394" class="ags">read-only</text></g><g class="ab r-human"><rect x="18" y="66" width="112" height="44" rx="22"/><text x="74.0" y="93.0" class="abt">User</text></g><g class="ab r-human"><rect x="18" y="150" width="112" height="56" rx="22"/><text x="74.0" y="175.0" class="abt">BA / Architect</text><text x="74.0" y="191.0" class="abs">approve, answer</text></g><g class="ab r-sys"><rect x="170" y="96" width="112" height="70" rx="8"/><text x="226.0" y="128.0" class="abt">UI</text><text x="226.0" y="144.0" class="abs">thin client</text></g><g class="ab r-sys"><rect x="338" y="62" width="196" height="50" rx="8"/><text x="436.0" y="84.0" class="abt">Reconciler</text><text x="436.0" y="100.0" class="abs">stateless loop</text></g><g class="ab r-gate"><rect x="338" y="134" width="94" height="84" rx="8"/><text x="385.0" y="173.0" class="abt">Verify</text><text x="385.0" y="189.0" class="abs">spec-lint</text></g><g class="ab r-gate"><rect x="440" y="134" width="94" height="84" rx="8"/><text x="487.0" y="173.0" class="abt">Eval gate</text><text x="487.0" y="189.0" class="abs">LLM judge</text></g><g class="ab r-sys"><rect x="338" y="280" width="160" height="74" rx="8"/><text x="418.0" y="314.0" class="abt">Git repo</text><text x="418.0" y="330.0" class="abs">specs/ · domain/ · PRs</text></g><g class="ab r-exec"><rect x="338" y="424" width="196" height="58" rx="8"/><text x="436.0" y="450.0" class="abt">plan → code → QA</text><text x="436.0" y="466.0" class="abs">execution loop</text></g><g class="ab r-agent"><rect x="612" y="62" width="116" height="52" rx="8"/><text x="670.0" y="93.0" class="abt">Intent</text></g><g class="ab r-agent"><rect x="734" y="62" width="116" height="52" rx="8"/><text x="792.0" y="93.0" class="abt">Req analysis</text></g><g class="ab r-agent"><rect x="856" y="62" width="116" height="52" rx="8"/><text x="914.0" y="93.0" class="abt">Req generation</text></g><g class="ab r-agent"><rect x="612" y="138" width="116" height="52" rx="8"/><text x="670.0" y="169.0" class="abt">Design analysis</text></g><g class="ab r-agent"><rect x="734" y="138" width="116" height="52" rx="8"/><text x="792.0" y="169.0" class="abt">Design generation</text></g><g class="ab r-agent"><rect x="856" y="138" width="116" height="52" rx="8"/><text x="914.0" y="169.0" class="abt">DDD agent</text></g><text x="612" y="232" class="agt small">Pinned per step (pipeline.lock.yaml)</text><g class="ab r-cfg"><rect x="612" y="244" width="86" height="38" rx="6"/><text x="655.0" y="268.0" class="abt">AGENTS.md</text></g><g class="ab r-cfg"><rect x="704" y="244" width="86" height="38" rx="6"/><text x="747.0" y="268.0" class="abt">skill(s)</text></g><g class="ab r-cfg"><rect x="796" y="244" width="86" height="38" rx="6"/><text x="839.0" y="268.0" class="abt">template(s)</text></g><g class="ab r-cfg"><rect x="888" y="244" width="86" height="38" rx="6"/><text x="931.0" y="268.0" class="abt">prompts</text></g><text x="612" y="316" class="al st">route: ddd findings go to the DDD agent</text><text x="612" y="331" class="al st">analysis never rewrites upstream artifacts</text><g class="ab r-kb"><rect x="616" y="408" width="150" height="70" rx="8"/><text x="691.0" y="440.0" class="abt">constitution.md</text><text x="691.0" y="456.0" class="abs">pinned by version</text></g><g class="ab r-kb"><rect x="778" y="408" width="186" height="70" rx="8"/><text x="871.0" y="440.0" class="abt">policies · systems</text><text x="871.0" y="456.0" class="abs">provider docs</text></g><path class="aa " d="M130 88 H164 V116" marker-end="url(#am-human)"/><path class="aa " d="M130 178 H150 V150 H164" marker-end="url(#am-human)"/><path class="aa " d="M282 124 H332" marker-end="url(#am-sys)"/><text x="307" y="142" class="al">commands</text><path class="aa " d="M534 87 H592" marker-end="url(#am-sys)"/><text x="563" y="80" class="al">run step</text><path class="aa " d="M420 112 V128" marker-end="url(#am-sys)"/><path class="aa " d="M480 112 V128" marker-end="url(#am-sys)"/><path class="aa " d="M418 218 V274" marker-end="url(#am-sys)"/><text x="424" y="252" class="al st">commit · PR · merge</text><path class="aa " d="M418 354 V418" marker-end="url(#am-sys)"/><text x="424" y="392" class="al st">tag SPEC-n ready</text><path class="aa " d="M790 342 V366" marker-end="url(#am-agent)"/><text x="796" y="360" class="al st">kb_search / kb_get</text><path class="aa dash" d="M534 190 H570 V446 H610" marker-end="url(#am-gate)"/><text x="576" y="361" class="al st">scores ART-n</text><path class="aa dash" d="M518 424 V224" marker-end="url(#am-exec)"/><text x="0" y="0" class="al" transform="translate(511 330) rotate(-90)">lagging signals</text></svg></div>
+  <p class="hint">Scroll sideways on narrow screens.</p>
+  <ul class="changes">
+    <li><b>Every agent runs on pi.</b> The sketch still labels Requirement analysis and DDD as hermes.</li>
+    <li><b>The UI talks to the engine, not to the Intent agent.</b> The intent chat is a pi RPC session the reconciler hosts. The UI only relays it.</li>
+    <li><b>BA and architect act through the UI.</b> Every button is a PR approval or a comment command such as <code>/answer RAF-1</code>.</li>
+    <li><b>Verify and eval are separate gates.</b> The deterministic lint runs first and triggers repair. The judge runs second and triggers revise.</li>
+    <li><b>Git is on the drawing.</b> It is the workflow state. The engine keeps none of its own.</li>
+    <li><b>AGENTS.md joins skills, templates and prompts</b> as pinned per-step config. The constitution stays in the org KB, pinned by version.</li>
+  </ul>
+</section>
+
+<section class="block" id="swimlane">
+  <h2>The scenario</h2>
+  <p class="sub">Read top to bottom. Each numbered arrow is one step. In the pi-agent lane, the purple tag names the agent acting at that point.</p>
+  <ul class="legend" aria-label="Legend">
+    <li><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" class="arr"/><path d="M26 1 L33 5 L26 9z" class="mk-sys"/></svg>request</li>
+    <li><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" class="arr a-reply"/><path d="M26 1 L33 5 L26 9z" class="mk-sys"/></svg>reply</li>
+    <li><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" class="arr a-pass"/><path d="M26 1 L33 5 L26 9z" class="mk-pass"/></svg>gate passed</li>
+    <li><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" class="arr a-fail"/><path d="M26 1 L33 5 L26 9z" class="mk-fail"/></svg>gate failed</li>
+    <li><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" class="arr a-human"/><path d="M26 1 L33 5 L26 9z" class="mk-human"/></svg>human input</li>
+  </ul>
+  <div class="scroll"><svg class="lane" viewBox="0 0 1388 3094" width="1388" height="3094" role="img" aria-labelledby="lane-t lane-d" xmlns="http://www.w3.org/2000/svg">
+<title id="lane-t">SPEC-0001 swimlane</title>
+<desc id="lane-d">66 numbered steps across 11 lanes and four phases, from the user typing an intent to a tagged, handoff-ready spec.</desc>
+<defs>
+<marker id="mk-sys" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-sys"/></marker>
+<marker id="mk-pass" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-pass"/></marker>
+<marker id="mk-fail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-fail"/></marker>
+<marker id="mk-human" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-human"/></marker>
+<marker id="mk-agent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-agent"/></marker>
+</defs>
+<line class="life" x1="112" y1="60" x2="112" y2="3086"/>
+<line class="life" x1="230" y1="60" x2="230" y2="3086"/>
+<line class="life" x1="348" y1="60" x2="348" y2="3086"/>
+<line class="life" x1="466" y1="60" x2="466" y2="3086"/>
+<line class="life" x1="584" y1="60" x2="584" y2="3086"/>
+<line class="life" x1="702" y1="60" x2="702" y2="3086"/>
+<line class="life" x1="820" y1="60" x2="820" y2="3086"/>
+<line class="life" x1="938" y1="60" x2="938" y2="3086"/>
+<line class="life" x1="1056" y1="60" x2="1056" y2="3086"/>
+<line class="life" x1="1174" y1="60" x2="1174" y2="3086"/>
+<line class="life" x1="1292" y1="60" x2="1292" y2="3086"/>
+<g class="head r-human"><rect x="58" y="14" width="108" height="46" rx="7"/><text x="112" y="34" class="h1t">User</text><text x="112" y="50" class="h2t">requester</text></g>
+<g class="head r-human"><rect x="176" y="14" width="108" height="46" rx="7"/><text x="230" y="34" class="h1t">BA</text><text x="230" y="50" class="h2t">business analyst</text></g>
+<g class="head r-human"><rect x="294" y="14" width="108" height="46" rx="7"/><text x="348" y="34" class="h1t">Architect</text><text x="348" y="50" class="h2t">senior</text></g>
+<g class="head r-sys"><rect x="412" y="14" width="108" height="46" rx="7"/><text x="466" y="34" class="h1t">UI</text><text x="466" y="50" class="h2t">thin client</text></g>
+<g class="head r-sys"><rect x="530" y="14" width="108" height="46" rx="7"/><text x="584" y="34" class="h1t">Reconciler</text><text x="584" y="50" class="h2t">orchestrator</text></g>
+<g class="head r-sys"><rect x="648" y="14" width="108" height="46" rx="7"/><text x="702" y="34" class="h1t">Git / PR</text><text x="702" y="50" class="h2t">workflow state</text></g>
+<g class="head r-agent"><rect x="766" y="14" width="108" height="46" rx="7"/><text x="820" y="34" class="h1t">pi agent</text><text x="820" y="50" class="h2t">one per step</text></g>
+<g class="head r-agent"><rect x="884" y="14" width="108" height="46" rx="7"/><text x="938" y="34" class="h1t">DDD agent</text><text x="938" y="50" class="h2t">pi</text></g>
+<g class="head r-gate"><rect x="1002" y="14" width="108" height="46" rx="7"/><text x="1056" y="34" class="h1t">Verify</text><text x="1056" y="50" class="h2t">spec-lint</text></g>
+<g class="head r-gate"><rect x="1120" y="14" width="108" height="46" rx="7"/><text x="1174" y="34" class="h1t">Eval judge</text><text x="1174" y="50" class="h2t">rubric + articles</text></g>
+<g class="head r-kb"><rect x="1238" y="14" width="108" height="46" rx="7"/><text x="1292" y="34" class="h1t">Org KB</text><text x="1292" y="50" class="h2t">constitution</text></g>
+<g class="band"><rect x="6" y="80" width="1376" height="70" rx="8"/><text x="22" y="106" class="bcode">P1</text><text x="58" y="106" class="bname">Intent</text><text x="142.8304" y="106" class="bdate">19 Sep</text><text x="22" y="128" class="bsum">The user&#x27;s words become intent.md, grounded in the org KB and checked against the constitution.</text>
+<text x="112" y="144" class="bl">User</text>
+<text x="230" y="144" class="bl">BA</text>
+<text x="348" y="144" class="bl">Architect</text>
+<text x="466" y="144" class="bl">UI</text>
+<text x="584" y="144" class="bl">Reconciler</text>
+<text x="702" y="144" class="bl">Git / PR</text>
+<text x="820" y="144" class="bl">pi agent</text>
+<text x="938" y="144" class="bl">DDD agent</text>
+<text x="1056" y="144" class="bl">Verify</text>
+<text x="1174" y="144" class="bl">Eval judge</text>
+<text x="1292" y="144" class="bl">Org KB</text>
+</g>
+<g class="band"><rect x="6" y="876" width="1376" height="70" rx="8"/><text x="22" y="902" class="bcode">P2</text><text x="58" y="902" class="bname">Requirements</text><text x="203.56799999999998" y="902" class="bdate">19–20 Sep</text><text x="22" y="924" class="bsum">Analysis finds gaps, DDD fixes the language and boundaries, and generation is verified, repaired, evaluated and revised.</text>
+<text x="112" y="940" class="bl">User</text>
+<text x="230" y="940" class="bl">BA</text>
+<text x="348" y="940" class="bl">Architect</text>
+<text x="466" y="940" class="bl">UI</text>
+<text x="584" y="940" class="bl">Reconciler</text>
+<text x="702" y="940" class="bl">Git / PR</text>
+<text x="820" y="940" class="bl">pi agent</text>
+<text x="938" y="940" class="bl">DDD agent</text>
+<text x="1056" y="940" class="bl">Verify</text>
+<text x="1174" y="940" class="bl">Eval judge</text>
+<text x="1292" y="940" class="bl">Org KB</text>
+</g>
+<g class="grp g-par"><rect x="196" y="1096" width="776" height="176" rx="10"/><text x="208" y="1111" class="gt">In parallel<tspan class="gs"> · route: ddd and route: human findings resolve at the same time</tspan></text></g>
+<g class="grp g-repair"><rect x="550" y="1424" width="540" height="214" rx="10"/><text x="562" y="1439" class="gt">Verify → repair<tspan class="gs"> · deterministic · ≤ 3 attempts</tspan></text></g>
+<g class="grp g-revise"><rect x="550" y="1638" width="658" height="252" rx="10"/><text x="562" y="1653" class="gt">Eval → revise<tspan class="gs"> · judgment · ≤ 2 retries</tspan></text></g>
+<g class="band"><rect x="6" y="2078" width="1376" height="70" rx="8"/><text x="22" y="2104" class="bcode">P3</text><text x="58" y="2104" class="bname">Design</text><text x="138.4512" y="2104" class="bdate">21–22 Sep</text><text x="22" y="2126" class="bsum">Design analysis raises risks for the architect, DDD adds the tactical model, and generation passes verify and eval first time.</text>
+<text x="112" y="2142" class="bl">User</text>
+<text x="230" y="2142" class="bl">BA</text>
+<text x="348" y="2142" class="bl">Architect</text>
+<text x="466" y="2142" class="bl">UI</text>
+<text x="584" y="2142" class="bl">Reconciler</text>
+<text x="702" y="2142" class="bl">Git / PR</text>
+<text x="820" y="2142" class="bl">pi agent</text>
+<text x="938" y="2142" class="bl">DDD agent</text>
+<text x="1056" y="2142" class="bl">Verify</text>
+<text x="1174" y="2142" class="bl">Eval judge</text>
+<text x="1292" y="2142" class="bl">Org KB</text>
+</g>
+<g class="band"><rect x="6" y="2828" width="1376" height="70" rx="8"/><text x="22" y="2854" class="bcode">P4</text><text x="58" y="2854" class="bname">Verify &amp; handoff</text><text x="246.97920000000002" y="2854" class="bdate">22 Sep →</text><text x="22" y="2876" class="bsum">A whole-spec verify on main, a ready tag, and the feedback path from execution back to eval.</text>
+<text x="112" y="2892" class="bl">User</text>
+<text x="230" y="2892" class="bl">BA</text>
+<text x="348" y="2892" class="bl">Architect</text>
+<text x="466" y="2892" class="bl">UI</text>
+<text x="584" y="2892" class="bl">Reconciler</text>
+<text x="702" y="2892" class="bl">Git / PR</text>
+<text x="820" y="2892" class="bl">pi agent</text>
+<text x="938" y="2892" class="bl">DDD agent</text>
+<text x="1056" y="2892" class="bl">Verify</text>
+<text x="1174" y="2892" class="bl">Eval judge</text>
+<text x="1292" y="2892" class="bl">Org KB</text>
+</g>
+<line class="arr a-human" x1="116" y1="178" x2="463" y2="178" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="213.4" y="154" width="151.1" height="18" rx="9"/>
+<text x="221.4" y="167" class="ct">Types the raw intent</text></g>
+<g class="num"><circle cx="24" cy="163" r="10"/><text x="24" y="167">1</text></g>
+<line class="arr a-msg" x1="470" y1="216" x2="581" y2="216" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="461.7" y="192" width="126.5" height="18" rx="9"/>
+<text x="469.7" y="205" class="ct">New spec request</text></g>
+<g class="num"><circle cx="24" cy="201" r="10"/><text x="24" y="205">2</text></g>
+<line class="arr a-msg" x1="588" y1="254" x2="699" y2="254" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="499.5" y="230" width="287.0" height="18" rx="9"/>
+<text x="507.5" y="243" class="ct">Branch spec/SPEC-0001/intent + template</text></g>
+<g class="num"><circle cx="24" cy="239" r="10"/><text x="24" y="243">3</text></g>
+<line class="arr a-msg" x1="588" y1="292" x2="817" y2="292" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="593.1" y="268" width="217.9" height="18" rx="9"/>
+<rect class="tag" x="596.1" y="271" width="54.6" height="12" rx="6"/><text x="623.4" y="280.5" class="tagt">INTENT</text>
+<text x="658.7" y="281" class="ct">Start session (create)</text></g>
+<g class="num"><circle cx="24" cy="277" r="10"/><text x="24" y="281">4</text></g>
+<line class="arr a-msg" x1="824" y1="330" x2="1289" y2="330" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="882.0" y="306" width="348.1" height="18" rx="9"/>
+<rect class="tag" x="885.0" y="309" width="54.6" height="12" rx="6"/><text x="912.3" y="318.5" class="tagt">INTENT</text>
+<text x="947.6" y="319" class="ct">kb_search: refund policy, provider refunds</text></g>
+<g class="num"><circle cx="24" cy="315" r="10"/><text x="24" y="319">5</text></g>
+<line class="arr a-reply" x1="1288" y1="368" x2="823" y2="368" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="878.2" y="344" width="355.6" height="18" rx="9"/>
+<text x="886.2" y="357" class="ct">refund-policy v4 · provider doc v7 · constitution v3</text></g>
+<g class="num"><circle cx="24" cy="353" r="10"/><text x="24" y="357">6</text></g>
+<line class="arr a-msg" x1="816" y1="406" x2="115" y2="406" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="298.4" y="382" width="335.2" height="18" rx="9"/>
+<rect class="tag" x="301.4" y="385" width="54.6" height="12" rx="6"/><text x="328.7" y="394.5" class="tagt">INTENT</text>
+<text x="364.0" y="395" class="ct">ask_user Q-1: what does “quickly” mean?</text></g>
+<g class="num"><circle cx="24" cy="391" r="10"/><text x="24" y="395">7</text></g>
+<line class="arr a-reply" x1="116" y1="444" x2="817" y2="444" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="353.7" y="420" width="224.7" height="18" rx="9"/>
+<text x="361.7" y="433" class="ct">Refund must start within 1 hour</text></g>
+<g class="num"><circle cx="24" cy="429" r="10"/><text x="24" y="433">8</text></g>
+<path class="arr a-self" d="M820 474 h34 v16 h-32" marker-end="url(#mk-agent)"/>
+<g class="chip c-self"><rect x="864.0" y="465" width="316.3" height="18" rx="9"/>
+<rect class="tag" x="867.0" y="468" width="54.6" height="12" rx="6"/><text x="894.3" y="477.5" class="tagt">INTENT</text>
+<text x="929.6" y="478" class="ct">Writes intent.md · validate_artifact ✓</text></g>
+<g class="num"><circle cx="24" cy="474" r="10"/><text x="24" y="478">9</text></g>
+<line class="arr a-msg" x1="588" y1="528" x2="1053" y2="528" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="752.5" y="504" width="134.9" height="18" rx="9"/>
+<text x="760.5" y="517" class="ct">spec-lint intent.md</text></g>
+<g class="num"><circle cx="24" cy="513" r="10"/><text x="24" y="517">10</text></g>
+<line class="arr a-pass" x1="1052" y1="566" x2="587" y2="566" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="666.1" y="542" width="307.8" height="18" rx="9"/>
+<text x="674.1" y="555" class="ct">Clean · no open Q (F6) · CON-1 cites KB (K2)</text></g>
+<g class="num"><circle cx="24" cy="551" r="10"/><text x="24" y="555">11</text></g>
+<line class="arr a-msg" x1="588" y1="604" x2="1171" y2="604" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="797.9" y="580" width="162.3" height="18" rx="9"/>
+<text x="805.9" y="593" class="ct">Intent rubric + ART-1</text></g>
+<g class="num"><circle cx="24" cy="589" r="10"/><text x="24" y="593">12</text></g>
+<line class="arr a-pass" x1="1170" y1="642" x2="587" y2="642" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="839.4" y="618" width="79.1" height="18" rx="9"/>
+<text x="847.4" y="631" class="ct">Pass 0.86</text></g>
+<g class="num"><circle cx="24" cy="627" r="10"/><text x="24" y="631">13</text></g>
+<line class="arr a-msg" x1="588" y1="680" x2="935" y2="680" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="725.6" y="656" width="70.7" height="18" rx="9"/>
+<text x="733.6" y="669" class="ct">ddd-seed</text></g>
+<g class="num"><circle cx="24" cy="665" r="10"/><text x="24" y="669">14</text></g>
+<line class="arr a-reply" x1="934" y1="718" x2="587" y2="718" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="668.3" y="694" width="185.3" height="18" rx="9"/>
+<text x="676.3" y="707" class="ct">Proposed terms → glossary</text></g>
+<g class="num"><circle cx="24" cy="703" r="10"/><text x="24" y="707">15</text></g>
+<line class="arr a-msg" x1="588" y1="756" x2="699" y2="756" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="492.7" y="732" width="300.6" height="18" rx="9"/>
+<text x="500.7" y="745" class="ct">status in-review · PR 11 · ready-for-review</text></g>
+<g class="num"><circle cx="24" cy="741" r="10"/><text x="24" y="745">16</text></g>
+<line class="arr a-human" x1="234" y1="794" x2="463" y2="794" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="289.5" y="770" width="116.9" height="18" rx="9"/>
+<text x="297.5" y="783" class="ct">Approves intent</text></g>
+<g class="num"><circle cx="24" cy="779" r="10"/><text x="24" y="783">17</text></g>
+<line class="arr a-msg" x1="588" y1="832" x2="699" y2="832" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="518.9" y="808" width="248.2" height="18" rx="9"/>
+<text x="526.9" y="821" class="ct">Re-verify · status approved · merge</text></g>
+<g class="num"><circle cx="24" cy="817" r="10"/><text x="24" y="821">18</text></g>
+<line class="arr a-msg" x1="588" y1="974" x2="817" y2="974" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="618.4" y="950" width="167.2" height="18" rx="9"/>
+<rect class="tag" x="621.4" y="953" width="97.2" height="12" rx="6"/><text x="670.0" y="962.5" class="tagt">REQ ANALYSIS</text>
+<text x="726.6" y="963" class="ct">Round 1</text></g>
+<g class="num"><circle cx="24" cy="959" r="10"/><text x="24" y="963">19</text></g>
+<line class="arr a-reply" x1="816" y1="1012" x2="587" y2="1012" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="566.1" y="988" width="271.8" height="18" rx="9"/>
+<text x="574.1" y="1001" class="ct">RAF-1..4 · RAF-4 boundary is a blocker</text></g>
+<g class="num"><circle cx="24" cy="997" r="10"/><text x="24" y="1001">20</text></g>
+<line class="arr a-msg" x1="588" y1="1050" x2="1053" y2="1050" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="784.0" y="1026" width="72.0" height="18" rx="9"/>
+<text x="792.0" y="1039" class="ct">spec-lint</text></g>
+<g class="num"><circle cx="24" cy="1035" r="10"/><text x="24" y="1039">21</text></g>
+<line class="arr a-fail" x1="1052" y1="1088" x2="587" y2="1088" marker-end="url(#mk-fail)"/>
+<g class="chip c-fail"><rect x="702.3" y="1064" width="235.5" height="18" rx="9"/>
+<text x="710.3" y="1077" class="ct">Gate F1: blocker RAF-4 still open</text></g>
+<g class="num"><circle cx="24" cy="1073" r="10"/><text x="24" y="1077">22</text></g>
+<line class="arr a-msg" x1="588" y1="1142" x2="935" y2="1142" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="648.8" y="1118" width="224.3" height="18" rx="9"/>
+<text x="656.8" y="1131" class="ct">ddd-strategic for RAF-2, RAF-4</text></g>
+<g class="num"><circle cx="24" cy="1127" r="10"/><text x="24" y="1131">23</text></g>
+<line class="arr a-reply" x1="934" y1="1180" x2="587" y2="1180" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="586.9" y="1156" width="348.3" height="18" rx="9"/>
+<text x="594.9" y="1169" class="ct">Refund, Order Reference · Ordering → Payments map</text></g>
+<g class="num"><circle cx="24" cy="1165" r="10"/><text x="24" y="1169">24</text></g>
+<line class="arr a-msg" x1="580" y1="1218" x2="469" y2="1218" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="456.0" y="1194" width="137.9" height="18" rx="9"/>
+<text x="464.0" y="1207" class="ct">needs-input: RAF-1</text></g>
+<g class="num"><circle cx="24" cy="1203" r="10"/><text x="24" y="1207">25</text></g>
+<line class="arr a-human" x1="234" y1="1256" x2="463" y2="1256" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="235.4" y="1232" width="225.2" height="18" rx="9"/>
+<text x="243.4" y="1245" class="ct">/answer RAF-1: whole Order only</text></g>
+<g class="num"><circle cx="24" cy="1241" r="10"/><text x="24" y="1245">26</text></g>
+<line class="arr a-msg" x1="588" y1="1302" x2="817" y2="1302" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="618.4" y="1278" width="167.2" height="18" rx="9"/>
+<rect class="tag" x="621.4" y="1281" width="97.2" height="12" rx="6"/><text x="670.0" y="1290.5" class="tagt">REQ ANALYSIS</text>
+<text x="726.6" y="1291" class="ct">Round 2</text></g>
+<g class="num"><circle cx="24" cy="1287" r="10"/><text x="24" y="1291">27</text></g>
+<line class="arr a-reply" x1="816" y1="1340" x2="587" y2="1340" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="572.9" y="1316" width="258.2" height="18" rx="9"/>
+<text x="580.9" y="1329" class="ct">No new findings · ART-2, ART-5 apply</text></g>
+<g class="num"><circle cx="24" cy="1325" r="10"/><text x="24" y="1329">28</text></g>
+<line class="arr a-msg" x1="588" y1="1378" x2="817" y2="1378" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="576.4" y="1354" width="251.2" height="18" rx="9"/>
+<rect class="tag" x="579.4" y="1357" width="111.4" height="12" rx="6"/><text x="635.1" y="1366.5" class="tagt">REQ GENERATION</text>
+<text x="698.8" y="1367" class="ct">Create (attempt 1)</text></g>
+<g class="num"><circle cx="24" cy="1363" r="10"/><text x="24" y="1367">29</text></g>
+<line class="arr a-reply" x1="816" y1="1416" x2="587" y2="1416" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="600.3" y="1392" width="203.3" height="18" rx="9"/>
+<text x="608.3" y="1405" class="ct">requirements.md + trace links</text></g>
+<g class="num"><circle cx="24" cy="1401" r="10"/><text x="24" y="1405">30</text></g>
+<line class="arr a-msg" x1="588" y1="1470" x2="1053" y2="1470" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="784.0" y="1446" width="72.0" height="18" rx="9"/>
+<text x="792.0" y="1459" class="ct">spec-lint</text></g>
+<g class="num"><circle cx="24" cy="1455" r="10"/><text x="24" y="1459">31</text></g>
+<line class="arr a-fail" x1="1052" y1="1508" x2="587" y2="1508" marker-end="url(#mk-fail)"/>
+<g class="chip c-fail"><rect x="647.4" y="1484" width="345.2" height="18" rx="9"/>
+<text x="655.4" y="1497" class="ct">L5 “quickly” · D5 “reimbursement” · L2 two “shall”</text></g>
+<g class="num"><circle cx="24" cy="1493" r="10"/><text x="24" y="1497">32</text></g>
+<line class="arr a-msg" x1="588" y1="1546" x2="817" y2="1546" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="527.2" y="1522" width="349.6" height="18" rx="9"/>
+<rect class="tag" x="530.2" y="1525" width="111.4" height="12" rx="6"/><text x="585.9" y="1534.5" class="tagt">REQ GENERATION</text>
+<text x="649.6" y="1535" class="ct">Repair (attempt 2) with error list</text></g>
+<g class="num"><circle cx="24" cy="1531" r="10"/><text x="24" y="1535">33</text></g>
+<line class="arr a-msg" x1="588" y1="1584" x2="1053" y2="1584" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="784.0" y="1560" width="72.0" height="18" rx="9"/>
+<text x="792.0" y="1573" class="ct">spec-lint</text></g>
+<g class="num"><circle cx="24" cy="1569" r="10"/><text x="24" y="1573">34</text></g>
+<line class="arr a-pass" x1="1052" y1="1622" x2="587" y2="1622" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="795.7" y="1598" width="48.5" height="18" rx="9"/>
+<text x="803.7" y="1611" class="ct">Clean</text></g>
+<g class="num"><circle cx="24" cy="1607" r="10"/><text x="24" y="1611">35</text></g>
+<line class="arr a-msg" x1="588" y1="1684" x2="1171" y2="1684" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="797.1" y="1660" width="163.8" height="18" rx="9"/>
+<text x="805.1" y="1673" class="ct">Rubric + ART-2, ART-5</text></g>
+<g class="num"><circle cx="24" cy="1669" r="10"/><text x="24" y="1673">36</text></g>
+<line class="arr a-fail" x1="1170" y1="1722" x2="587" y2="1722" marker-end="url(#mk-fail)"/>
+<g class="chip c-fail"><rect x="726.4" y="1698" width="305.2" height="18" rx="9"/>
+<text x="734.4" y="1711" class="ct">ART-2: REQ-002 has no duplicate-trigger AC</text></g>
+<g class="num"><circle cx="24" cy="1707" r="10"/><text x="24" y="1711">37</text></g>
+<line class="arr a-msg" x1="588" y1="1760" x2="817" y2="1760" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="548.9" y="1736" width="306.1" height="18" rx="9"/>
+<rect class="tag" x="551.9" y="1739" width="111.4" height="12" rx="6"/><text x="607.6" y="1748.5" class="tagt">REQ GENERATION</text>
+<text x="671.3" y="1749" class="ct">Revise with judge rationale</text></g>
+<g class="num"><circle cx="24" cy="1745" r="10"/><text x="24" y="1749">38</text></g>
+<line class="arr a-reply" x1="816" y1="1798" x2="587" y2="1798" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="584.4" y="1774" width="235.2" height="18" rx="9"/>
+<text x="592.4" y="1787" class="ct">Adds AC-002.2 (no second Refund)</text></g>
+<g class="num"><circle cx="24" cy="1783" r="10"/><text x="24" y="1787">39</text></g>
+<line class="arr a-msg" x1="588" y1="1836" x2="1171" y2="1836" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="808.2" y="1812" width="141.5" height="18" rx="9"/>
+<text x="816.2" y="1825" class="ct">Re-verify + re-eval</text></g>
+<g class="num"><circle cx="24" cy="1821" r="10"/><text x="24" y="1825">40</text></g>
+<line class="arr a-pass" x1="1170" y1="1874" x2="587" y2="1874" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="839.4" y="1850" width="79.1" height="18" rx="9"/>
+<text x="847.4" y="1863" class="ct">Pass 0.91</text></g>
+<g class="num"><circle cx="24" cy="1859" r="10"/><text x="24" y="1863">41</text></g>
+<line class="arr a-msg" x1="588" y1="1920" x2="699" y2="1920" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="470.4" y="1896" width="345.2" height="18" rx="9"/>
+<text x="478.4" y="1909" class="ct">PR 12 in-review · BA + architect (domain/ changed)</text></g>
+<g class="num"><circle cx="24" cy="1905" r="10"/><text x="24" y="1909">42</text></g>
+<line class="arr a-human" x1="352" y1="1958" x2="463" y2="1958" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="321.2" y="1934" width="171.6" height="18" rx="9"/>
+<text x="329.2" y="1947" class="ct">Approves domain changes</text></g>
+<g class="num"><circle cx="24" cy="1943" r="10"/><text x="24" y="1947">43</text></g>
+<line class="arr a-human" x1="234" y1="1996" x2="463" y2="1996" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="269.0" y="1972" width="158.0" height="18" rx="9"/>
+<text x="277.0" y="1985" class="ct">Approves requirements</text></g>
+<g class="num"><circle cx="24" cy="1981" r="10"/><text x="24" y="1985">44</text></g>
+<line class="arr a-msg" x1="588" y1="2034" x2="699" y2="2034" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="545.7" y="2010" width="194.6" height="18" rx="9"/>
+<text x="553.7" y="2023" class="ct">Merge · glossary v2 on main</text></g>
+<g class="num"><circle cx="24" cy="2019" r="10"/><text x="24" y="2023">45</text></g>
+<line class="arr a-msg" x1="588" y1="2176" x2="817" y2="2176" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="607.7" y="2152" width="188.5" height="18" rx="9"/>
+<rect class="tag" x="610.7" y="2155" width="118.5" height="12" rx="6"/><text x="670.0" y="2164.5" class="tagt">DESIGN ANALYSIS</text>
+<text x="737.2" y="2165" class="ct">Round 1</text></g>
+<g class="num"><circle cx="24" cy="2161" r="10"/><text x="24" y="2165">46</text></g>
+<line class="arr a-msg" x1="824" y1="2214" x2="1289" y2="2214" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="912.3" y="2190" width="287.3" height="18" rx="9"/>
+<rect class="tag" x="915.3" y="2193" width="118.5" height="12" rx="6"/><text x="974.6" y="2202.5" class="tagt">DESIGN ANALYSIS</text>
+<text x="1041.8" y="2203" class="ct">kb_get provider doc v7</text></g>
+<g class="num"><circle cx="24" cy="2199" r="10"/><text x="24" y="2203">47</text></g>
+<line class="arr a-reply" x1="1288" y1="2252" x2="823" y2="2252" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="944.3" y="2228" width="223.5" height="18" rx="9"/>
+<text x="952.3" y="2241" class="ct">Refund API limit: 20 per second</text></g>
+<g class="num"><circle cx="24" cy="2237" r="10"/><text x="24" y="2241">48</text></g>
+<line class="arr a-reply" x1="816" y1="2290" x2="587" y2="2290" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="562.5" y="2266" width="278.9" height="18" rx="9"/>
+<text x="570.5" y="2279" class="ct">DAF-1 rate-limit risk · DAF-2 duplicates</text></g>
+<g class="num"><circle cx="24" cy="2275" r="10"/><text x="24" y="2279">49</text></g>
+<line class="arr a-msg" x1="580" y1="2328" x2="469" y2="2328" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="418.6" y="2304" width="212.8" height="18" rx="9"/>
+<text x="426.6" y="2317" class="ct">needs-input: DAF-1 (2 options)</text></g>
+<g class="num"><circle cx="24" cy="2313" r="10"/><text x="24" y="2317">50</text></g>
+<line class="arr a-human" x1="352" y1="2366" x2="463" y2="2366" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="279.9" y="2342" width="254.2" height="18" rx="9"/>
+<text x="287.9" y="2355" class="ct">/answer DAF-1: durable refund queue</text></g>
+<g class="num"><circle cx="24" cy="2351" r="10"/><text x="24" y="2355">51</text></g>
+<line class="arr a-msg" x1="588" y1="2404" x2="935" y2="2404" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="714.7" y="2380" width="92.6" height="18" rx="9"/>
+<text x="722.7" y="2393" class="ct">ddd-tactical</text></g>
+<g class="num"><circle cx="24" cy="2389" r="10"/><text x="24" y="2393">52</text></g>
+<line class="arr a-reply" x1="934" y1="2442" x2="587" y2="2442" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="619.3" y="2418" width="283.5" height="18" rx="9"/>
+<text x="627.3" y="2431" class="ct">Orders, Refunds aggregates · cml_check ✓</text></g>
+<g class="num"><circle cx="24" cy="2427" r="10"/><text x="24" y="2431">53</text></g>
+<line class="arr a-msg" x1="588" y1="2480" x2="817" y2="2480" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="604.6" y="2456" width="194.8" height="18" rx="9"/>
+<rect class="tag" x="607.6" y="2459" width="132.7" height="12" rx="6"/><text x="673.9" y="2468.5" class="tagt">DESIGN GENERATION</text>
+<text x="748.3" y="2469" class="ct">Create</text></g>
+<g class="num"><circle cx="24" cy="2465" r="10"/><text x="24" y="2469">54</text></g>
+<line class="arr a-reply" x1="816" y1="2518" x2="587" y2="2518" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="587.3" y="2494" width="229.4" height="18" rx="9"/>
+<text x="595.3" y="2507" class="ct">DES-1..4 · ADR-1 · realizes links</text></g>
+<g class="num"><circle cx="24" cy="2503" r="10"/><text x="24" y="2507">55</text></g>
+<line class="arr a-msg" x1="588" y1="2556" x2="1053" y2="2556" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="784.0" y="2532" width="72.0" height="18" rx="9"/>
+<text x="792.0" y="2545" class="ct">spec-lint</text></g>
+<g class="num"><circle cx="24" cy="2541" r="10"/><text x="24" y="2545">56</text></g>
+<line class="arr a-pass" x1="1052" y1="2594" x2="587" y2="2594" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="644.8" y="2570" width="350.3" height="18" rx="9"/>
+<text x="652.8" y="2583" class="ct">Clean · coverage C5–C8 · no boundary violation (D9)</text></g>
+<g class="num"><circle cx="24" cy="2579" r="10"/><text x="24" y="2583">57</text></g>
+<line class="arr a-msg" x1="588" y1="2632" x2="1171" y2="2632" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="813.8" y="2608" width="130.5" height="18" rx="9"/>
+<text x="821.8" y="2621" class="ct">Rubric + ART-2..5</text></g>
+<g class="num"><circle cx="24" cy="2617" r="10"/><text x="24" y="2621">58</text></g>
+<line class="arr a-pass" x1="1170" y1="2670" x2="587" y2="2670" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="839.4" y="2646" width="79.1" height="18" rx="9"/>
+<text x="847.4" y="2659" class="ct">Pass 0.88</text></g>
+<g class="num"><circle cx="24" cy="2655" r="10"/><text x="24" y="2659">59</text></g>
+<line class="arr a-msg" x1="588" y1="2708" x2="699" y2="2708" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="584.3" y="2684" width="117.4" height="18" rx="9"/>
+<text x="592.3" y="2697" class="ct">PR 15 in-review</text></g>
+<g class="num"><circle cx="24" cy="2693" r="10"/><text x="24" y="2697">60</text></g>
+<line class="arr a-human" x1="352" y1="2746" x2="463" y2="2746" marker-end="url(#mk-human)"/>
+<g class="chip c-human"><rect x="348.5" y="2722" width="116.9" height="18" rx="9"/>
+<text x="356.5" y="2735" class="ct">Approves design</text></g>
+<g class="num"><circle cx="24" cy="2731" r="10"/><text x="24" y="2735">61</text></g>
+<line class="arr a-msg" x1="588" y1="2784" x2="699" y2="2784" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="617.4" y="2760" width="51.3" height="18" rx="9"/>
+<text x="625.4" y="2773" class="ct">Merge</text></g>
+<g class="num"><circle cx="24" cy="2769" r="10"/><text x="24" y="2773">62</text></g>
+<line class="arr a-msg" x1="588" y1="2926" x2="1053" y2="2926" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="730.1" y="2902" width="179.8" height="18" rx="9"/>
+<text x="738.1" y="2915" class="ct">Whole-spec verify on main</text></g>
+<g class="num"><circle cx="24" cy="2911" r="10"/><text x="24" y="2915">63</text></g>
+<line class="arr a-pass" x1="1052" y1="2964" x2="587" y2="2964" marker-end="url(#mk-pass)"/>
+<g class="chip c-pass"><rect x="688.2" y="2940" width="263.7" height="18" rx="9"/>
+<text x="696.2" y="2953" class="ct">C1–C9 ✓ · no stale pins · metrics.json</text></g>
+<g class="num"><circle cx="24" cy="2949" r="10"/><text x="24" y="2953">64</text></g>
+<line class="arr a-msg" x1="588" y1="3002" x2="699" y2="3002" marker-end="url(#mk-sys)"/>
+<g class="chip c-msg"><rect x="548.4" y="2978" width="189.3" height="18" rx="9"/>
+<text x="556.4" y="2991" class="ct">Tag SPEC-0001/v1.1-ready</text></g>
+<g class="num"><circle cx="24" cy="2987" r="10"/><text x="24" y="2991">65</text></g>
+<line class="arr a-reply" x1="706" y1="3040" x2="1171" y2="3040" marker-end="url(#mk-sys)"/>
+<g class="chip c-reply"><rect x="797.5" y="3016" width="281.0" height="18" rx="9"/>
+<text x="805.5" y="3029" class="ct">Execution loop feeds lagging signals back</text></g>
+<g class="num"><circle cx="24" cy="3025" r="10"/><text x="24" y="3029">66</text></g>
+</svg></div>
+  <p class="hint">The diagram is 1,400 px wide. Scroll sideways on smaller screens.</p>
+</section>
+
+<section class="block" id="steps">
+  <h2>Step by step</h2>
+  <p class="sub">The same steps in words, with the detail that doesn't fit on an arrow.</p>
+  <div class="phases"><section class="phase" id="p1"><div class="ph-head"><span class="ph-code">P1</span><h3>Intent</h3><span class="ph-date">19 Sep</span></div><p class="ph-sum">The user&#x27;s words become intent.md, grounded in the org KB and checked against the constitution.</p><ol class="steps"><li value="1"><div class="sl"><span class="route">User → UI</span><span class="pill p-human">human</span></div><p class="what">Types the raw intent</p><p class="det">“Customers who cancel before we ship keep emailing support to get their money back… Support is drowning.”</p></li><li value="2"><div class="sl"><span class="route">UI → Reconciler</span></div><p class="what">New spec request</p></li><li value="3"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">Branch spec/SPEC-0001/intent + template</p><p class="det">The header pins constitution v3 and the AGENTS.md hash before any agent runs.</p></li><li value="4"><div class="sl"><span class="route">Reconciler → Intent agent</span></div><p class="what">Start session (create)</p></li><li value="5"><div class="sl"><span class="route">Intent agent → Org KB</span></div><p class="what">kb_search: refund policy, provider refunds</p></li><li value="6"><div class="sl"><span class="route">Org KB → Intent agent</span></div><p class="what">refund-policy v4 · provider doc v7 · constitution v3</p></li><li value="7"><div class="sl"><span class="route">Intent agent → User</span></div><p class="what">ask_user Q-1: what does “quickly” mean?</p><p class="det">Relayed through the reconciler and the UI. The agent never guesses a number.</p></li><li value="8"><div class="sl"><span class="route">User → Intent agent</span></div><p class="what">Refund must start within 1 hour</p></li><li value="9"><div class="sl"><span class="route">Intent agent</span></div><p class="what">Writes intent.md · validate_artifact ✓</p><p class="det">STK-1..3, GOAL-1 (must), GOAL-2 (should), NG-1, CON-1 citing kb:finance-refund-policy@4, SC-1/2, ASM-1, Q-1 answered.</p></li><li value="10"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">spec-lint intent.md</p></li><li value="11"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Clean · no open Q (F6) · CON-1 cites KB (K2)</p></li><li value="12"><div class="sl"><span class="route">Reconciler → Eval judge</span></div><p class="what">Intent rubric + ART-1</p></li><li value="13"><div class="sl"><span class="route">Eval judge → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Pass 0.86</p></li><li value="14"><div class="sl"><span class="route">Reconciler → DDD agent</span></div><p class="what">ddd-seed</p></li><li value="15"><div class="sl"><span class="route">DDD agent → Reconciler</span></div><p class="what">Proposed terms → glossary</p></li><li value="16"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">status in-review · PR 11 · ready-for-review</p></li><li value="17"><div class="sl"><span class="route">BA → UI</span><span class="pill p-human">human</span></div><p class="what">Approves intent</p></li><li value="18"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">Re-verify · status approved · merge</p></li></ol></section><section class="phase" id="p2"><div class="ph-head"><span class="ph-code">P2</span><h3>Requirements</h3><span class="ph-date">19–20 Sep</span></div><p class="ph-sum">Analysis finds gaps, DDD fixes the language and boundaries, and generation is verified, repaired, evaluated and revised.</p><ol class="steps"><li value="19"><div class="sl"><span class="route">Reconciler → Req analysis agent</span></div><p class="what">Round 1</p></li><li value="20"><div class="sl"><span class="route">Req analysis agent → Reconciler</span></div><p class="what">RAF-1..4 · RAF-4 boundary is a blocker</p><p class="det">RAF-1 partial cancellation (human) · RAF-2 “money back” wording (ddd) · RAF-3 provider rejects refund (self) · RAF-4 which context decides (ddd, blocker).</p></li><li value="21"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">spec-lint</p></li><li value="22"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-fail">failed</span></div><p class="what">Gate F1: blocker RAF-4 still open</p></li><li value="23"><div class="sl"><span class="route">Reconciler → DDD agent</span></div><p class="what">ddd-strategic for RAF-2, RAF-4</p></li><li value="24"><div class="sl"><span class="route">DDD agent → Reconciler</span></div><p class="what">Refund, Order Reference · Ordering → Payments map</p><p class="det">Adds TERM-005 Refund (avoid: reimbursement, money back) and TERM-008 Order Reference. Declares the Ordering and Payments contexts and maps Ordering [OHS,PL] → Payments [ACL].</p></li><li value="25"><div class="sl"><span class="route">Reconciler → UI</span></div><p class="what">needs-input: RAF-1</p></li><li value="26"><div class="sl"><span class="route">BA → UI</span><span class="pill p-human">human</span></div><p class="what">/answer RAF-1: whole Order only</p></li><li value="27"><div class="sl"><span class="route">Reconciler → Req analysis agent</span></div><p class="what">Round 2</p></li><li value="28"><div class="sl"><span class="route">Req analysis agent → Reconciler</span></div><p class="what">No new findings · ART-2, ART-5 apply</p></li><li value="29"><div class="sl"><span class="route">Reconciler → Req generation agent</span></div><p class="what">Create (attempt 1)</p></li><li value="30"><div class="sl"><span class="route">Req generation agent → Reconciler</span></div><p class="what">requirements.md + trace links</p></li><li value="31"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">spec-lint</p></li><li value="32"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-fail">failed</span></div><p class="what">L5 “quickly” · D5 “reimbursement” · L2 two “shall”</p><p class="det">Errors are deterministic, so the same draft always fails the same way. The step is re-run in repair mode with the error list.</p></li><li value="33"><div class="sl"><span class="route">Reconciler → Req generation agent</span></div><p class="what">Repair (attempt 2) with error list</p></li><li value="34"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">spec-lint</p></li><li value="35"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Clean</p></li><li value="36"><div class="sl"><span class="route">Reconciler → Eval judge</span></div><p class="what">Rubric + ART-2, ART-5</p></li><li value="37"><div class="sl"><span class="route">Eval judge → Reconciler</span><span class="pill p-fail">failed</span></div><p class="what">ART-2: REQ-002 has no duplicate-trigger AC</p><p class="det">The draft was lint-clean but broke a constitution article. Only a judgment check could catch this.</p></li><li value="38"><div class="sl"><span class="route">Reconciler → Req generation agent</span></div><p class="what">Revise with judge rationale</p></li><li value="39"><div class="sl"><span class="route">Req generation agent → Reconciler</span></div><p class="what">Adds AC-002.2 (no second Refund)</p></li><li value="40"><div class="sl"><span class="route">Reconciler → Eval judge</span></div><p class="what">Re-verify + re-eval</p></li><li value="41"><div class="sl"><span class="route">Eval judge → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Pass 0.91</p></li><li value="42"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">PR 12 in-review · BA + architect (domain/ changed)</p></li><li value="43"><div class="sl"><span class="route">Architect → UI</span><span class="pill p-human">human</span></div><p class="what">Approves domain changes</p></li><li value="44"><div class="sl"><span class="route">BA → UI</span><span class="pill p-human">human</span></div><p class="what">Approves requirements</p></li><li value="45"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">Merge · glossary v2 on main</p></li></ol></section><section class="phase" id="p3"><div class="ph-head"><span class="ph-code">P3</span><h3>Design</h3><span class="ph-date">21–22 Sep</span></div><p class="ph-sum">Design analysis raises risks for the architect, DDD adds the tactical model, and generation passes verify and eval first time.</p><ol class="steps"><li value="46"><div class="sl"><span class="route">Reconciler → Design analysis agent</span></div><p class="what">Round 1</p></li><li value="47"><div class="sl"><span class="route">Design analysis agent → Org KB</span></div><p class="what">kb_get provider doc v7</p></li><li value="48"><div class="sl"><span class="route">Org KB → Design analysis agent</span></div><p class="what">Refund API limit: 20 per second</p></li><li value="49"><div class="sl"><span class="route">Design analysis agent → Reconciler</span></div><p class="what">DAF-1 rate-limit risk · DAF-2 duplicates</p><p class="det">DAF-1 nfr-risk goes to the architect with two options and a recommendation. DAF-2 is a gap the step resolves itself, citing const:ART-2.</p></li><li value="50"><div class="sl"><span class="route">Reconciler → UI</span></div><p class="what">needs-input: DAF-1 (2 options)</p></li><li value="51"><div class="sl"><span class="route">Architect → UI</span><span class="pill p-human">human</span></div><p class="what">/answer DAF-1: durable refund queue</p></li><li value="52"><div class="sl"><span class="route">Reconciler → DDD agent</span></div><p class="what">ddd-tactical</p></li><li value="53"><div class="sl"><span class="route">DDD agent → Reconciler</span></div><p class="what">Orders, Refunds aggregates · cml_check ✓</p><p class="det">Ordering v2: Order + OrderCancelled. Payments v2: Refund keyed by OrderReference, plus RefundIssued and RefundFailed.</p></li><li value="54"><div class="sl"><span class="route">Reconciler → Design generation agent</span></div><p class="what">Create</p></li><li value="55"><div class="sl"><span class="route">Design generation agent → Reconciler</span></div><p class="what">DES-1..4 · ADR-1 · realizes links</p></li><li value="56"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">spec-lint</p></li><li value="57"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Clean · coverage C5–C8 · no boundary violation (D9)</p><p class="det">DES-3 in Payments depends on DES-2 in Ordering. That is allowed only because the context map has Ordering → Payments.</p></li><li value="58"><div class="sl"><span class="route">Reconciler → Eval judge</span></div><p class="what">Rubric + ART-2..5</p></li><li value="59"><div class="sl"><span class="route">Eval judge → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">Pass 0.88</p></li><li value="60"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">PR 15 in-review</p></li><li value="61"><div class="sl"><span class="route">Architect → UI</span><span class="pill p-human">human</span></div><p class="what">Approves design</p></li><li value="62"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">Merge</p></li></ol></section><section class="phase" id="p4"><div class="ph-head"><span class="ph-code">P4</span><h3>Verify &amp; handoff</h3><span class="ph-date">22 Sep →</span></div><p class="ph-sum">A whole-spec verify on main, a ready tag, and the feedback path from execution back to eval.</p><ol class="steps"><li value="63"><div class="sl"><span class="route">Reconciler → Verify</span></div><p class="what">Whole-spec verify on main</p></li><li value="64"><div class="sl"><span class="route">Verify → Reconciler</span><span class="pill p-pass">passed</span></div><p class="what">C1–C9 ✓ · no stale pins · metrics.json</p></li><li value="65"><div class="sl"><span class="route">Reconciler → Git / PR</span></div><p class="what">Tag SPEC-0001/v1.1-ready</p></li><li value="66"><div class="sl"><span class="route">Git / PR → Eval judge</span></div><p class="what">Execution loop feeds lagging signals back</p><p class="det">plan → code → QA consumes only the tag and adds implements/tests links. Clarification requests, spec-rooted rework and escaped defects are attributed to IDs and flow into the eval sets.</p></li></ol></section></div>
+</section>
+
+<section class="block" id="metrics">
+  <h2>Leading metrics at handoff</h2>
+  <p class="sub">What <code>spec-lint</code> recorded in <code>metrics.json</code> by the time the spec was tagged. The lagging signals from plan → code → QA are later checked against these.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Metric</th><th>Value</th><th>What it says</th></tr></thead>
+    <tbody><tr><td><code>goal_coverage</code></td><td class="num">1.00</td><td>the must-goal has requirements</td></tr><tr><td><code>ears_rate</code></td><td class="num">5 / 5</td><td>every REQ statement is valid EARS</td></tr><tr><td><code>testable_ac_rate</code></td><td class="num">7 / 7</td><td>every AC is Given/When/Then</td></tr><tr><td><code>nfr_measurable_rate</code></td><td class="num">2 / 2</td><td>every NFR has a number and unit</td></tr><tr><td><code>findings</code></td><td class="num">4 RAF · 2 DAF</td><td>1 blocker, 4 major, 1 minor</td></tr><tr><td><code>human_questions</code></td><td class="num">3</td><td>Q-1, RAF-1, DAF-1</td></tr><tr><td><code>repair_attempts</code></td><td class="num">1</td><td>req-generation, lint errors</td></tr><tr><td><code>eval_retries</code></td><td class="num">1</td><td>req-generation, ART-2</td></tr><tr><td><code>realization_rate</code></td><td class="num">5 / 5</td><td>every must REQ is realized by a DES</td></tr><tr><td><code>boundary_violations</code></td><td class="num">0</td><td>D9</td></tr><tr><td><code>back_edges</code></td><td class="num">0</td><td>no requirement changes from design</td></tr></tbody>
+  </table></div>
+</section>
+
+<section class="block" id="files">
+  <h2>Where it lives</h2>
+  <p class="sub">All of this is in the spec-contracts bundle and is generated from one model, so the page, the drawing and the diagrams can't drift apart.</p>
+  <ul class="files">
+    <li><code>docs/scenario/model.py</code><span>The steps, lanes and phases. Edit this, then run <code>build.py</code>.</span></li>
+    <li><code>docs/scenario/SPEC-0001-scenario.excalidraw</code><span>The swimlane as an editable Excalidraw drawing.</span></li>
+    <li><code>docs/diagrams/*.mmd</code><span>Mermaid sequence diagrams per phase and in full. Paste them into Excalidraw's Mermaid import.</span></li>
+    <li><code>docs/scenario-SPEC-0001.md</code><span>This walkthrough as Markdown, for the repo.</span></li>
+    <li><code>examples/</code><span>Every artifact the scenario produces: intent, analyses, requirements, design, trace, glossary, CML and the constitution.</span></li>
+  </ul>
+</section>
+</div>

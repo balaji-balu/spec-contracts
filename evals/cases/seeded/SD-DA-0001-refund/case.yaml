@@ -1,0 +1,20 @@
+id: SD-DA-0001-refund
+suite: seeded
+title: Design analysis on requirements with four planted defects
+targets: [design-analysis]
+start_at: design-analysis
+stop_after: design-analysis
+inputs:
+  artifacts: [inputs/intent.md, inputs/requirements.md, inputs/trace.yaml]
+  domain: ../../../../examples/domain
+  constitution: ../../../../examples/org/constitution.md
+  kb: [../../golden/G-0001-refund/inputs/kb/finance-refund-policy.md, ../../golden/G-0001-refund/inputs/kb/payments-provider-integration.md]
+sim_reviewer:
+  fallback: defer
+  approve: never
+expected:
+  findings: expected.yaml
+notes: >-
+  The second not_defects entry is a trap. An agent that doesn't do the arithmetic from the KB
+  (2,000 cancellations in 10 minutes is about 3.3 per second, against a limit of 20 per second) will raise
+  a false blocker, and that counts as noise.

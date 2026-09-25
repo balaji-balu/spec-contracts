@@ -1,0 +1,15 @@
+header:
+  artifact: trace
+  id: SPEC-9003
+  version: 1
+  status: draft
+  upstream:
+    intent: {id: SPEC-9003, version: 1}
+    requirements: {id: SPEC-9003, version: 1}
+  produced_by: {step: reconciler, harness: {name: pi, version: 0.9.0}, model: none, prompt: none@0.0.0, template: trace@1.0.0, run_id: sample-g-0001-k1}
+links:
+  - {from: REQ-001, rel: derives-from, to: GOAL-1, by: req-generation, run: sample-g-0001-k1}
+  - {from: REQ-002, rel: derives-from, to: GOAL-1, by: req-generation, run: sample-g-0001-k1}
+  - {from: REQ-002, rel: derives-from, to: CON-1, by: req-generation, run: sample-g-0001-k1}
+  - {from: REQ-003, rel: derives-from, to: SC-1, by: req-generation, run: sample-g-0001-k1}
+  - {from: REQ-004, rel: derives-from, to: GOAL-2, by: req-generation, run: sample-g-0001-k1}

@@ -1,0 +1,72 @@
+rubric: requirements-analysis
+version: 1.0.0
+grounding: "Robertson & Robertson: quality gateway (relevance, completeness, consistency, ambiguity, testability)"
+scale: {1: fails, 2: weak, 3: acceptable, 4: good, 5: exemplary}
+constitution: auto
+criteria:
+  - id: RA-1
+    name: Findings that matter
+    question: Do the findings target the defects that would cause wrong or missing requirements, rather than cosmetic issues?
+    anchors:
+      1: Mostly wording nits, and a material gap or conflict is missed
+      3: The main defects are found, mixed with low-value findings
+      5: Every finding would change a requirement or a decision if left unresolved
+    evidence: For each finding, say what would go wrong if ignored
+    weight: 3
+    hard_fail: false
+    status: advisory
+  - id: RA-2
+    name: Defect classes covered
+    question: Were ambiguity, conflict, gap, testability, terminology, boundary and constitution checks all applied?
+    anchors:
+      1: Only one class checked
+      3: Most classes are visible, but the boundary or constitution check is absent
+      5: The Summary shows every class was considered, and it lists the applicable articles
+    evidence: List the classes with at least one finding, or an explicit "none found"
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RA-3
+    name: Resolutions are actionable
+    question: Could a BA accept each proposed_resolution as written?
+    anchors:
+      1: Resolutions say "clarify with stakeholder" or restate the problem
+      3: Most are concrete, and some leave the decision open
+      5: Every resolution is a specific, acceptable decision or question with options
+    evidence: Quote the weakest proposed_resolution
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RA-4
+    name: Honest routing
+    question: Are business and policy decisions routed to a human, and only mechanical fixes kept as self?
+    anchors:
+      1: A business decision (scope, policy, money, risk) is routed self or ddd
+      3: Routing is right, but a human finding lacks the context to decide
+      5: Every route matches who can legitimately decide, with enough context
+    evidence: Quote any finding whose route is wrong
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: RA-5
+    name: Severity calibrated
+    question: Do severities reflect impact (blocker means requirements can't be written correctly)?
+    anchors:
+      1: A blocker-class defect is marked minor, or everything is major
+      3: One severity is off by one level
+      5: All severities are defensible
+    evidence: Name any mis-rated finding
+    weight: 1
+    hard_fail: false
+    status: advisory
+  - id: RA-6
+    name: Stays an analysis
+    question: Does it find and propose without rewriting intent or inventing requirements?
+    anchors:
+      1: Upstream content is rewritten, or requirements are drafted inside findings
+      3: One finding drifts into solution design
+      5: It quotes sources and proposes decisions only
+    evidence: Quote any finding that designs or rewrites
+    weight: 1
+    hard_fail: false
+    status: advisory

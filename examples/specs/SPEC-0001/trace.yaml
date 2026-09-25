@@ -1,0 +1,57 @@
+header:
+  artifact: trace
+  id: SPEC-0001
+  version: 1
+  status: approved
+  upstream:
+    intent: {id: SPEC-0001, version: 1}
+    requirements-analysis: {id: SPEC-0001, version: 1}
+    requirements: {id: SPEC-0001, version: 1}
+    design-analysis: {id: SPEC-0001, version: 1}
+    design: {id: SPEC-0001, version: 1}
+  produced_by:
+    step: reconciler
+    harness: {name: pi, version: 0.9.0}
+    model: none
+    prompt: none@0.0.0
+    template: trace@1.0.0
+    run_id: run-0001-13
+  approved_by:
+    - {name: arch-ravi, role: architect, at: "2026-09-22T16:40:00+05:30", pr: "#15"}
+
+links:
+  # requirements analysis
+  - {from: RAF-1, rel: affects, to: GOAL-1, by: req-analysis, run: run-0001-03}
+  - {from: RAF-1, rel: resolved-by, to: REQ-001, by: req-generation, run: run-0001-06}
+  - {from: RAF-2, rel: affects, to: GOAL-1, by: req-analysis, run: run-0001-03}
+  - {from: RAF-2, rel: resolved-by, to: TERM-005, by: ddd-strategic, run: run-0001-04}
+  - {from: RAF-3, rel: affects, to: GOAL-1, by: req-analysis, run: run-0001-03}
+  - {from: RAF-3, rel: resolved-by, to: REQ-003, by: req-generation, run: run-0001-06}
+  - {from: RAF-4, rel: affects, to: GOAL-1, by: req-analysis, run: run-0001-03}
+  - {from: RAF-4, rel: resolved-by, to: "domain-context:Payments", by: ddd-strategic, run: run-0001-04}
+  - {from: RAF-4, rel: resolved-by, to: TERM-008, by: ddd-strategic, run: run-0001-04}
+
+  # requirements
+  - {from: REQ-001, rel: derives-from, to: GOAL-1, by: req-generation, run: run-0001-06}
+  - {from: REQ-002, rel: derives-from, to: GOAL-1, by: req-generation, run: run-0001-06}
+  - {from: REQ-002, rel: derives-from, to: GOAL-2, by: req-generation, run: run-0001-06}
+  - {from: REQ-002, rel: assumes, to: ASM-1, by: req-generation, run: run-0001-06}
+  - {from: REQ-003, rel: derives-from, to: GOAL-1, by: req-generation, run: run-0001-06}
+  - {from: REQ-101, rel: derives-from, to: SC-1, by: req-generation, run: run-0001-06}
+  - {from: REQ-102, rel: derives-from, to: CON-1, by: req-generation, run: run-0001-06}
+
+  # design analysis
+  - {from: DAF-1, rel: affects, to: REQ-101, by: design-analysis, run: run-0001-10}
+  - {from: DAF-1, rel: resolved-by, to: ADR-1, by: design-generation, run: run-0001-12}
+  - {from: DAF-2, rel: affects, to: AC-002.2, by: design-analysis, run: run-0001-10}
+  - {from: DAF-2, rel: resolved-by, to: DES-3, by: design-generation, run: run-0001-12}
+
+  # design
+  - {from: DES-1, rel: realizes, to: REQ-001, by: design-generation, run: run-0001-12}
+  - {from: DES-2, rel: realizes, to: AC-001.1, by: design-generation, run: run-0001-12}
+  - {from: DES-3, rel: realizes, to: REQ-002, by: design-generation, run: run-0001-12}
+  - {from: DES-3, rel: realizes, to: REQ-102, by: design-generation, run: run-0001-12}
+  - {from: DES-4, rel: realizes, to: REQ-003, by: design-generation, run: run-0001-12}
+  - {from: DES-4, rel: realizes, to: REQ-101, by: design-generation, run: run-0001-12}
+  - {from: ADR-1, rel: decides, to: DES-4, by: design-generation, run: run-0001-12}
+  - {from: ADR-1, rel: addresses, to: DAF-1, by: design-generation, run: run-0001-12}

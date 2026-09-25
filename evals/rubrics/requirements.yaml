@@ -1,0 +1,83 @@
+rubric: requirements
+version: 1.0.0
+grounding: "Robertson & Robertson: fit criteria, atomic requirements, what not how; EARS for form"
+scale: {1: fails, 2: weak, 3: acceptable, 4: good, 5: exemplary}
+constitution: auto
+criteria:
+  - id: RQ-1
+    name: Fit criteria verify their requirement
+    question: Does each REQ's set of ACs actually prove its statement, not a neighbouring behaviour, and would it fail if the requirement were broken?
+    anchors:
+      1: An AC tests something other than its REQ, or a REQ's key clause has no AC
+      3: Every REQ is verified, but one AC is weaker than its statement (misses a condition)
+      5: Every clause of every statement is pinned by an AC that would fail on violation
+    evidence: For the weakest REQ, quote the clause that no AC pins
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: RQ-2
+    name: What, not how
+    question: Do requirements avoid prescribing design (technologies, components, data structures) unless a constraint demands it?
+    anchors:
+      1: A REQ names an implementation ("shall use Kafka", "shall store in table X") with no CON behind it
+      3: One REQ leans towards a mechanism but is still testable as behaviour
+      5: Every REQ is behaviour or a quality, and any mechanism is traced to a CON
+    evidence: Quote any design-smuggling statement
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RQ-3
+    name: Complete against intent and findings
+    question: Is every must-goal fully covered, and is every resolved finding reflected?
+    anchors:
+      1: A must-goal is only partly addressed, or a resolved finding is ignored
+      3: Covered, but a resolution is reflected only in part
+      5: Every goal, constraint and resolution visibly lands in a REQ or AC
+    evidence: List goals and resolutions with their REQs
+    weight: 3
+    hard_fail: true
+    status: advisory
+  - id: RQ-4
+    name: Atomic and consistent
+    question: Is each REQ one obligation, with no overlaps or contradictions between REQs?
+    anchors:
+      1: Two REQs contradict, or one REQ hides several obligations
+      3: Some overlap between two REQs, with no contradiction
+      5: A clean partition of obligations
+    evidence: Name the overlapping or contradictory pairs
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RQ-5
+    name: Unwanted behaviour covered
+    question: Are failure paths, duplicates, limits and rejections specified where the domain implies them?
+    anchors:
+      1: Only the happy path
+      3: The main failure covered, an obvious one missing (duplicate trigger, timeout)
+      5: Every realistic failure has an If/then or an AC
+    evidence: Name the missing unwanted behaviours
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RQ-6
+    name: NFRs measurable in operation
+    question: Could each NFR fit criterion be measured in production with realistic data?
+    anchors:
+      1: A number exists but can't be observed, or is plainly unrealistic
+      3: Measurable, but the load or condition is unspecified
+      5: Metric, condition, percentile and window are all specified and observable
+    evidence: Quote each NFR AC
+    weight: 2
+    hard_fail: false
+    status: advisory
+  - id: RQ-7
+    name: Ubiquitous language used right
+    question: Beyond lint, are terms used with their glossary meaning in the REQ's context?
+    anchors:
+      1: A term is used with another context's meaning
+      3: Correct, but one statement relies on an undefined concept
+      5: Every domain concept is a glossary term used as defined
+    evidence: Quote any misuse
+    weight: 1
+    hard_fail: false
+    status: advisory

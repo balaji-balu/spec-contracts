@@ -1,0 +1,20 @@
+header:
+  artifact: trace
+  id: SPEC-9002
+  version: 1
+  status: approved
+  upstream:
+    intent: {id: SPEC-9002, version: 1}
+    requirements: {id: SPEC-9002, version: 1}
+  produced_by: {step: human, harness: {name: pi, version: 0.9.0}, model: none, prompt: none@0.0.0, template: trace@1.0.0, run_id: eval-fixture}
+  approved_by:
+    - {name: eval-fixture, role: ba, at: "2026-09-24T10:00:00+05:30", pr: fixture}
+links:
+  - {from: REQ-001, rel: derives-from, to: GOAL-1, by: human}
+  - {from: REQ-002, rel: derives-from, to: GOAL-1, by: human}
+  - {from: REQ-002, rel: derives-from, to: GOAL-2, by: human}
+  - {from: REQ-003, rel: derives-from, to: GOAL-1, by: human}
+  - {from: REQ-004, rel: derives-from, to: GOAL-1, by: human}
+  - {from: REQ-005, rel: derives-from, to: GOAL-1, by: human}
+  - {from: REQ-101, rel: derives-from, to: SC-1, by: human}
+  - {from: REQ-102, rel: derives-from, to: CON-1, by: human}

@@ -1,0 +1,31 @@
+sequenceDiagram
+  autonumber
+  actor USER as User (requester)
+  actor BA as BA (business analyst)
+  participant UI as UI (thin client)
+  participant REC as Reconciler (orchestrator)
+  participant GIT as Git / PR (workflow state)
+  participant AGENT as pi agent (one per step)
+  participant DDD as DDD agent (pi)
+  participant VERIFY as Verify (spec-lint)
+  participant EVAL as Eval judge (rubric + articles)
+  participant KB as Org KB (constitution)
+  Note over USER,KB: P1 Intent (19 Sep)
+  USER->>UI: Types the raw intent
+  UI->>REC: New spec request
+  REC->>GIT: Branch spec/SPEC-0001/intent + template
+  REC->>AGENT: [Intent] Start session (create)
+  AGENT->>KB: [Intent] kb_search - refund policy, provider refunds
+  KB-->>AGENT: refund-policy v4 · provider doc v7 · constitution v3
+  AGENT->>USER: [Intent] ask_user Q-1 - what does 'quickly' mean?
+  USER-->>AGENT: Refund must start within 1 hour
+  AGENT->>AGENT: [Intent] Writes intent.md · validate_artifact ✓
+  REC->>VERIFY: spec-lint intent.md
+  VERIFY-->>REC: ✓ Clean · no open Q (F6) · CON-1 cites KB (K2)
+  REC->>EVAL: Intent rubric + ART-1
+  EVAL-->>REC: ✓ Pass 0.86
+  REC->>DDD: ddd-seed
+  DDD-->>REC: Proposed terms → glossary
+  REC->>GIT: status in-review · PR 11 · ready-for-review
+  BA->>UI: Approves intent
+  REC->>GIT: Re-verify · status approved · merge
