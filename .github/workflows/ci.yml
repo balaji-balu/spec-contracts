@@ -26,6 +26,20 @@ jobs:
       - name: Lint the worked example
         run: npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
 
+  pi-spec-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci # also builds spec-lint (its prepare script), which the extensions import
+      - run: npm run typecheck -w pi-spec-tools
+      - run: npm test -w pi-spec-tools # includes a real pi session driven by pi's faux provider
+
   prototype-parity:
     # Re-runs the Python prototype and checks the recorded baseline is current. Remove with the prototype.
     runs-on: ubuntu-latest

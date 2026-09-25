@@ -37,7 +37,8 @@ templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
-packages/spec-lint/              # the linter (TypeScript): CLI + library for the validate_artifact pi extension
+packages/spec-lint/              # the linter (TypeScript): CLI + library
+packages/pi-spec-tools/          # pi package: extensions agents call (validate_artifact; trace_link, term_lookup, kb_* next)
 tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed, then deleted
 ```
 
@@ -45,7 +46,7 @@ Run the linter (Node 20+, after `npm install` at the repo root):
 
 ```
 npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
-npm test -w spec-lint
+npm test --workspaces
 ```
 
 The example is clean apart from one warning (C4 on SC-2). The tests check parity with the prototype on every fixture and

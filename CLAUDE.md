@@ -4,7 +4,7 @@ Context for Claude Code working in this repo. Read this first, then `README.md`.
 
 ## What this is
 The contracts, templates, examples and eval harness for the **intent → requirements → design**
-half of an agentic, spec-driven SDLC platform. Agents run on **pi** (pi.dev, `@mariozechner/pi-coding-agent`),
+half of an agentic, spec-driven SDLC platform. Agents run on **pi** (pi.dev, `@earendil-works/pi-coding-agent`, 0.85.1 installed),
 orchestrated by a **git-as-state reconciler**. Humans (BA, senior architect) approve through PRs.
 The plan → code → QA loop comes later and consumes only tagged, approved specs.
 
@@ -17,6 +17,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - `evals/`: the harness. `README.md` (layers), `scoring.md`, `calibration.md`, `thresholds.yaml`,
   `rubrics/`, `judge/prompt.md`, `schemas/`, `cases/` (7 cases), and `runner/score.py` (prototype).
 - `packages/spec-lint/`: the TypeScript linter (M1 step 1). `src/rules/` has one file per rule family, and `test/cases.ts` lists the fixtures and planted defects.
+- `packages/pi-spec-tools/`: the pi package agents load (M1 step 2+). `extensions/` registers tools and `src/` holds their logic. Tests drive a real pi session with pi's faux provider, so no model key is needed.
 - `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
 - `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `spec-pipeline-roadmap.html` at the repo root.
 
@@ -62,6 +63,8 @@ Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
 ```
 npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
 npm test -w spec-lint              # parity + planted + git-aware + rule tests
+npm test -w pi-spec-tools          # validate_artifact unit tests + a faux-model pi session
+pi -e packages/pi-spec-tools/extensions/validate-artifact.ts   # try the tool in an interactive pi session
 npm run typecheck -w spec-lint
 npm run parity:check -w spec-lint  # re-runs the Python prototype and diffs it against test/parity/prototype-baseline.json
 ```
