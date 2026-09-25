@@ -6,7 +6,7 @@ import type { TraceLink } from "../parse/trace.js";
 import { specBlocks, type Workspace } from "../workspace.js";
 
 /** Allowed (from, to) prefixes per rel (validation-rules §3). `resolved-by` accepts any target. */
-const ALLOWED: Record<string, { from: string[]; to: string[] | "any" }[]> = {
+export const ALLOWED: Record<string, { from: string[]; to: string[] | "any" }[]> = {
   "derives-from": [{ from: ["REQ"], to: ["GOAL", "CON", "SC"] }],
   assumes: [{ from: ["REQ", "DES"], to: ["ASM"] }],
   affects: [
@@ -39,9 +39,20 @@ function resolveQualified(ws: Workspace, id: string): boolean {
     .some((f) => pattern.test(readFileSync(join(dir, f), "utf8")));
 }
 
-type Resolution = "ok" | "withdrawn" | "missing";
+/** T2: why `rel` is not allowed from `from` to `to`, or null when it is. */
+export function relError(rel: string, from: string, to: string): string | null {
+  const rules = ALLOWED[rel];
+  if (!rules) return `unknown rel '${rel}' (allowed: ${Object.keys(ALLOWED).join(", ")})`;
+  const fp = prefixOf(from);
+  const tp = prefixOf(to);
+  if (rules.some((r) => r.from.includes(fp) && (r.to === "any" || r.to.includes(tp)))) return null;
+  const allowed = rules.map((r) => `${r.from.join("/")} → ${r.to === "any" ? "any ID" : r.to.join("/")}`).join("; ");
+  return `'${rel}' is not allowed from ${fp} to ${tp} (allowed: ${allowed})`;
+}
 
-function resolveTo(ws: Workspace, id: string): Resolution {
+export type Resolution = "ok" | "withdrawn" | "missing";
+
+export function resolveTo(ws: Workspace, id: string): Resolution {
   if (id.startsWith("domain-context:")) return ws.contexts.has(id.slice("domain-context:".length)) ? "ok" : "missing";
   if (/^SPEC-\d{4}\//.test(id)) return resolveQualified(ws, id) ? "ok" : "missing";
   const e = ws.ids.get(id);
@@ -74,11 +85,8 @@ export function checkTrace(ws: Workspace): void {
     else if (to === "withdrawn") ws.diags.add("T1", "W", file, l.line, `'to' ${l.to} is withdrawn`, l.from);
 
     // T2: rel allowed for the prefix pair
-    const rules = ALLOWED[l.rel];
-    const fp = prefixOf(l.from);
-    const tp = prefixOf(l.to);
-    const ok = rules?.some((r) => r.from.includes(fp) && (r.to === "any" || r.to.includes(tp)));
-    if (!ok) ws.diags.add("T2", "E", file, l.line, rules ? `'${l.rel}' is not allowed from ${fp} to ${tp}` : `unknown rel '${l.rel}'`, l.from);
+    const t2 = relError(l.rel, l.from, l.to);
+    if (t2) ws.diags.add("T2", "E", file, l.line, t2, l.from);
   }
 
   // T4: a cross-file ID written into a block field instead of trace.yaml

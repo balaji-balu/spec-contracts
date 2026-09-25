@@ -118,6 +118,8 @@ Every step has the same invocation contract:
 - **Modes.** A step starts in `create` mode. It switches to `repair` when given lint errors, and to `revise` when given review comments or a judge's rationale. Only the preamble of the prompt differs between modes.
 - **Must self-validate.** The step has to call `validate_artifact` and get zero E errors before it ends. If it ends with errors anyway, the reconciler still counts one attempt.
 - **Traceable output.** The session JSONL is stored outside git, keyed by `run_id`, and the commit carries `run_id` as a trailer.
+- **Session identity.** The reconciler starts the session with `SPEC_STEP=<step>` and `SPEC_RUN=<run_id>` in its environment. `trace_link` writes these as the link's `by` and `run`. The model never supplies them, and a step may remove only links whose `by` is its own step.
+- **Workspace layout.** The session's working directory is the workspace root. It holds `domain/`, `specs/<SPEC>/` and a `spec-lint.config.yaml` naming the KB and constitution (validation-rules §8). The tools find the domain root by walking up to the folder that holds `domain/`.
 
 ### Verify vs eval
 

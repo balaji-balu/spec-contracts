@@ -1,14 +1,17 @@
 {
   "name": "pi-spec-tools",
   "version": "0.1.0",
-  "description": "pi extensions for spec-contracts agent steps: validate_artifact (M1 step 2); trace_link, term_lookup, kb_search/kb_get follow.",
+  "description": "pi extensions for spec-contracts agent steps: validate_artifact, trace_link, term_lookup, kb_search, kb_get.",
   "type": "module",
   "keywords": [
     "pi-package"
   ],
   "pi": {
     "extensions": [
-      "./extensions/validate-artifact.ts"
+      "./extensions/validate-artifact.ts",
+      "./extensions/trace-link.ts",
+      "./extensions/term-lookup.ts",
+      "./extensions/kb.ts"
     ]
   },
   "scripts": {
@@ -17,10 +20,12 @@
   },
   "dependencies": {
     "spec-lint": "*",
-    "typebox": "1.3.7"
+    "typebox": "1.3.7",
+    "yaml": "^2.6.1"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": ">=0.85.1"
+    "@earendil-works/pi-coding-agent": ">=0.85.1",
+    "@earendil-works/pi-ai": ">=0.85.1"
   },
   "devDependencies": {
     "@earendil-works/pi-ai": "0.85.1",

@@ -38,7 +38,7 @@ examples/                        # a worked SPEC-0001 (+ sample org/constitution
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
 packages/spec-lint/              # the linter (TypeScript): CLI + library
-packages/pi-spec-tools/          # pi package: extensions agents call (validate_artifact; trace_link, term_lookup, kb_* next)
+packages/pi-spec-tools/          # pi package: the tools agents call (validate_artifact, trace_link, term_lookup, kb_search, kb_get)
 tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed, then deleted
 ```
 
@@ -95,3 +95,4 @@ then **eval gate** (rubric/judge; thresholds defined when we design the eval har
 | D15 | Severity **I** marks a rule that could not run (no git, no ContextMapper, no KB, no lock file); D10 runs a configured ContextMapper command | decided |
 | D16 | Rule clarifications from the TypeScript port: T4 exempts prose fields, L7 exempts `Raw intent`, D15 exempts human commits, K3 owners map to people in `spec-lint.config.yaml` (validation-rules §3, §5, §5a, §6) | proposed |
 | D17 | Agents fix every E and every G except open findings routed to someone else; those are what the gate is for (AGENTS.md "Format") | decided |
+| D18 | The M1 org KB is plain Markdown files (`kb_doc`/`version` frontmatter) behind a `KbStore` interface that a Typegraph store can implement later. `kb_get` also serves `const:ART-n`, and KB text reaches the model fenced as data | decided |
