@@ -3,7 +3,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { type Diagnostic, formatDiagnostic, lint, type LintResult } from "spec-lint";
 
 /** Pinned in artifact headers as `produced_by.extensions.validate_artifact`. */
-export const VALIDATE_ARTIFACT_VERSION = "0.1.0";
+export const VALIDATE_ARTIFACT_VERSION = "1.0.0";
 
 export interface ValidateParams {
   /** A spec folder, or one artifact file in it. Relative to the session cwd. */

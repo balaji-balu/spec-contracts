@@ -1,0 +1,15 @@
+# pipeline.lock.yaml: everything an agent step uses, pinned (contracts/workflow.md §12).
+# Changes go through their own PR and are gated by the offline eval suites (evals/README.md §4).
+# context_files hashes are generated: npm run lock -w step-runner -- --update
+harness: {name: pi, version: 0.85.1}
+steps:
+  req-analysis:
+    model: openai/gpt-5.5
+    thinking: high
+    prompt: req-analysis@1.0.0
+    skills: {requirements-analysis: 1.0.0}
+    extensions: {validate_artifact: 1.0.0, trace_link: 1.0.0, kb_search: 1.0.0, kb_get: 1.0.0}
+    template: requirements-analysis@1.0.0
+    context_files: {AGENTS.md: "sha256:b6f34144e228", agents/req-analysis/AGENTS.md: "sha256:fa12a9f1d35e"}
+# eval_judge is chosen in M2; its model must differ from every step model above.
+limits: {repair_attempts: 3, analysis_rounds: 3, eval_retries: 2, back_edges: 2}

@@ -5,7 +5,7 @@ import { Diagnostics, openSpec, parseTrace, type TraceLink } from "spec-lint";
 import { findDomainRoot } from "./validate-artifact.ts";
 
 /** Pinned in artifact headers as `produced_by.extensions.trace_link`. */
-export const TRACE_LINK_VERSION = "0.1.0";
+export const TRACE_LINK_VERSION = "1.0.0";
 
 export interface TraceLinkParams {
   /** The spec folder (or its trace.yaml), relative to the session cwd. */

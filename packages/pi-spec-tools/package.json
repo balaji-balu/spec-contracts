@@ -1,6 +1,6 @@
 {
   "name": "pi-spec-tools",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "pi extensions for spec-contracts agent steps: validate_artifact, trace_link, term_lookup, kb_search, kb_get.",
   "type": "module",
   "keywords": [
