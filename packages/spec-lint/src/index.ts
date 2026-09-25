@@ -14,8 +14,11 @@ import { loadWorkspace } from "./workspace.js";
 export type { Diagnostic, Severity } from "./diagnostics.js";
 export type { Metrics } from "./metrics.js";
 export type { GitReader, Commit } from "./git.js";
-export { formatDiagnostic } from "./diagnostics.js";
+export { formatDiagnostic, Diagnostics } from "./diagnostics.js";
 export { CliGit, NullGit } from "./git.js";
+export { openDomain, openSpec, type SpecView, type TermInfo, type OpenOptions } from "./api.js";
+export { loadConfig, type Config } from "./config.js";
+export { parseTrace, type TraceLink } from "./parse/trace.js";
 
 export interface LintOptions {
   /** Folder holding `domain/` (and by default `org/constitution.md` and `kb/`). */

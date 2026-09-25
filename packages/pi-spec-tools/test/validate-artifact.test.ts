@@ -1,29 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { rmSync } from "node:fs";
+import { join } from "node:path";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import extension from "../extensions/validate-artifact.ts";
 import { findDomainRoot, validateArtifact } from "../src/validate-artifact.ts";
+import { EXAMPLES, workspace as ws } from "./helpers.ts";
 
-const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-const EXAMPLES = join(REPO, "examples");
+const workspace = (edit?: { file: string; find: string; replace: string }) => ws({ edit });
 
-/** SPEC-0001 with its domain in a temp folder, plus a config pointing at the golden-case KB. */
-function workspace(edit?: { file: string; find: string; replace: string }): string {
-  const root = mkdtempSync(join(tmpdir(), "pi-spec-tools-"));
-  for (const d of ["domain", "org"]) cpSync(join(EXAMPLES, d), join(root, d), { recursive: true });
-  cpSync(join(EXAMPLES, "specs", "SPEC-0001"), join(root, "specs", "SPEC-0001"), { recursive: true });
-  const kb = join(REPO, "evals", "cases", "golden", "G-0001-refund", "inputs", "kb").split("\\").join("/");
-  writeFileSync(join(root, "spec-lint.config.yaml"), `kb: ["${kb}"]\n`);
-  if (edit) {
-    const f = join(root, edit.file);
-    writeFileSync(f, readFileSync(f, "utf8").replace(/\r\n/g, "\n").replace(edit.find, edit.replace));
-  }
-  return root;
-}
 
 test("findDomainRoot walks up to the folder holding domain/", () => {
   assert.equal(findDomainRoot(join(EXAMPLES, "specs", "SPEC-0001")), EXAMPLES);
