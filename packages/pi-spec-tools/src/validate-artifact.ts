@@ -77,7 +77,7 @@ function report(r: LintResult, focus: string | null, ok: boolean): string {
       lines.push(formatDiagnostic(d));
     }
   }
-  if (G) lines.push("G = gate error: allowed while the artifact is a draft, but it blocks approval.");
+  if (G) lines.push("G = gate error: blocks approval. Fix it unless it is an open finding routed to someone else (human, architect, ddd, requirements).");
   if (W) lines.push("W = warning: report any you leave in place under ## Notes.");
   if (skipped.length) lines.push(`Not checked here (${skipped.length}): ${[...new Set(skipped.map((d) => d.code))].join(", ")}.`);
   return lines.join("\n");

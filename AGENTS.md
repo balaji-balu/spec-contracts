@@ -13,7 +13,7 @@ its own `agents/<step>/AGENTS.md`, which adds to these rules and never relaxes t
 - Follow `contracts/block-grammar.md` exactly: fixed sections, `### ID · title` blocks, only the listed keys.
 - New IDs continue from the highest existing number. Never renumber, reuse or delete an ID. Withdraw it with `withdrawn: <reason>`.
 - Cross-artifact links go through the `trace_link` tool only. Never write another file's IDs into a block.
-- Before you finish, call `validate_artifact` and fix every error (E and G). Report any warnings you leave in place in `## Notes`.
+- Before you finish, call `validate_artifact` and fix every E. Fix every G too, except open findings routed to someone else (`human`, `architect`, `ddd`, `requirements`): those stay open for the gate. Report any warnings you leave in place in `## Notes`.
 
 ## Language
 - Use glossary terms exactly as spelled, in the block's bounded context. Look them up with `term_lookup`.
