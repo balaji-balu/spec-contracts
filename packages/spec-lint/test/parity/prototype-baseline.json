@@ -1,0 +1,124 @@
+{
+  "note": "Output of tools/spec-lint-prototype.py (PYTHONUTF8=1). Regenerate with `npm run parity:record -w spec-lint`.",
+  "fixtures": {
+    "SPEC-0001": [],
+    "JF-REQ-0001-bad": [],
+    "JF-REQ-0002-good": [],
+    "G-0001-sample-run": [],
+    "SD-RA-0001-sample-run": [
+      "F1/F2: RAF-1",
+      "F1/F2: RAF-2",
+      "F1/F2: RAF-3"
+    ],
+    "SD-DA-0001-inputs": []
+  },
+  "planted": {
+    "L2 compound requirement": [
+      "L2: REQ-003"
+    ],
+    "L5 vague word in AC": [
+      "L5: REQ-002 'quickly'"
+    ],
+    "D2 term from another context": [
+      "D2: REQ-001 term 'Refund' in Ordering",
+      "D7(W): REQ-001 term Refund not used"
+    ],
+    "D5 avoid-word": [
+      "D5: REQ-002 uses 'reimbursement'"
+    ],
+    "D9 boundary violation": [
+      "D9: DES-3->DES-2"
+    ],
+    "T4 cross-file ID in a block": [
+      "T4: DES-1.responsibilities -> REQ-001"
+    ],
+    "C7 orphan DES": [
+      "C7: DES-1"
+    ],
+    "F1 open blocker": [
+      "F1/F2: RAF-4"
+    ],
+    "S4 unknown key": [
+      "S4: REQ-001 unknown {'owner'}"
+    ],
+    "H1 bad status": [
+      "H1: requirements.md: 'done' is not one of ['draft', 'in-review', 'approved', 'superseded']"
+    ],
+    "H2 missing pin": [],
+    "H3 pin to a future version": [],
+    "S1 renamed section": [
+      "S1: intent.md sections ['Raw intent', 'Problem', 'Stakeholders', 'Goals', 'Nongoals', 'Constraints', 'Success criteria', 'Assumptions', 'Open questions']"
+    ],
+    "S5 bad enum": [
+      "S5: GOAL-1.priority=critical"
+    ],
+    "S6 duplicate ID": [
+      "S6: dup DES-3",
+      "T1: ('DES-4', 'realizes', 'REQ-003')",
+      "T1: ('DES-4', 'realizes', 'REQ-101')",
+      "T1: ('ADR-1', 'decides', 'DES-4')"
+    ],
+    "S8 AC under the wrong REQ": [
+      "S8: REQ-002 bad AC AC-003.2: Given a Re",
+      "T1: ('DAF-2', 'affects', 'AC-002.2')"
+    ],
+    "S9 local ref does not resolve": [
+      "S9: GOAL-2.stakeholders -> STK-9"
+    ],
+    "T1 link to a missing ID": [
+      "T1: ('REQ-002', 'derives-from', 'GOAL-7')"
+    ],
+    "T2 rel not allowed": [
+      "T2: ('REQ-002', 'realizes', 'ASM-1')"
+    ],
+    "T3 duplicate link": [
+      "T3: ('REQ-001', 'derives-from', 'GOAL-1')"
+    ],
+    "T5 finding without affects": [
+      "T5: RAF-3"
+    ],
+    "C3 orphan REQ": [
+      "C3: REQ-001"
+    ],
+    "C9 wont REQ realized": [],
+    "F3 resolved without round": [
+      "F3: RAF-1"
+    ],
+    "F4 human finding resolved by agent": [
+      "F4: RAF-1"
+    ],
+    "F6 open question": [],
+    "D1 unknown context": [
+      "D1: REQ-002 Billing",
+      "D2: REQ-002 term 'Order Reference' in Billing",
+      "D2: REQ-002 term 'Refund' in Billing",
+      "D2: REQ-002 term 'Payment' in Billing"
+    ],
+    "D3 proposed term": [
+      "D3/D4: DES-1 Shipment",
+      "D3/D4: REQ-001 Shipment"
+    ],
+    "D8 unknown CML element": [
+      "D8: DES-1 cml OrderVoided"
+    ],
+    "D12 aggregate without root": [
+      "D12: Refunds aggregateRoot count"
+    ],
+    "K1 unknown KB version": [
+      "K1: CON-1 kb:finance-refund-policy@9"
+    ],
+    "K2 regulatory CON without sources": [
+      "K2: CON-1"
+    ],
+    "L1 not EARS": [
+      "L1: REQ-102"
+    ],
+    "L3 AC not Given/When/Then": [
+      "L3: AC-003.1: A "
+    ],
+    "L4 unmeasurable NFR": [
+      "L4: REQ-101"
+    ],
+    "L7 placeholder": []
+  }
+}
