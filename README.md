@@ -37,12 +37,22 @@ templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
-tools/spec-lint-prototype.py     # throwaway Python prototype covering ~40 of the rules; the real one is a TS pi extension
+packages/spec-lint/              # the linter (TypeScript): CLI + library for the validate_artifact pi extension
+tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed, then deleted
 ```
 
-Try the prototype linter: `python3 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
-tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json`
-(needs `pyyaml` and `jsonschema`). It prints `clean` for the example and catches planted defects (L2, L5, D2, D5, D9, T4, C7, F1, S4).
+Run the linter (Node 20+, after `npm install` at the repo root):
+
+```
+npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
+npm test -w spec-lint
+```
+
+The example is clean apart from one warning (C4 on SC-2). The tests check parity with the prototype on every fixture and
+on 36 planted defects, plus the git-aware rules in temp repositories. See `contracts/validation-rules.md` §8 for options.
+
+The prototype is still runnable for comparison: `PYTHONUTF8=1 python tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json`
+(needs `pyyaml` and `jsonschema`; on Windows `PYTHONUTF8=1` is required, or it misreads the `·` separator and finds no blocks).
 
 ## Pipeline
 
@@ -80,3 +90,6 @@ then **eval gate** (rubric/judge; thresholds defined when we design the eval har
 | D11 | Evals: offline suites (golden, seeded, judge, consistency, adversarial) gate every pipeline.lock change; runtime judge gates every artifact; criteria stay advisory until calibrated against BA/architect | proposed |
 | D12 | Judge model ≠ generator model; all model calls via litellm for cost/trace attribution | proposed |
 | D13 | Every spec-rooted rework / escaped defect proposes a new seeded case (suites grow from real misses) | proposed |
+| D14 | spec-lint and the pi extensions live in this repo under `packages/` (npm workspaces), next to the contracts and fixtures they are tested against | decided |
+| D15 | Severity **I** marks a rule that could not run (no git, no ContextMapper, no KB, no lock file); D10 runs a configured ContextMapper command | decided |
+| D16 | Rule clarifications from the TypeScript port: T4 exempts prose fields, L7 exempts `Raw intent`, D15 exempts human commits, K3 owners map to people in `spec-lint.config.yaml` (validation-rules §3, §5, §5a, §6) | proposed |

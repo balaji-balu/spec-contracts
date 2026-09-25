@@ -1,0 +1,10 @@
+{
+  "name": "spec-contracts",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "lint:example": "spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb",
+    "test": "npm test --workspaces"
+  }
+}

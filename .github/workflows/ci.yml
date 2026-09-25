@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  spec-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # git-aware rules read history
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck -w spec-lint
+      - run: npm test -w spec-lint
+      - run: npm run build -w spec-lint
+
+      - name: Lint the worked example
+        run: npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
+
+  prototype-parity:
+    # Re-runs the Python prototype and checks the recorded baseline is current. Remove with the prototype.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install pyyaml jsonschema
+      - run: npm ci
+      - run: npm run parity:check -w spec-lint
+        env:
+          PYTHONUTF8: "1"

@@ -8,6 +8,7 @@ Severity levels:
 - **E (error)**: blocks the step. The reconciler sends the error list back to the agent (see workflow.md §5).
 - **W (warning)**: does not block. It is recorded in `metrics.json` and shown to the human reviewer.
 - **G (gate error)**: allowed while `status: draft` and blocks the move to `in-review` / `approved`.
+- **I (info)**: the rule could not run here, and the message says why (no git history, no ContextMapper, no KB configured, no `pipeline.lock.yaml` yet). It never blocks, and it is never used for a rule that ran and passed. It exists so a skipped check is visible rather than silently green.
 
 Every rule has a stable code so evals and dashboards can count by rule.
 
@@ -18,7 +19,7 @@ Every rule has a stable code so evals and dashboards can count by rule.
 | H1 | Frontmatter validates against `header.schema.json` | E |
 | H2 | Required `upstream` pins are present (table below) | E |
 | H3 | Every pin resolves to an existing version of that artifact, either on `main` or on the same branch | E |
-| H4 | **Staleness**: a pinned upstream has a newer *approved* version on `main` | G |
+| H4 | **Staleness**: a pinned upstream has a newer *approved* version on `main` (without git: in the working copy; the constitution is always compared with the KB copy) | G |
 | H5 | `version` and `status` are changed only by `produced_by.step: reconciler` commits. The check compares the last commit's trailer (workflow.md §7) | E |
 | H6 | `main` holds only `approved` or `superseded` artifacts | E (CI) |
 | H7 | `produced_by.context_files` hashes match the AGENTS.md files pinned in `pipeline.lock.yaml` | E |
@@ -79,7 +80,7 @@ Each link record is `{from, rel, to, by, run}`:
 | T1 | Endpoints resolve. A withdrawn endpoint is a warning (W) | E |
 | T2 | `rel` is allowed for the (from, to) prefix pair above | E |
 | T3 | Duplicate link | E |
-| T4 | Link written into a Markdown block instead of `trace.yaml`: a cross-file ID appears in a block field | E |
+| T4 | Link written into a Markdown block instead of `trace.yaml`: a cross-file ID appears in a block field. Prose fields may mention IDs for the reader (`statement`, `summary`, `description`, `rationale`, `situation`, `proposed_resolution`, `recommendation`, `resolution`). Every other field, and a qualified `SPEC-nnnn/ID` anywhere, is checked | E |
 | T5 | Every finding (RAF/DAF) has ≥1 `affects` link | E |
 
 ### Coverage (checked at gates)
@@ -122,10 +123,10 @@ Term resolution: a name in `terms` resolves to the glossary TERM with the same `
 | D7 | A `terms` entry does not appear in the block text | W |
 | D8 | `cml` references exist in `domain/contexts/<context>.cml` | E |
 | D9 | **Boundary violation**: a DES `depends_on` a DES in another context with no relationship between the two contexts in the ContextMap | E |
-| D10 | CML loads without errors in ContextMapper (standalone library / CLI in CI) | E |
+| D10 | CML loads without errors in ContextMapper (standalone library / CLI in CI). Pluggable: spec-lint runs `cml_command` from its config (§8), and reports I when none is configured | E |
 | D11 | strategic.cml imports every `contexts/*.cml`, and every imported BoundedContext is in the `ContextMap` `contains`, `implements` a Subdomain and has a `domainVisionStatement` | E |
 | D12 | `contexts/<X>.cml` declares exactly one BoundedContext, named `X`. No BoundedContext is declared in strategic.cml. Every Aggregate has exactly one `aggregateRoot` | E |
-| D15 | Aggregate/Entity/ValueObject/DomainEvent/Service elements are added or changed only by `ddd-tactical` commits. `ddd-strategic` may only touch the context header layer | E |
+| D15 | Aggregate/Entity/ValueObject/DomainEvent/Service elements are added or changed only by `ddd-tactical` commits. `ddd-strategic` may only touch the context header layer. Human commits (no `Spec-Step` trailer) are exempt: the architect's PR review covers them | E |
 | D13 | Two accepted TERMs share a `name` and `context` | E |
 | D14 | A BoundedContext used by REQ/DES has no accepted TERMs | W |
 
@@ -139,7 +140,7 @@ findings, and by the eval gate, which scores each applicable article.
 |---|---|---|
 | K1 | `sources` entries resolve: `const:ART-n` exists in the pinned constitution, and `kb:<doc>@<v>` exists in the KB index | E |
 | K2 | A `regulatory`/`organisational` CON has no `sources` | E |
-| K3 | A `constitution-conflict` finding is resolved by anyone except the article's `owner` (or their delegate), or is marked `accepted-risk`. A conflict ends only with a fix or a recorded waiver | G |
+| K3 | A `constitution-conflict` finding is resolved by anyone except the article's `owner` (or their delegate), or is marked `accepted-risk`. A conflict ends only with a fix or a recorded waiver. Owners are role names, so the people who may act for each are listed under `owners` in the config (§8); without that mapping the owner check reports I | G |
 | K4 | An analysis artifact's Summary does not state which articles apply to this spec (`Applicable articles: ART-…`) | W |
 
 ## 6. Language (L)
@@ -152,7 +153,7 @@ findings, and by the eval gate, which scores each applicable article.
 | L4 | An `nfr` REQ has at least one AC with a number and a unit or percentile (for example `p95 ≤ 300 ms`, `99.9 %`, `24 h`) | E |
 | L5 | Vague words in a REQ statement or AC (list below) | E |
 | L6 | Vague words in intent, DES or ADR text | W |
-| L7 | `TBD`, `TBC`, `TODO`, `???` or `XXX` anywhere outside `## Notes` | G |
+| L7 | `TBD`, `TBC`, `TODO`, `???` or `XXX` anywhere outside `## Notes` and `## Raw intent` (the user's verbatim words, which S11 freezes) | G |
 
 EARS patterns (case-insensitive, one `shall`):
 
@@ -198,3 +199,30 @@ and the eval harness reads it.
 
 Lagging indicators (execution-loop feedback: clarification requests, spec-rooted rework,
 escaped defects) are defined with the eval harness. They attach to IDs through `implements`/`tests` links.
+
+## 8. Running spec-lint
+
+```
+spec-lint <domain-root> <spec-dir> [--constitution <file>] [--kb <path>]… [--git-ref main] [--no-git]
+          [--gate] [--ci] [--format text|json] [--metrics <file>] [--schema <file>] [--info]
+```
+
+- `<domain-root>` holds `domain/`. By default the constitution is `<domain-root>/org/constitution.md`, and the KB is `<domain-root>/kb/`.
+- Each output line is `<severity> <code> <file>:<line> [<ID>] <message>`. Codes appear exactly as in this document and are never combined. `--format json` returns `{diagnostics, metrics, counts, blocking, statuses}`, which is what `validate_artifact` returns to an agent.
+- Exit codes:
+  - 1 when blocking: any E, or a G on an artifact whose `status` isn't `draft` (or any G with `--gate`);
+  - 2 for usage errors;
+  - 0 otherwise.
+- `--ci` turns on H6 and is meant for runs on the base branch.
+- Git-aware rules (H3–H5, S7, S11, D15) compare against `--git-ref`. Without git they report I.
+
+Optional `spec-lint.config.yaml` in the domain root. Unknown keys are errors (S4):
+
+| Key | Meaning |
+|---|---|
+| `vague_words` | extra words for L5/L6 |
+| `cml_command` | D10: the command that loads one CML file in ContextMapper. `{file}` is replaced by the path, and exit 0 means it loads |
+| `kb` | KB files or folders (Markdown with `kb_doc` and `version` frontmatter), relative to the domain root |
+| `constitution` | constitution file, relative to the domain root |
+| `owners` | K3: article `owner` → the people who may resolve a conflict on it |
+| `pipeline_lock` | H7: path of `pipeline.lock.yaml` (default `<domain-root>/pipeline.lock.yaml`) |

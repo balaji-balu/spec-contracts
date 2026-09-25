@@ -16,8 +16,9 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
   (glossary, CML) and a sample `org/constitution.md`. Used as a lint fixture and eval reference.
 - `evals/`: the harness. `README.md` (layers), `scoring.md`, `calibration.md`, `thresholds.yaml`,
   `rubrics/`, `judge/prompt.md`, `schemas/`, `cases/` (7 cases), and `runner/score.py` (prototype).
-- `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It is to be replaced in M1.
-- `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`) and the roadmap.
+- `packages/spec-lint/`: the TypeScript linter (M1 step 1). `src/rules/` has one file per rule family, and `test/cases.ts` lists the fixtures and planted defects.
+- `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
+- `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `spec-pipeline-roadmap.html` at the repo root.
 
 ## Decisions already made (don't reopen without being asked)
 - The harness is pi, with one session per agent step, driven through the SDK or RPC. Everything an agent uses is pinned in `pipeline.lock.yaml`.
@@ -31,7 +32,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - Decisions D6–D13 in `README.md` are still *proposed*.
 
 ## Current milestone: M1 "One real agent"
-Details are in `docs/roadmap/` and `M1-KICKOFF.md`. In short:
+Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
 1. Port `spec-lint` to **TypeScript**: the full rule set from `contracts/validation-rules.md`, with a CLI plus a pi extension `validate_artifact`.
 2. pi extensions: `trace_link`, `term_lookup`, and `kb_search`/`kb_get` over a file-based KB.
 3. A req-analysis prompt and skill, and the first `pipeline.lock.yaml`.
@@ -54,12 +55,21 @@ Details are in `docs/roadmap/` and `M1-KICKOFF.md`. In short:
 
 ## Environment
 - Windows, running Claude Code in the terminal. pi is installed (`~/.pi`). Prefer cross-platform Node/TypeScript scripts over bash.
-- Python 3 is needed only for the prototypes (`pyyaml`, `jsonschema`).
+- Python 3 is needed only for the prototypes (`pyyaml`, `jsonschema`). Always run them with `PYTHONUTF8=1`: without it, Windows reads the `·` separator as cp1252 and the linter silently finds 0 blocks.
+- The repo keeps LF line endings (`.gitattributes`), and the parsers also accept CRLF.
 
-## Handy commands (prototypes, until replaced)
+## Handy commands
 ```
-python tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json
-python evals/runner/score.py seeded evals/cases/seeded/SD-RA-0001-refund evals/cases/seeded/SD-RA-0001-refund/fixtures/sample-run
-python evals/runner/score.py golden evals/cases/golden/G-0001-refund evals/cases/golden/G-0001-refund/fixtures/sample-run
-python docs/scenario/build.py
+npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
+npm test -w spec-lint              # parity + planted + git-aware + rule tests
+npm run typecheck -w spec-lint
+npm run parity:check -w spec-lint  # re-runs the Python prototype and diffs it against test/parity/prototype-baseline.json
+```
+
+Prototypes (until retired):
+```
+PYTHONUTF8=1 python tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json
+PYTHONUTF8=1 python evals/runner/score.py seeded evals/cases/seeded/SD-RA-0001-refund evals/cases/seeded/SD-RA-0001-refund/fixtures/sample-run
+PYTHONUTF8=1 python evals/runner/score.py golden evals/cases/golden/G-0001-refund evals/cases/golden/G-0001-refund/fixtures/sample-run
+PYTHONUTF8=1 python docs/scenario/build.py
 ```
