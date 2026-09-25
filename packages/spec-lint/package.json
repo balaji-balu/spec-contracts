@@ -17,7 +17,8 @@
     "typecheck": "tsc -p tsconfig.test.json",
     "test": "node --import tsx --test test/*.test.ts",
     "parity:record": "node --import tsx test/parity/record.ts",
-    "parity:check": "node --import tsx test/parity/record.ts --check"
+    "parity:check": "node --import tsx test/parity/record.ts --check",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "ajv": "^8.17.1",

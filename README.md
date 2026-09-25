@@ -37,7 +37,8 @@ templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
-packages/spec-lint/              # the linter (TypeScript): CLI + library for the validate_artifact pi extension
+packages/spec-lint/              # the linter (TypeScript): CLI + library
+packages/pi-spec-tools/          # pi package: extensions agents call (validate_artifact; trace_link, term_lookup, kb_* next)
 tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed, then deleted
 ```
 
@@ -45,7 +46,7 @@ Run the linter (Node 20+, after `npm install` at the repo root):
 
 ```
 npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
-npm test -w spec-lint
+npm test --workspaces
 ```
 
 The example is clean apart from one warning (C4 on SC-2). The tests check parity with the prototype on every fixture and
@@ -93,3 +94,4 @@ then **eval gate** (rubric/judge; thresholds defined when we design the eval har
 | D14 | spec-lint and the pi extensions live in this repo under `packages/` (npm workspaces), next to the contracts and fixtures they are tested against | decided |
 | D15 | Severity **I** marks a rule that could not run (no git, no ContextMapper, no KB, no lock file); D10 runs a configured ContextMapper command | decided |
 | D16 | Rule clarifications from the TypeScript port: T4 exempts prose fields, L7 exempts `Raw intent`, D15 exempts human commits, K3 owners map to people in `spec-lint.config.yaml` (validation-rules §3, §5, §5a, §6) | proposed |
+| D17 | Agents fix every E and every G except open findings routed to someone else; those are what the gate is for (AGENTS.md "Format") | decided |
