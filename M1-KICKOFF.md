@@ -24,7 +24,7 @@ Each step ends with something you can run.
 | 4 | `agents/req-analysis/`: prompt + AGENTS.md + skill; first `pipeline.lock.yaml` | One manual pi run on SD-RA-0001 produces a lint-clean `requirements-analysis.md` + `trace.yaml` |
 | 5 | litellm in front of pi | The run shows up in litellm with tokens and cost |
 | 6 | TypeScript scorer + suite runner (k = 3) | Scores on the `fixtures/sample-run` folders match `EXPECTED-SCORE.md` exactly |
-| 7 | Real suite run | SD-RA-0001, worst of 3: `recall.blocker` 1.0 and `recall.all` ≥ 0.85; baseline report committed |
+| 7 | Real suite run | SD-RA-0001 over 3 runs: `recall.blocker` 1.0 on the worst run, and `recall.all` ≥ 0.85 on the mean (hard rules use the worst run, other metrics the mean: evals/README.md §1); baseline report committed to `evals/baselines/` |
 
 ## Decisions due in M1 (answer when Claude Code asks)
 - **Generator model for req-analysis.** Choose it from suite results. Try at least two.
