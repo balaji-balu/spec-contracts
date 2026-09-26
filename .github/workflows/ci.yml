@@ -55,6 +55,20 @@ jobs:
       - run: npm run lock -w step-runner # pipeline.lock.yaml matches prompts, skills, tool versions and AGENTS.md hashes
       - run: npm test -w step-runner # the runner end to end, with pi's faux provider as the model
 
+  eval-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck -w eval-runner
+      - run: npm test -w eval-runner # scorer parity with EXPECTED-SCORE.md, and a k-run suite with pi's faux provider
+
   prototype-parity:
     # Re-runs the Python prototype and checks the recorded baseline is current. Remove with the prototype.
     runs-on: ubuntu-latest

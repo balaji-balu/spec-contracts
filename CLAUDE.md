@@ -15,10 +15,11 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - `examples/`: the worked **SPEC-0001** (refund on pre-shipment cancellation), plus its domain
   (glossary, CML) and a sample `org/constitution.md`. Used as a lint fixture and eval reference.
 - `evals/`: the harness. `README.md` (layers), `scoring.md`, `calibration.md`, `thresholds.yaml`,
-  `rubrics/`, `judge/prompt.md`, `schemas/`, `cases/` (7 cases), and `runner/score.py` (prototype).
+  `rubrics/`, `judge/prompt.md`, `schemas/`, `cases/` (7 cases), and `runner/score.py` (prototype, now ported to `packages/eval-runner`).
 - `packages/spec-lint/`: the TypeScript linter (M1 step 1). `src/rules/` has one file per rule family, and `test/cases.ts` lists the fixtures and planted defects.
 - `packages/pi-spec-tools/`: the pi package agents load. It has `validate_artifact`, `trace_link`, `term_lookup`, `kb_search` and `kb_get`. `extensions/` registers the tools and `src/` holds their logic. Tests drive a real pi session with pi's faux provider, so no model key is needed. `trace_link` needs `SPEC_STEP` (and `SPEC_RUN`) in the environment (workflow.md §4).
 - `packages/step-runner/`: `run-step <case-dir>` runs one agent step in a clean temp workspace, pinned by `pipeline.lock.yaml`. It writes the headers, sets `SPEC_STEP`/`SPEC_RUN`, blocks writes outside the step's files, repairs on lint errors, and saves `runs/<case>/<run-id>/`. It stands in for the reconciler in M1.
+- `packages/eval-runner/`: `score` (the port of `evals/runner/score.py`: seeded, golden and judge scoring, same reports byte for byte) and `run-suite <case-dir>...`, which runs each case k times through run-step, scores every run and writes `runs/suites/<suite-id>/report.md` + `report.json`. Hard rules (`regression.never_regress` in `thresholds.yaml`) are judged on the worst run, other metrics on the mean, and a run that fails verify fails its case. Committed baselines go in `evals/baselines/`.
 - `gateway/litellm/`: the litellm proxy (Docker Compose) that every model call goes through. Keys live in the gitignored `gateway/litellm/.env`, which you fill in yourself; never put keys anywhere else.
 - `agents/<step>/prompt.md` + `AGENTS.md`, `skills/<name>/SKILL.md`, `pipeline.lock.yaml`: what a step runs with. After editing an AGENTS.md, run `npm run lock -w step-runner -- --update`.
 - `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
@@ -43,7 +44,7 @@ Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
 4. litellm in front of every call.
 5. Port the scorer and suite runner (k = 3).
 
-**Exit:** `evals/cases/seeded/SD-RA-0001-refund` meets the release thresholds on the worst of 3 runs, and a baseline report is committed.
+**Exit:** `evals/cases/seeded/SD-RA-0001-refund` meets the release thresholds over 3 runs (hard rules such as `recall.blocker` on the worst run, the other metrics on the mean), and a baseline report is committed to `evals/baselines/`.
 
 ## Working rules for this repo
 - **Contracts lead, code follows.** If the implementation needs a contract change, propose it and change `contracts/` first, in the same PR, with a note in the README decisions table.
@@ -72,6 +73,9 @@ pi -e ./packages/pi-spec-tools     # try the tools in an interactive pi session 
 docker compose -f gateway/litellm/docker-compose.yml up -d   # start the litellm gateway (needs gateway/litellm/.env; UI at http://localhost:4000/ui)
 npm run demo -w step-runner -- --verbose            # watch the whole step flow with a scripted model: no key, no Docker, no cost
 npx run-step evals/cases/seeded/SD-RA-0001-refund   # real req-analysis run through litellm (openai/gpt-5.5, about $1 and 3 min) (add --verbose to see model text and tool results)
+npx run-suite evals/cases/seeded/SD-RA-0001-refund   # k = 3 real runs, scored and aggregated (about 3x a run-step); --k, --quiet, --direct
+npx score seeded <case-dir> <run-dir>               # score one run (also: golden, judge); writes score.json next to the target
+npm test -w eval-runner                             # scorer parity with EXPECTED-SCORE.md + faux-model suite run
 npm run lock -w step-runner [-- --update]           # check pipeline.lock.yaml (or refresh AGENTS.md hashes)
 npm run typecheck -w spec-lint
 npm run parity:check -w spec-lint  # re-runs the Python prototype and diffs it against test/parity/prototype-baseline.json

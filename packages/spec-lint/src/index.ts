@@ -19,6 +19,7 @@ export { CliGit, NullGit } from "./git.js";
 export { openDomain, openSpec, type SpecView, type TermInfo, type OpenOptions } from "./api.js";
 export { loadConfig, type Config } from "./config.js";
 export { parseTrace, type TraceLink } from "./parse/trace.js";
+export { parseMarkdown, fieldList, fieldScalar, type Block, type MdArtifact } from "./parse/markdown.js";
 
 export interface LintOptions {
   /** Folder holding `domain/` (and by default `org/constitution.md` and `kb/`). */
