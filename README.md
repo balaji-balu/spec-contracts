@@ -35,6 +35,7 @@ AGENTS.md                        # behaviour rules every pi session loads (pinne
 contracts/                       # this folder: schema, rules, workflow
 templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
+docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
 packages/spec-lint/              # the linter (TypeScript): CLI + library

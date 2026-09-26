@@ -24,6 +24,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - `agents/<step>/prompt.md` + `AGENTS.md`, `skills/<name>/SKILL.md`, `pipeline.lock.yaml`: what a step runs with. After editing an AGENTS.md, run `npm run lock -w step-runner -- --update`.
 - `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
 - `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `spec-pipeline-roadmap.html` at the repo root.
+- `docs/platform/features.md`: the platform features register (governance `GOV-nn`, observability `OBS-nn`), with component IDs, stages and statuses. Read it before work on security, guards, the gateway, tracing or the reconciler.
 
 ## Decisions already made (don't reopen without being asked)
 - The harness is pi, with one session per agent step, driven through the SDK or RPC. Everything an agent uses is pinned in `pipeline.lock.yaml`.
@@ -57,6 +58,7 @@ Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
 - Never edit `examples/` or `evals/cases/` to make a tool pass. They are fixtures. If a fixture is wrong, say so.
 - Rule codes (for example `D9`, `L2`) must appear in the linter output exactly as in `validation-rules.md`.
 - Keep pi extensions small and dependency-light. pi's value is minimalism.
+- **Features carry IDs.** Work that implements or changes a register feature cites its ID in the commit message and PR title (`GOV-06: …`) and updates that row's Status and Evidence in `docs/platform/features.md` in the same PR. Never add a feature without an ID, and never renumber or reuse one.
 - Ask before choosing: the generator or judge models, the git host, or anything listed under "Decisions and when they're due" in the roadmap.
 
 ## Environment
