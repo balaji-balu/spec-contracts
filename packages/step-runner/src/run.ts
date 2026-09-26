@@ -271,7 +271,7 @@ export async function runStep(o: RunOptions): Promise<RunResult> {
   session.dispose();
   if (gateway.kind === "litellm" && g) {
     say("gateway", "reading this run's calls back from litellm's spend logs …");
-    gateway.usage = await fetchGatewayUsage(g, key, `run:${runId}`, stats.assistantMessages, { since: new Date(started) });
+    gateway.usage = await fetchGatewayUsage(g, key, `run:${runId}`, stats.assistantMessages);
   }
 
   const headersIntact = headersBefore.every(([f, h]) => existsSync(f) && headerBlock(f) === h);

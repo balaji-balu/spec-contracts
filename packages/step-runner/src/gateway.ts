@@ -116,19 +116,17 @@ export function summariseSpend(logs: SpendLog[], runTag: string): GatewayUsage {
 /**
  * Reads the run's calls back from litellm's spend logs. litellm writes them in batches, so this polls until
  * it sees at least `expectedCalls` or `timeoutMs` passes, and returns what it has.
+ * No start_date/end_date: with them, litellm returns per-day totals without request_tags, so no call matches the run tag.
  */
 export async function fetchGatewayUsage(
   g: GatewayLock,
   key: string,
   runTag: string,
   expectedCalls: number,
-  opts: { timeoutMs?: number; intervalMs?: number; fetchImpl?: typeof fetch; since?: Date } = {},
+  opts: { timeoutMs?: number; intervalMs?: number; fetchImpl?: typeof fetch } = {},
 ): Promise<GatewayUsage & { complete: boolean }> {
   const f = opts.fetchImpl ?? fetch;
-  const day = (d: Date) => d.toISOString().slice(0, 10);
-  const since = opts.since ?? new Date();
-  const until = new Date(Date.now() + 86_400_000);
-  const url = `${g.base_url.replace(/\/$/, "")}/spend/logs?start_date=${day(since)}&end_date=${day(until)}`;
+  const url = `${g.base_url.replace(/\/$/, "")}/spend/logs`;
   const deadline = Date.now() + (opts.timeoutMs ?? 90_000);
   let last: GatewayUsage = { calls: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, spend: 0, models: [] };
   for (;;) {

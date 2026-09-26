@@ -22,7 +22,10 @@ interface Seen {
   model?: string;
 }
 
-/** A minimal litellm: records each chat call as a spend log with its tags, like the real proxy. */
+/**
+ * A minimal litellm: records each chat call as a spend log with its tags, like the real proxy. Like litellm
+ * v1.102, /spend/logs with start_date/end_date returns per-day totals without request_tags.
+ */
 async function fakeLitellm() {
   const seen: Seen[] = [];
   const logs: Array<Record<string, unknown>> = [];
@@ -32,6 +35,10 @@ async function fakeLitellm() {
     if (req.url?.startsWith("/spend/logs")) {
       if (req.headers.authorization !== "Bearer sk-test") return res.writeHead(401).end();
       res.setHeader("content-type", "application/json");
+      if (/[?&]start_date=/.test(req.url)) {
+        const spend = logs.reduce((s, l) => s + Number(l.spend), 0);
+        return res.end(JSON.stringify(logs.length ? [{ startTime: "2026-01-01", spend, users: {}, models: {} }] : []));
+      }
       return res.end(JSON.stringify(logs));
     }
     if (req.url === "/v1/chat/completions" && req.method === "POST") {
