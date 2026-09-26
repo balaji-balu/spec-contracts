@@ -213,6 +213,7 @@ The same reconciler runs with `--mode eval`, against a throwaway local bare repo
 
 ```yaml
 harness: {name: pi, version: 0.x.y}
+gateway: {kind: litellm, base_url: "http://localhost:4000", api: openai-completions, key_env: LITELLM_API_KEY, env_file: gateway/litellm/.env}
 steps:
   req-generation:
     model: anthropic/<model-id>
@@ -229,5 +230,7 @@ eval_judge:
   rubrics: {intent: 1.0.0, requirements-analysis: 1.0.0, requirements: 1.0.0, design-analysis: 1.0.0, design: 1.0.0}
 limits: {repair_attempts: 3, analysis_rounds: 3, eval_retries: 2, back_edges: 2}
 ```
+
+`gateway` routes every model call through litellm (README D20). The runner registers it with pi as the provider for each step's model. Every request carries the tags `step:<step>`, `run:<run_id>` and `case:<case>` (in eval mode). The run reads its tokens and spend back from litellm into `run.json`. A run that bypasses the gateway must say so in `run.json`.
 
 A change to this file goes through its own PR and is gated by the offline eval suites (evals/README.md §4). Changing `eval_judge` also triggers judge recalibration (evals/calibration.md).

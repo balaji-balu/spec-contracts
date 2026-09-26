@@ -1,0 +1,20 @@
+# Models the pipeline may call, by the same provider/model ids pipeline.lock.yaml uses.
+# Wildcards keep the lock the single place where a model is chosen; litellm still prices each call by its real model.
+model_list:
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: "google/*"
+    litellm_params:
+      model: "gemini/*"
+      api_key: os.environ/GEMINI_API_KEY
+
+litellm_settings:
+  drop_params: true          # pi may send parameters a provider doesn't take
+  request_timeout: 600
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_prompts_in_spend_logs: false   # tokens, cost and tags only; prompts stay in the pi session JSONL
