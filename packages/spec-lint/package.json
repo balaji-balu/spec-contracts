@@ -1,6 +1,7 @@
 {
   "name": "spec-lint",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "Validator for spec-contracts artifacts (contracts/validation-rules.md).",
   "type": "module",
   "main": "dist/index.js",

@@ -1,6 +1,7 @@
 {
   "name": "eval-runner",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "Eval scorer (evals/scoring.md) and the k-run suite runner for spec-contracts agent steps.",
   "type": "module",
   "private": true,

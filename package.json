@@ -1,6 +1,7 @@
 {
   "name": "spec-contracts",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "workspaces": ["packages/*"],
   "scripts": {

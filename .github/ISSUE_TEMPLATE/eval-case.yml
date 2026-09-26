@@ -1,0 +1,23 @@
+name: Eval case
+description: An agent got something wrong; propose it as a seeded eval case
+labels: [eval-case]
+body:
+  - type: dropdown
+    id: step
+    attributes:
+      label: Agent step
+      options: [intent, req-analysis, req-generation, design-analysis, design-generation, ddd, other]
+    validations:
+      required: true
+  - type: textarea
+    id: miss
+    attributes:
+      label: What the agent missed or got wrong
+      description: The input, the output, and what a good output would contain.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: The rework or defect this would have caused downstream.
