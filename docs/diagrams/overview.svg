@@ -3,7 +3,7 @@
 <desc id="d">A user's intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code). What the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval.</desc>
 <style>
   :root{
-    --bg:#F4F5F2; --surface:#FFFFFF; --band:#E8EBE6;
+    --bg:#FFFFFF; --surface:#FFFFFF; --band:#F1F3F0;
     --ink:#18211D; --ink2:#46524C; --muted:#78837D; --line:#C9D0CB;
     --sys:#2B6A8A; --sys-t:#E1EDF3; --human:#A15F12; --human-t:#F7EBDA;
     --agent:#6450A6; --agent-t:#ECE8F6; --gate:#3E4A44; --gate-t:#E5E9E6;
