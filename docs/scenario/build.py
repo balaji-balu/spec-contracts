@@ -120,51 +120,76 @@ def svg_swimlane():
     return "\n".join(o)
 
 # ------------------------------------------------------------------ architecture SVG (hand laid out)
+# Layered view (Discussion #21): UI, control, orchestration, execution, plus a cross-cutting column.
 def svg_arch():
     B = []
-    def box(x, y, w, h, t, sub="", cls="sys", rx=8):
-        B.append(f'<g class="ab r-{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}"/>'
-                 f'<text x="{x+w/2}" y="{y+h/2 + (-3 if sub else 5)}" class="abt">{esc(t)}</text>'
-                 + (f'<text x="{x+w/2}" y="{y+h/2+13}" class="abs">{esc(sub)}</text>' if sub else "") + '</g>')
+    def box(x, y, w, h, t, sub="", cls="sys", rx=8, dash=False, subs=()):
+        lines = [sub] if sub else list(subs)
+        ty = y + h/2 + 5 - 7 * len(lines)
+        st = ' style="stroke-dasharray:5 4"' if dash else ""
+        B.append(f'<g class="ab r-{cls}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}"{st}/>'
+                 f'<text x="{x+w/2}" y="{ty}" class="abt">{esc(t)}</text>'
+                 + "".join(f'<text x="{x+w/2}" y="{ty+16+14*i}" class="abs">{esc(l)}</text>' for i, l in enumerate(lines)) + '</g>')
     def grp(x, y, w, h, t, sub=""):
         B.append(f'<g class="ag"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="14"/><text x="{x+14}" y="{y+22}" class="agt">{esc(t)}</text>'
                  + (f'<text x="{x+w-14}" y="{y+22}" class="ags">{esc(sub)}</text>' if sub else "") + '</g>')
-    def arr(d, cls="sys", label="", lx=0, ly=0, dash=False):
+    def arr(d, cls="sys", label="", lx=0, ly=0, dash=False, anchor=""):
         B.append(f'<path class="aa {"dash" if dash else ""}" d="{d}" marker-end="url(#am-{cls})"/>')
-        if label: B.append(f'<text x="{lx}" y="{ly}" class="al">{esc(label)}</text>')
-    grp(318, 24, 236, 214, "Orchestrator / engine")
-    grp(598, 24, 384, 318, "pi agent steps", "one session each")
-    grp(598, 372, 384, 124, "Org KB", "read-only")
-    box(18, 66, 112, 44, "User", "", "human", 22)
-    box(18, 150, 112, 56, "BA / Architect", "approve, answer", "human", 22)
-    box(170, 96, 112, 70, "UI", "thin client")
-    box(338, 62, 196, 50, "Reconciler", "stateless loop")
-    box(338, 134, 94, 84, "Verify", "spec-lint", "gate")
-    box(440, 134, 94, 84, "Eval gate", "LLM judge", "gate")
-    box(338, 280, 160, 74, "Git repo", "specs/ · domain/ · PRs")
-    box(338, 424, 196, 58, "plan → code → QA", "execution loop", "exec")
-    for t_, x, yy in [("Intent", 612, 50), ("Req analysis", 734, 50), ("Req generation", 856, 50),
-                      ("Design analysis", 612, 126), ("Design generation", 734, 126), ("DDD agent", 856, 126)]:
-        box(x, yy + 12, 116, 52, t_, "", "agent")
-    B.append('<text x="612" y="232" class="agt small">Pinned per step (pipeline.lock.yaml)</text>')
-    for t_, x in [("AGENTS.md", 612), ("skill(s)", 704), ("template(s)", 796), ("prompts", 888)]:
-        box(x, 244, 86, 38, t_, "", "cfg", 6)
-    B.append('<text x="612" y="316" class="al st">route: ddd findings go to the DDD agent</text>')
-    B.append('<text x="612" y="331" class="al st">analysis never rewrites upstream artifacts</text>')
-    box(616, 408, 150, 70, "constitution.md", "pinned by version", "kb")
-    box(778, 408, 186, 70, "policies · systems", "provider docs", "kb")
-    arr("M130 88 H164 V116", "human"); arr("M130 178 H150 V150 H164", "human")
-    arr("M282 124 H332", "sys", "commands", 307, 142)
-    arr("M534 87 H592", "sys", "run step", 563, 80)
-    arr("M420 112 V128", "sys"); arr("M480 112 V128", "sys")
-    arr("M418 218 V274", "sys"); B.append('<text x="424" y="252" class="al st">commit · PR · merge</text>')
-    arr("M418 354 V418", "sys"); B.append('<text x="424" y="392" class="al st">tag SPEC-n ready</text>')
-    arr("M790 342 V366", "agent"); B.append('<text x="796" y="360" class="al st">kb_search / kb_get</text>')
-    arr("M534 190 H570 V446 H610", "gate", dash=True); B.append('<text x="576" y="361" class="al st">scores ART-n</text>')
-    arr("M518 424 V224", "exec", dash=True); B.append('<text x="0" y="0" class="al" transform="translate(511 330) rotate(-90)">lagging signals</text>')
+        if label: B.append(f'<text x="{lx}" y="{ly}" class="al {anchor}">{esc(label)}</text>')
+    def note(x, y, t):
+        B.append(f'<text x="{x}" y="{y}" class="al st">{esc(t)}</text>')
+    # layer bands
+    grp(150, 20, 610, 86, "UI layer")
+    grp(150, 122, 610, 96, "Control layer")
+    grp(150, 234, 610, 96, "Orchestration layer")
+    grp(150, 346, 610, 150, "Execution layer", "one pi session per action")
+    grp(780, 20, 202, 476, "Cross-cutting")
+    # people
+    box(18, 40, 112, 34, "User", "", "human", 17)
+    box(18, 84, 112, 46, "BA / Architect", "approve, answer", "human", 20)
+    # UI
+    box(166, 52, 200, 44, "UI", "thin client · holds no state")
+    note(382, 78, "talks only to the control plane")
+    # control
+    box(166, 154, 140, 50, "API", "requests · commands")
+    box(316, 154, 140, 50, "Governance", "policy · identity", "gate")
+    box(466, 154, 130, 50, "Registries", "pipeline.lock.yaml")
+    box(606, 154, 140, 50, "LLM gateway", "litellm · placement #21", dash=True)
+    # orchestration
+    box(166, 266, 200, 50, "Reconciler", "stateless loop · git is state")
+    box(376, 266, 120, 50, "Runner", "clean workspace")
+    box(506, 266, 110, 50, "Verify", "spec-lint", "gate")
+    box(626, 266, 120, 50, "Eval gate", "LLM judge", "gate")
+    # execution: graph engine with a small step graph
+    box(166, 378, 190, 104, "", "", "agent")
+    B.append('<text x="261" y="398" class="abt">Graph engine</text><text x="261" y="412" class="abs">nodes = actions · edges = routes</text>')
+    nodes = [("I", 176), ("RA", 210), ("RG", 244), ("DA", 278), ("DG", 312)]
+    for (_, x), (_, x2) in zip(nodes, nodes[1:]):
+        B.append(f'<path class="aa" d="M{x+28} 435 H{x2}"/>')
+    B.append('<path class="aa dash" d="M224 444 V465 H250"/><path class="aa dash" d="M292 444 V465 H290"/>')
+    for t_, x in nodes:
+        B.append(f'<g class="ab r-agent"><rect x="{x}" y="426" width="28" height="18" rx="4"/><text x="{x+14}" y="439" class="abs">{t_}</text></g>')
+    B.append('<g class="ab r-agent"><rect x="250" y="456" width="40" height="18" rx="4"/><text x="270" y="469" class="abs">DDD</text></g>')
+    box(366, 378, 190, 104, "Loop engine + harness", "", "agent", subs=("pi agent loop inside one action", "guards · lint repair · pinned", "AGENTS.md, prompts, templates"))
+    box(566, 378, 180, 104, "Skills · tools · MCP", "", "agent", subs=("validate_artifact · trace_link", "term_lookup · kb_search", "skills · MCP servers"))
+    # cross-cutting
+    box(794, 56, 174, 120, "Evidence + provenance", "", "kb", subs=("git: specs/, domain/, PRs", "artifact headers", "trace.yaml · tags"))
+    box(794, 190, 174, 96, "Observability", "", "kb", subs=("run_id on every call", "cost · run.json · traces"))
+    box(794, 376, 174, 106, "Knowledge + memory", "", "kb", dash=True, subs=("org KB · constitution", "KG later · placement #21"))
+    # spec-to-code loop
+    box(470, 516, 290, 50, "plan → code → QA", "spec-to-code loop · consumes tagged specs", "exec")
+    # arrows
+    arr("M130 57 H160", "human"); arr("M130 107 H146 V88 H160", "human")
+    arr("M266 96 V148", "sys", "commands", 272, 126, anchor="st")
+    arr("M236 204 V260", "sys", "start, approve", 242, 228, anchor="st")
+    arr("M266 316 V372", "sys", "run action", 272, 340, anchor="st")
+    arr("M746 291 H770 V116 H788", "sys")
+    arr("M746 430 H788", "agent")
+    arr("M968 116 H974 V541 H766", "sys", "tag SPEC-n ready", 868, 534)
+    arr("M470 552 H140 V291 H160", "exec", "code-to-spec: proposed spec changes", 300, 545, dash=True)
     defs = "".join(f'<marker id="am-{k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk mk-{k}"/></marker>' for k in ("sys", "human", "agent", "gate", "exec"))
-    return (f'<svg class="arch" viewBox="0 0 1000 510" width="1000" height="510" role="img" aria-labelledby="arch-t" xmlns="http://www.w3.org/2000/svg">'
-            f'<title id="arch-t">Platform components and how they connect</title><defs>{defs}</defs>' + "".join(B) + '</svg>')
+    return (f'<svg class="arch" viewBox="0 0 1000 580" width="1000" height="580" role="img" aria-labelledby="arch-t" xmlns="http://www.w3.org/2000/svg">'
+            f'<title id="arch-t">Platform layers: UI, control, orchestration and execution, with cross-cutting evidence, observability and knowledge</title><defs>{defs}</defs>' + "".join(B) + '</svg>')
 
 # ------------------------------------------------------------------ HTML page
 def page():
