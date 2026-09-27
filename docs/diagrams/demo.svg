@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 466" width="960" height="466" role="img" aria-labelledby="t d">
+<title id="t">spec-contracts demo: one agent step, guarded and linted</title>
+<desc id="d">A replay of npm run demo: the requirements-analysis agent reads the intent and the refund policy, is blocked from rewriting a file it does not own, writes a finding, fails lint on a missing field, repairs it, and finishes with no errors and the finding routed to a human.</desc>
+<style>
+text{font-family:ui-monospace,"SFMono-Regular","Cascadia Mono",Consolas,Menlo,monospace;font-size:13.5px;fill:#D5DDD8}
+.tag{fill:#7FB8D6}.prompt{fill:#7DC79C;font-weight:700}.cmd{fill:#FFFFFF;font-weight:600}
+.dim{fill:#8E9A94}.bad{fill:#F08A80}.warn{fill:#E6B06A}.good{fill:#7DC79C}.ok{fill:#7DC79C;font-weight:700}
+.bar{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:12.5px;fill:#8E9A94}
+@keyframes k0{0%,2.99%{opacity:0}3.79%,97.01%{opacity:1}100%{opacity:0}}.l0{animation:k0 20.1s linear infinite}
+@keyframes k1{0%,8.96%{opacity:0}9.76%,97.01%{opacity:1}100%{opacity:0}}.l1{animation:k1 20.1s linear infinite}
+@keyframes k2{0%,12.94%{opacity:0}13.74%,97.01%{opacity:1}100%{opacity:0}}.l2{animation:k2 20.1s linear infinite}
+@keyframes k3{0%,16.92%{opacity:0}17.72%,97.01%{opacity:1}100%{opacity:0}}.l3{animation:k3 20.1s linear infinite}
+@keyframes k4{0%,21.89%{opacity:0}22.69%,97.01%{opacity:1}100%{opacity:0}}.l4{animation:k4 20.1s linear infinite}
+@keyframes k5{0%,25.87%{opacity:0}26.67%,97.01%{opacity:1}100%{opacity:0}}.l5{animation:k5 20.1s linear infinite}
+@keyframes k6{0%,30.85%{opacity:0}31.65%,97.01%{opacity:1}100%{opacity:0}}.l6{animation:k6 20.1s linear infinite}
+@keyframes k7{0%,35.32%{opacity:0}36.12%,97.01%{opacity:1}100%{opacity:0}}.l7{animation:k7 20.1s linear infinite}
+@keyframes k8{0%,40.30%{opacity:0}41.10%,97.01%{opacity:1}100%{opacity:0}}.l8{animation:k8 20.1s linear infinite}
+@keyframes k9{0%,44.28%{opacity:0}45.08%,97.01%{opacity:1}100%{opacity:0}}.l9{animation:k9 20.1s linear infinite}
+@keyframes k10{0%,49.25%{opacity:0}50.05%,97.01%{opacity:1}100%{opacity:0}}.l10{animation:k10 20.1s linear infinite}
+@keyframes k11{0%,51.74%{opacity:0}52.54%,97.01%{opacity:1}100%{opacity:0}}.l11{animation:k11 20.1s linear infinite}
+@keyframes k12{0%,56.72%{opacity:0}57.52%,97.01%{opacity:1}100%{opacity:0}}.l12{animation:k12 20.1s linear infinite}
+@keyframes k13{0%,61.69%{opacity:0}62.49%,97.01%{opacity:1}100%{opacity:0}}.l13{animation:k13 20.1s linear infinite}
+@keyframes k14{0%,66.67%{opacity:0}67.47%,97.01%{opacity:1}100%{opacity:0}}.l14{animation:k14 20.1s linear infinite}
+@keyframes k15{0%,70.65%{opacity:0}71.45%,97.01%{opacity:1}100%{opacity:0}}.l15{animation:k15 20.1s linear infinite}
+@keyframes k16{0%,75.12%{opacity:0}75.92%,97.01%{opacity:1}100%{opacity:0}}.l16{animation:k16 20.1s linear infinite}
+@media (prefers-reduced-motion: reduce){[class^="l"]{animation:none!important;opacity:1}}
+</style>
+<rect width="960" height="466" rx="12" fill="#151A18"/>
+<rect width="960" height="36" rx="12" fill="#1F2623"/><rect y="24" width="960" height="12" fill="#1F2623"/>
+<circle cx="22" cy="18" r="6" fill="#EE7C71"/><circle cx="42" cy="18" r="6" fill="#E2A45C"/><circle cx="62" cy="18" r="6" fill="#6CC58C"/>
+<text class="bar" x="480" y="22" text-anchor="middle">spec-contracts · npm run demo · scripted model, no key, no cost</text>
+<text class="l0" y="64"><tspan x="24"><tspan class="prompt">$</tspan></tspan><tspan x="40" class="cmd">npm run demo -w step-runner</tspan></text>
+<text class="l1" y="86"><tspan x="24"></tspan><tspan x="112" class="dim">Demo: the req-analysis step on SD-RA-0001, with a scripted model (no API key, no cost).</tspan></text>
+<text class="l2" y="108"><tspan x="24"><tspan class="tag">[run]</tspan></tspan><tspan x="112" class="">case SD-RA-0001-refund (seeded) · step req-analysis</tspan></text>
+<text class="l3" y="130"><tspan x="24"><tspan class="tag">[context]</tspan></tspan><tspan x="112" class="">constitution v3 · AGENTS.md sha256:b6f34144e228 · skill requirements-analysis@1.0.0</tspan></text>
+<text class="l4" y="152"><tspan x="24"><tspan class="tag">[model]</tspan></tspan><tspan x="112" class="">turn 2 · calls kb_search · "The intent offers another payout. Checking the refund policy."</tspan></text>
+<text class="l5" y="174"><tspan x="24"><tspan class="tag">[tool←]</tspan></tspan><tspan x="112" class="">kb_get ✓ kb:finance-refund-policy@4 · Refund policy (Finance)</tspan></text>
+<text class="l6" y="196"><tspan x="24"><tspan class="tag">[model]</tspan></tspan><tspan x="112" class="">turn 4 · calls write · tries to rewrite the intent, which this step does not own</tspan></text>
+<text class="l7" y="218"><tspan x="24"><tspan class="tag">[guard]</tspan></tspan><tspan x="112" class="bad">blocked write specs/SPEC-9001/intent.md: this step may write only requirements-analysis.md</tspan></text>
+<text class="l8" y="240"><tspan x="24"><tspan class="tag">[model]</tspan></tspan><tspan x="112" class="">turn 5 · calls edit · "Writing the finding into requirements-analysis.md."</tspan></text>
+<text class="l9" y="262"><tspan x="24"><tspan class="tag">[tool←]</tspan></tspan><tspan x="112" class="">trace_link ✓ added: RAF-1 affects GOAL-2</tspan></text>
+<text class="l10" y="284"><tspan x="24"><tspan class="tag">[lint]</tspan></tspan><tspan x="112" class="bad">spec-lint after attempt 1: 1 E · 1 G · 2 W</tspan></text>
+<text class="l11" y="306"><tspan x="24"></tspan><tspan x="112" class="bad">E S4 requirements-analysis.md:46 RAF-1 missing required key 'proposed_resolution'</tspan></text>
+<text class="l12" y="328"><tspan x="24"><tspan class="tag">[repair]</tspan></tspan><tspan x="112" class="warn">attempt 2 of 4: sending the 1 error back to the model</tspan></text>
+<text class="l13" y="350"><tspan x="24"><tspan class="tag">[model]</tspan></tspan><tspan x="112" class="">turn 8 · calls edit · "Adding the missing proposed_resolution."</tspan></text>
+<text class="l14" y="372"><tspan x="24"><tspan class="tag">[lint]</tspan></tspan><tspan x="112" class="good">spec-lint after attempt 2: 0 E · 1 G · 2 W · no errors</tspan></text>
+<text class="l15" y="394"><tspan x="24"><tspan class="tag">[check]</tspan></tspan><tspan x="112" class="">headers unchanged · 1 action blocked · 10 model calls · $0.0000</tspan></text>
+<text class="l16" y="416"><tspan x="24"></tspan><tspan x="112" class="ok">OK · attempts 2 · RAF-1: blocker, routed to a human</tspan></text>
+</svg>

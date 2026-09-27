@@ -1,25 +1,51 @@
 # Spec Contracts
 
+[![CI](https://github.com/balaji-balu/spec-contracts/actions/workflows/ci.yml/badge.svg)](https://github.com/balaji-balu/spec-contracts/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/website-github.io-2B6A8A.svg)](https://balaji-balu.github.io/spec-contracts/)
+[![Status: early](https://img.shields.io/badge/status-early-E2A45C.svg)](https://balaji-balu.github.io/spec-contracts/docs/roadmap.html)
+
 **An AI-native, spec-driven development platform. The spec is the source of truth: agents generate code from it and feed changes back into it (spec ⇄ code), with every step validated, evaluated and human-approved.**
 
 **[Website](https://balaji-balu.github.io/spec-contracts/)** · [Roadmap](https://balaji-balu.github.io/spec-contracts/docs/roadmap.html) · [Walkthrough](https://balaji-balu.github.io/spec-contracts/docs/scenario/spec-pipeline-walkthrough.html) · [Architecture](docs/architecture.md) · [Contributing](CONTRIBUTING.md)
 
-AI coding agents are good at writing code and poor at knowing what to build. Specs written up front go stale, code drifts from what the business meant, and nobody can say which is right. This platform makes the spec the one source of truth and keeps code and spec in step in both directions:
-
-- **Spec-to-code.** Agents turn a user's intent into requirements, then a design, then a plan, code and tests, one small, reviewable step at a time. Code is generated from an approved spec, never the other way round.
-- **Code-to-spec.** What the code teaches us (a failing test, a design that doesn't fit, a production incident, a hand-made change) comes back as a proposed change to the spec. It goes through the same gates, and the code is regenerated from the updated spec.
-
-This is not waterfall. Nobody can fully specify a system before building it: the first spec is a hypothesis, design is discovered through implementation, and business needs keep changing ([Fowler and Joshi](https://martinfowler.com/articles/convo-llm-abstractions.html); [Joshi on DSLs and LLMs](https://martinfowler.com/articles/llm-and-dsls.html)). So the spec grows in small, reviewed steps and changes whenever implementation or the business teaches something new. It is the current, agreed truth, not the first guess.
-
-Every artifact is validated by a deterministic linter, scored by evals, and approved by a human (business analyst, senior architect) through a pull request. **pi** agents do the work one step at a time, and a **git reconciler** drives the workflow, with git as the only state.
-
-This repo holds the platform's contracts (artifact format, validation rules, workflow), the linter, the agent tools and the eval harness. Every other part of the platform consumes only what these contracts define.
-
-> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done. Spec-to-code (plan → code → QA) and code-to-spec feedback are planned, not built yet; see the [roadmap](https://balaji-balu.github.io/spec-contracts/docs/roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
-
 <p align="center"><img src="docs/diagrams/overview.svg" alt="User intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code); what the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval." width="100%"></p>
 
-<sub>The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
+## Why
+
+AI agents write code fast and still build the wrong thing. Specs go stale, code drifts from what the business meant, and nobody can say which is right. Spec Contracts keeps one agreed spec and keeps code and spec in step, in both directions:
+
+- **Spec-to-code.** Agents turn intent into requirements, design, then code and tests, one small reviewable step at a time.
+- **Code-to-spec.** A failing test, a design misfit, an incident or a hand edit comes back as a proposed spec change, through the same gates.
+- **Checked, not trusted.** A deterministic linter runs before any LLM judge, eval suites measure every prompt or model change, and a person approves every step in a pull request.
+- **Not waterfall.** The first spec is a hypothesis and design is discovered while building ([Fowler and Joshi](https://martinfowler.com/articles/convo-llm-abstractions.html)), so the spec grows in small PRs and changes whenever the code or the business teaches something new.
+
+> **Status:** early. Milestone M1, one real agent (requirements analysis), is nearly done. The code side of the loop is planned, not built. Interfaces will change.
+
+## See it
+
+One agent step, replayed from `npm run demo` (a scripted model, so no key and no cost). The agent is blocked from editing a file it doesn't own, fails lint on a missing field, repairs it, and routes its finding to a human:
+
+<p align="center"><img src="docs/diagrams/demo.svg" alt="Terminal replay of npm run demo: the req-analysis agent reads the intent and the refund policy, is blocked from rewriting the intent, writes a finding, fails lint with S4 missing proposed_resolution, repairs it on attempt 2, and finishes with no errors and the finding routed to a human." width="100%"></p>
+
+Specs are Markdown people can read, made of strict blocks a parser can check. A requirement from the [worked example](examples/specs/SPEC-0001/requirements.md) (long lines wrapped):
+
+```markdown
+### REQ-002 · Refund the full payment
+- type: functional
+- context: Payments
+- priority: must
+- statement: When the Payments context receives an order-cancelled notice for an Order Reference,
+  the Payments context shall issue a Refund of the full captured Payment.
+- acceptance:
+  - AC-002.1: Given a captured Payment for an Order Reference When an order-cancelled notice arrives
+    Then a Refund for the full Payment amount is issued
+  - AC-002.2: Given a Refund already issued for an Order Reference When a duplicate order-cancelled
+    notice arrives Then no second Refund is issued
+- terms: [Order Reference, Refund, Payment]
+```
+
+Its terms are checked against the glossary, and `trace.yaml` links it to the goals it derives from and the design that realizes it.
 
 ## Quickstart
 
@@ -43,9 +69,10 @@ docker compose -f gateway/litellm/docker-compose.yml up -d
 npx run-step evals/cases/seeded/SD-RA-0001-refund --verbose
 ```
 
-Next: read the worked example in [`examples/specs/SPEC-0001`](examples/specs/SPEC-0001), then [`contracts/`](contracts). To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
+## How it works
 
-## Principles
+<details>
+<summary><b>Principles</b>: the seven rules the platform is built on</summary>
 
 1. **The spec is a living hypothesis.** It grows in small PRs (intent, analysis, requirements, design) and changes when implementation or the business proves it wrong. Every change is a diff that is linted, traced and approved, and the code follows it. Nothing is specified up front for its own sake.
 2. **The workflow owns control flow; agents own judgment inside one step.** No agent picks the next step.
@@ -56,9 +83,29 @@ Next: read the worked example in [`examples/specs/SPEC-0001`](examples/specs/SPE
 6. **Constitution owns org-wide rules, glossary owns language, CML owns boundaries.** Glossary and CML are shared across specs under `domain/`; the constitution lives in the org KB and is pinned by version.
 7. **Every artifact pins what it was built from** (`upstream`) **and who built it** (`produced_by`). Staleness and agent drift are detectable mechanically.
 
-## Repository layout
+</details>
 
-### This repo
+<details>
+<summary><b>Pipeline</b>: phases, agent steps and human gates</summary>
+
+| Phase | Agent step(s) | Writes | Human gate |
+|---|---|---|---|
+| 1 Intent | `intent` (conversational with the user) → `ddd-seed` | `intent.md`, proposed glossary terms | BA approves intent PR |
+| 2 Requirements | `req-analysis` ⇄ `ddd-strategic` / human → `req-generation` | `requirements-analysis.md`, `requirements.md`, `strategic.cml`, `glossary.md`, `trace.yaml` | BA approves (+ architect if `domain/` changed) |
+| 3 Design | `design-analysis` ⇄ `ddd-tactical` / architect → `design-generation` | `design-analysis.md`, `design.md`, `contexts/*.cml`, `trace.yaml` | Architect approves |
+| 4 Handoff | none (reconciler only) | tag `SPEC-0042/v<n>-ready` | none |
+
+Between every agent step and its human gate: **validate** (deterministic, `contracts/validation-rules.md`)
+then **eval gate** (rubric/judge; thresholds in `evals/thresholds.yaml`).
+
+The [contracts](contracts/) define it all: `header.schema.json` (the frontmatter every artifact carries), `block-grammar.md` (the strict-block format and ID scheme), `validation-rules.md` (every lint rule and the metrics it emits) and `workflow.md` (the reconciler: states, branches, PRs, loops, back-edges, eval mode). The detailed diagram is in [docs/architecture.md](docs/architecture.md); design decisions are logged in [docs/decisions.md](docs/decisions.md), with ADRs in [docs/adr/](docs/adr/).
+
+</details>
+
+<details>
+<summary><b>Repository layout</b>: this repo, and what a spec project looks like</summary>
+
+**This repo**
 
 ```
 contracts/                       # source of truth: header schema, block grammar, validation rules, workflow
@@ -84,18 +131,16 @@ docs/adr/                        # architecture decision records: the full write
 docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough of one spec (as a page: docs/scenario/spec-pipeline-walkthrough.html)
 docs/milestones/                 # milestone kickoff notes
-docs/diagrams/                   # diagram sources
+docs/diagrams/                   # diagram sources, the overview and the demo replay
 docs/roadmap.html                # the roadmap: milestones and the decisions they need
 index.html                       # the website home page (GitHub Pages); every page shares its top navigation
 
 runs/                            # run outputs, gitignored: spec files, session JSONL, lint.json, run.json
 ```
 
-The HTML pages are published with GitHub Pages, since GitHub shows `.html` files as source: the [roadmap](https://balaji-balu.github.io/spec-contracts/docs/roadmap.html) and the [SPEC-0001 walkthrough](https://balaji-balu.github.io/spec-contracts/docs/scenario/spec-pipeline-walkthrough.html).
+The HTML pages are published with GitHub Pages, since GitHub shows `.html` files as source.
 
-### A spec project
-
-What the platform creates in a product team's repo; `examples/` holds a small one.
+**A spec project**, what the platform creates in a product team's repo (`examples/` holds a small one):
 
 ```
 domain/                          # shared across all specs, architect-owned (CODEOWNERS)
@@ -113,31 +158,12 @@ specs/
     trace.yaml                   # all cross-artifact links
 ```
 
-## Pipeline
+</details>
 
-| Phase | Agent step(s) | Writes | Human gate |
-|---|---|---|---|
-| 1 Intent | `intent` (conversational with the user) → `ddd-seed` | `intent.md`, proposed glossary terms | BA approves intent PR |
-| 2 Requirements | `req-analysis` ⇄ `ddd-strategic` / human → `req-generation` | `requirements-analysis.md`, `requirements.md`, `strategic.cml`, `glossary.md`, `trace.yaml` | BA approves (+ architect if `domain/` changed) |
-| 3 Design | `design-analysis` ⇄ `ddd-tactical` / architect → `design-generation` | `design-analysis.md`, `design.md`, `contexts/*.cml`, `trace.yaml` | Architect approves |
-| 4 Handoff | none (reconciler only) | tag `SPEC-0042/v<n>-ready` | none |
+## Contributing
 
-Between every agent step and its human gate: **validate** (deterministic, `contracts/validation-rules.md`)
-then **eval gate** (rubric/judge; thresholds defined when we design the eval harness).
+The project is looking for builders. Good places to start: eval cases from real specs that went wrong, lint rules, small agent tools, the governance and observability features in the [features register](docs/platform/features.md), and the code side of the loop. [CONTRIBUTING.md](CONTRIBUTING.md) explains how, and issues labelled `good first issue` are a good first step.
 
-## Files in `contracts/`
-
-- `header.schema.json`: the YAML frontmatter every artifact carries.
-- `block-grammar.md`: the strict-block Markdown format and the ID scheme.
-- `validation-rules.md`: everything the parser and linker enforce, plus the leading metrics it emits.
-- `workflow.md`: the reconciler: states, branches, PRs, loops, back-edges, eval mode.
-
-## Decisions
-
-Design decisions are logged in [docs/decisions.md](docs/decisions.md), numbered D1, D2, … and marked *proposed* or *decided*. The bigger ones have a full write-up in [docs/adr/](docs/adr/).
-
-## Contributing and licence
-
-Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes, and [SECURITY.md](SECURITY.md) to report a vulnerability privately. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+If the idea is useful to you, a star helps others find it. To report a vulnerability, see [SECURITY.md](SECURITY.md); everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 Released under the [MIT licence](LICENSE).
