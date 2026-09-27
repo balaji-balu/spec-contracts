@@ -53,6 +53,41 @@ Next: read the worked example in [`examples/specs/SPEC-0001`](examples/specs/SPE
 
 ## Repository layout
 
+### This repo
+
+```
+contracts/                       # source of truth: header schema, block grammar, validation rules, workflow
+templates/                       # what agents fill in: spec/ (one file per artifact) and domain/ (glossary, CML)
+examples/                        # the worked SPEC-0001 with its domain and a sample org constitution (lint fixture, eval reference)
+
+AGENTS.md                        # behaviour rules every pi session loads (pinned by hash)
+agents/<step>/                   # the step's prompt.md (task + mode preambles) and AGENTS.md
+skills/<name>/SKILL.md           # pi skills the steps load
+pipeline.lock.yaml               # what each step runs with: model, prompt, skills, extensions, template and AGENTS.md hashes
+
+packages/spec-lint/              # the linter (TypeScript): CLI + library
+packages/pi-spec-tools/          # the tools agents call: validate_artifact, trace_link, term_lookup, kb_search, kb_get
+packages/step-runner/            # run-step: one agent step on an eval case (stands in for the reconciler in M1)
+packages/eval-runner/            # score and run-suite: score runs, run a case k times, write the report
+gateway/litellm/                 # the litellm gateway every model call goes through (docker compose, config, .env.example)
+evals/                           # eval harness: cases, rubrics, judge prompt, thresholds, scoring rules
+tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed
+
+docs/architecture.md             # the detailed architecture diagram and what each part does
+docs/adr/                        # architecture decision records
+docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
+docs/scenario-SPEC-0001.md       # end-to-end walkthrough of one spec (as a page: docs/scenario/spec-pipeline-walkthrough.html)
+docs/milestones/                 # milestone kickoff notes
+docs/diagrams/                   # diagram sources
+spec-pipeline-roadmap.html       # the roadmap: milestones and the decisions they need
+
+runs/                            # run outputs, gitignored: spec files, session JSONL, lint.json, run.json
+```
+
+### A spec project
+
+What the platform creates in a product team's repo; `examples/` holds a small one.
+
 ```
 domain/                          # shared across all specs, architect-owned (CODEOWNERS)
   glossary.md                    # ubiquitous language (terms, per bounded context)
@@ -67,37 +102,7 @@ specs/
     design-analysis.md           # phase 3a (findings)
     design.md                    # phase 3b
     trace.yaml                   # all cross-artifact links
-AGENTS.md                        # behaviour rules every pi session loads (pinned by hash)
-contracts/                       # this folder: schema, rules, workflow
-templates/                       # what agents fill in
-examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
-docs/architecture.md             # the detailed architecture diagram and what each part does
-docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
-docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
-evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
-packages/spec-lint/              # the linter (TypeScript): CLI + library
-packages/pi-spec-tools/          # pi package: the tools agents call (validate_artifact, trace_link, term_lookup, kb_search, kb_get)
-gateway/litellm/                 # the litellm gateway every model call goes through (docker compose, config.yaml, .env.example)
-packages/step-runner/            # run-step: one agent step on an eval case, pinned by pipeline.lock.yaml (stands in for the reconciler in M1)
-agents/<step>/                   # prompt.md (task + mode preambles) and the step's AGENTS.md
-skills/<name>/SKILL.md           # pi skills the steps load
-pipeline.lock.yaml               # model, prompt, skills, extensions, template and AGENTS.md hashes per step (workflow.md §12)
-runs/                            # run outputs (gitignored): spec files, session JSONL, lint.json, run.json
-tools/spec-lint-prototype.py     # throwaway Python prototype, kept until parity is reviewed, then deleted
 ```
-
-Run the linter (Node 20+, after `npm install` at the repo root):
-
-```
-npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb
-npm test --workspaces
-```
-
-The example is clean apart from one warning (C4 on SC-2). The tests check parity with the prototype on every fixture and
-on 36 planted defects, plus the git-aware rules in temp repositories. See `contracts/validation-rules.md` §8 for options.
-
-The prototype is still runnable for comparison: `PYTHONUTF8=1 python tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json`
-(needs `pyyaml` and `jsonschema`; on Windows `PYTHONUTF8=1` is required, or it misreads the `·` separator and finds no blocks).
 
 ## Pipeline
 
