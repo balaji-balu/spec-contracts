@@ -7,7 +7,7 @@ Feature ID (if any): <!-- e.g. GOV-06, OBS-03 -->
 ## Checklist
 
 - [ ] One logical change; CI passes
-- [ ] Contract changes (if any) are in `contracts/` and noted in the README decisions table
+- [ ] Contract changes (if any) are in `contracts/` and noted in `docs/decisions.md`
 - [ ] No edits to `examples/` or `evals/cases/` to make a tool pass
 - [ ] Prompts, skills and AGENTS.md are not tuned to an eval case
 - [ ] `npm run lock -w step-runner -- --update` run if an AGENTS.md, prompt or skill changed

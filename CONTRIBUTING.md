@@ -25,7 +25,7 @@ Issues labelled `good first issue` are a good place to start.
 
 These come from [`CLAUDE.md`](CLAUDE.md) and apply to human and AI-assisted contributions alike.
 
-- **Contracts lead, code follows.** If code needs a contract change, change `contracts/` first, in the same PR, and note it in the README decisions table.
+- **Contracts lead, code follows.** If code needs a contract change, change `contracts/` first, in the same PR, and note it in `docs/decisions.md`.
 - **Never edit fixtures to make a tool pass.** `examples/` and `evals/cases/` are fixtures. If you think one is wrong, say so in an issue.
 - **Never tune prompts, skills or AGENTS.md to an eval case.** Keep examples in unrelated domains, or the evals stop measuring anything.
 - **Features carry IDs.** Commits and PR titles cite the feature ID they touch (`GOV-06: …`), and the PR updates that row of the features register.
@@ -37,7 +37,7 @@ You never need to spend money to get a PR merged. CI uses pi's faux model and no
 
 ## Proposals and decisions
 
-Design decisions are tracked in the [decisions log](README.md#decisions-log), each marked *proposed* or *decided*. To propose a change to a decided item, or to decide a proposed one, open an issue with the **Proposal** template. For now the maintainer (@balaji-balu) makes the final call; this will change as the community grows.
+Design decisions are tracked in the [decisions log](docs/decisions.md), each marked *proposed* or *decided*. To propose a change to a decided item, or to decide a proposed one, open an issue with the **Proposal** template. For now the maintainer (@balaji-balu) makes the final call; this will change as the community grows.
 
 ## Pull requests
 

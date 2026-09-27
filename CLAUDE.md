@@ -49,7 +49,7 @@ Details are in `docs/roadmap.html` and `docs/milestones/M1-kickoff.md`. In short
 **Exit:** `evals/cases/seeded/SD-RA-0001-refund` meets the release thresholds over 3 runs (hard rules such as `recall.blocker` on the worst run, the other metrics on the mean), and a baseline report is committed to `evals/baselines/`.
 
 ## Working rules for this repo
-- **Contracts lead, code follows.** If the implementation needs a contract change, propose it and change `contracts/` first, in the same PR, with a note in the README decisions table.
+- **Contracts lead, code follows.** If the implementation needs a contract change, propose it and change `contracts/` first, in the same PR, with a note in `docs/decisions.md`.
 - **Parity before retirement.** The TS linter must reproduce the Python prototype's results on every fixture before the prototype is deleted:
   - `examples/specs/SPEC-0001` is clean;
   - the judge fixtures are clean;
