@@ -24,7 +24,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - `gateway/litellm/`: the litellm proxy (Docker Compose) that every model call goes through. Keys live in the gitignored `gateway/litellm/.env`, which you fill in yourself; never put keys anywhere else.
 - `agents/<step>/prompt.md` + `AGENTS.md`, `skills/<name>/SKILL.md`, `pipeline.lock.yaml`: what a step runs with. After editing an AGENTS.md, run `npm run lock -w step-runner -- --update`.
 - `tools/spec-lint-prototype.py`: **throwaway** Python linter covering about 40 rules. It stays until parity is reviewed, then gets deleted.
-- `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `spec-pipeline-roadmap.html` at the repo root.
+- `docs/`: scenario walkthrough (generated from `docs/scenario/model.py`). The roadmap is `docs/roadmap.html`.
 - `docs/platform/features.md`: the platform features register (governance `GOV-nn`, observability `OBS-nn`), with component IDs, stages and statuses. Read it before work on security, guards, the gateway, tracing or the reconciler.
 
 ## Decisions already made (don't reopen without being asked)
@@ -39,7 +39,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - Decisions D6–D13 in `README.md` are still *proposed*.
 
 ## Current milestone: M1 "One real agent"
-Details are in `spec-pipeline-roadmap.html` and `docs/milestones/M1-kickoff.md`. In short:
+Details are in `docs/roadmap.html` and `docs/milestones/M1-kickoff.md`. In short:
 1. Port `spec-lint` to **TypeScript**: the full rule set from `contracts/validation-rules.md`, with a CLI plus a pi extension `validate_artifact`.
 2. pi extensions: `trace_link`, `term_lookup`, and `kb_search`/`kb_get` over a file-based KB.
 3. A req-analysis prompt and skill, and the first `pipeline.lock.yaml`.
