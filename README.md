@@ -15,44 +15,16 @@ This repo holds the platform's contracts (artifact format, validation rules, wor
 
 ```mermaid
 flowchart LR
-  user((User)) --> UI
-  rev((BA / Sr. architect)) --> UI
-  UI["UI<br/>thin client"] -->|commands, chat relay| R
-  subgraph ENG[Orchestrator / engine]
-    R["Reconciler<br/>stateless loop"]
-    V["Verify<br/>spec-lint"]
-    EV["Eval gate<br/>LLM judge"]
-  end
-  R <-->|branches, commits, PRs| GIT[("Git repo<br/>specs/ + domain/<br/>= workflow state")]
-  R -->|one pi session per step| AG
-  R --> V
-  R --> EV
-  subgraph AG[pi agent steps]
-    IA[Intent] --> RA[Requirement analysis] --> RG[Requirement generation] --> DA[Design analysis] --> DG[Design generation]
-    DDD[DDD agent]
-    RA -.->|route: ddd| DDD
-    DA -.->|route: ddd| DDD
-    IA -.->|seed terms| DDD
-  end
-  subgraph CFG[Pinned per step]
-    AGM[AGENTS.md]
-    SK["skill(s)"]
-    TP["template(s)"]
-    PR[prompts]
-  end
-  CFG -.-> AG
-  subgraph KB[Org KB - read only]
-    CON[constitution.md]
-    DOCS[policies, systems, provider docs]
-  end
-  AG -->|kb_search / kb_get| KB
-  EV -.->|scores articles| CON
-  GIT -->|tag SPEC-n ready| EXE["plan → code → QA<br/>execution loop"]
-  EXE -.->|lagging signals| EV
-  EXE -.->|code-to-spec: proposed spec changes| R
+  U((User intent)) --> SA
+  SA["Spec agents<br/>requirements · design"] --> G{{"Lint + evals<br/>+ human approval"}}
+  G --> S[("Spec<br/>source of truth")]
+  S -->|spec-to-code| CA["Code agents<br/>plan · code · tests"]
+  CA --> G2{{"Tests + evals<br/>+ human approval"}}
+  G2 --> C[("Code")]
+  C -.->|code-to-spec<br/>proposed changes| SA
 ```
 
-<sub>Source: [docs/diagrams/00-architecture.mmd](docs/diagrams/00-architecture.mmd). Steps other than requirement analysis, the execution loop and the code-to-spec path are still planned.</sub>
+<sub>Agents work one small step at a time; git holds all the state. The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
 
 ## Quickstart
 
@@ -108,6 +80,7 @@ AGENTS.md                        # behaviour rules every pi session loads (pinne
 contracts/                       # this folder: schema, rules, workflow
 templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
+docs/architecture.md             # the detailed architecture diagram and what each part does
 docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer
