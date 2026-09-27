@@ -231,6 +231,6 @@ eval_judge:
 limits: {repair_attempts: 3, analysis_rounds: 3, eval_retries: 2, back_edges: 2}
 ```
 
-`gateway` routes every model call through litellm (README D20). The runner registers it with pi as the provider for each step's model. Every request carries the tags `step:<step>`, `run:<run_id>` and `case:<case>` (in eval mode). The run reads its tokens and spend back from litellm into `run.json`. A run that bypasses the gateway must say so in `run.json`.
+`gateway` routes every model call through litellm (decision D20, `docs/decisions.md`). The runner registers it with pi as the provider for each step's model. Every request carries the tags `step:<step>`, `run:<run_id>` and `case:<case>` (in eval mode). The run reads its tokens and spend back from litellm into `run.json`. A run that bypasses the gateway must say so in `run.json`.
 
 A change to this file goes through its own PR and is gated by the offline eval suites (evals/README.md §4). Changing `eval_judge` also triggers judge recalibration (evals/calibration.md).

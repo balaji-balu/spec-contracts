@@ -168,7 +168,7 @@ export async function runStep(o: RunOptions): Promise<RunResult> {
 
   const modelRuntime = o.modelRuntime ?? (await ModelRuntime.create());
   const [provider, ...rest] = s.model.split("/");
-  // Every model call goes through the gateway (README D20), unless a test injects a model or --direct is given.
+  // Every model call goes through the gateway (decision D20, docs/decisions.md), unless a test injects a model or --direct is given.
   const g = lock.gateway && (o.gatewayUrl ? { ...lock.gateway, base_url: o.gatewayUrl } : lock.gateway);
   const tags = gatewayTags({ step: o.step, runId, caseId: evalCase.id });
   let gateway: RunResult["gateway"];

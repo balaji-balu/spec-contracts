@@ -1,4 +1,4 @@
-# Local litellm gateway: every model call from pi goes through it (CLAUDE.md, README D20).
+# Local litellm gateway: every model call from pi goes through it (decision D20, docs/decisions.md).
 # Start: docker compose -f gateway/litellm/docker-compose.yml up -d   (needs gateway/litellm/.env, see .env.example)
 # UI:    http://localhost:4000/ui   (log in with UI_USERNAME / UI_PASSWORD from .env) → Logs, Usage
 name: spec-contracts-litellm

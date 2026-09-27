@@ -2,7 +2,7 @@
 # Changes go through their own PR and are gated by the offline eval suites (evals/README.md §4).
 # context_files hashes are generated: npm run lock -w step-runner -- --update
 harness: {name: pi, version: 0.85.1}
-# Every model call goes through this gateway (README D20). Start it: docker compose -f gateway/litellm/docker-compose.yml up -d
+# Every model call goes through this gateway (decision D20, docs/decisions.md). Start it: docker compose -f gateway/litellm/docker-compose.yml up -d
 gateway: {kind: litellm, base_url: "http://localhost:4000", api: openai-completions, key_env: LITELLM_API_KEY, env_file: gateway/litellm/.env}
 steps:
   req-analysis:

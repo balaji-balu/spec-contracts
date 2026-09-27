@@ -8,7 +8,7 @@ Every model call in the spec pipeline goes through one local litellm gateway, an
 
 |  |  |
 | --- | --- |
-| Status | Accepted: README decision D20, shipped in M1 step 5 (PR #5) |
+| Status | Accepted: decision D20 in `docs/decisions.md`, shipped in M1 step 5 (PR #5) |
 | Scope | Agent steps today (req-analysis); the eval judge and later steps from M2 |
 | Related | D12 (judge model differs from the generator), D21 (run traces, proposed) |
 
