@@ -13,14 +13,9 @@ This repo holds the platform's contracts (artifact format, validation rules, wor
 
 > **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done. Spec-to-code (plan → code → QA) and code-to-spec feedback are planned, not built yet; see the [roadmap](spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
 
-```mermaid
-flowchart LR
-  I((User<br/>intent)) -->|"spec agents<br/>requirements · design"| S[("<b>Spec</b><br/>source of truth<br/><small>linted · evaluated · human-approved</small>")]
-  S -->|"code agents<br/>plan · code · tests<br/>(spec-to-code)"| C[("<b>Code</b><br/><small>tested · evaluated · human-approved</small>")]
-  C -.->|"code-to-spec<br/>proposed spec changes"| S
-```
+<p align="center"><img src="docs/diagrams/overview.svg" alt="User intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code); what the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval." width="100%"></p>
 
-<sub>Agents work one small step at a time; git holds all the state. The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
+<sub>The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
 
 ## Quickstart
 
