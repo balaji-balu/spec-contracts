@@ -191,6 +191,39 @@ def svg_arch():
     return (f'<svg class="arch" viewBox="0 0 1000 580" width="1000" height="580" role="img" aria-labelledby="arch-t" xmlns="http://www.w3.org/2000/svg">'
             f'<title id="arch-t">Platform layers: UI, control, orchestration and execution, with cross-cutting evidence, observability and knowledge</title><defs>{defs}</defs>' + "".join(B) + '</svg>')
 
+# ------------------------------------------------------------------ standalone layers SVG (docs/diagrams/layers.svg)
+# The same drawing as the walkthrough's platform section, with its own light/dark styles so it renders
+# on GitHub (docs/architecture.md) without the page's CSS.
+LAYERS_CSS = """
+  :root{--bg:#FFFFFF;--surface:#FFFFFF;--band:#EEF0EC;--ink:#18211D;--ink2:#46524C;--muted:#78837D;--line:#C9D0CB;
+    --sys:#2B6A8A;--sys-t:#E1EDF3;--human:#A15F12;--human-t:#F7EBDA;--agent:#6450A6;--agent-t:#ECE8F6;
+    --gate:#3E4A44;--gate-t:#E5E9E6;--kb:#357652;--kb-t:#E1EFE6}
+  @media (prefers-color-scheme: dark){:root{--bg:#0D1117;--surface:#1A201D;--band:#1B2220;--ink:#E3E9E5;--ink2:#B4BFB9;
+    --muted:#86928C;--line:#38423D;--sys:#72B3D4;--sys-t:#1B2C35;--human:#E2A45C;--human-t:#33281A;--agent:#AA99E2;
+    --agent-t:#29243A;--gate:#B0BBB5;--gate-t:#252C28;--kb:#7DC79C;--kb-t:#1C2F24}}
+  text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .bg{fill:var(--bg)}
+  .ag rect{fill:var(--band)} .agt{font-size:13.5px;font-weight:700;fill:var(--ink)} .ags{font-size:11px;fill:var(--muted);text-anchor:end}
+  .ab rect{stroke-width:1.2} .abt{font-size:12.5px;font-weight:600;fill:var(--ink);text-anchor:middle} .abs{font-size:10.5px;fill:var(--muted);text-anchor:middle}
+  .r-human rect{fill:var(--human-t);stroke:var(--human)} .r-sys rect{fill:var(--sys-t);stroke:var(--sys)}
+  .r-agent rect{fill:var(--agent-t);stroke:var(--agent)} .r-gate rect{fill:var(--gate-t);stroke:var(--gate)}
+  .r-kb rect{fill:var(--kb-t);stroke:var(--kb)} .r-agent .abt{font-size:12px}
+  .r-exec rect{fill:var(--surface);stroke:var(--ink2);stroke-dasharray:4 3}
+  .aa{fill:none;stroke:var(--ink2);stroke-width:1.3} .aa.dash{stroke-dasharray:5 4;stroke:var(--muted)}
+  .al{font-size:10.5px;fill:var(--muted);text-anchor:middle} .al.st{text-anchor:start}
+  .mk-sys{fill:var(--ink2)} .mk-human{fill:var(--human)} .mk-agent{fill:var(--agent)} .mk-gate{fill:var(--gate)} .mk-exec{fill:var(--muted)}
+"""
+
+def layers_svg():
+    svg = svg_arch().replace(' class="arch"', "", 1)
+    desc = ("<desc>The UI layer talks only to the control layer (API, governance, registries, LLM gateway). The control layer starts "
+            "the orchestration layer (reconciler, runner, verify, eval gate), which runs one action at a time in the execution layer "
+            "(graph engine, loop engine and harness, skills, tools and MCP servers). Evidence and provenance, observability, and "
+            "knowledge and memory cut across all layers. Tagged specs go to the plan, code and QA loop, which sends proposed spec "
+            "changes back to the reconciler. Dashed boxes are still being placed in Discussion 21.</desc>")
+    i = svg.index("<defs>")
+    return svg[:i] + desc + "<style>" + LAYERS_CSS + "</style>" + '<rect class="bg" width="1000" height="580"/>' + svg[i:] + "\n"
+
 # ------------------------------------------------------------------ HTML page
 def page():
     counts = dict(
@@ -346,4 +379,5 @@ if __name__ == "__main__":
         (dd / f"0{i}-{name.lower().replace(' & ', '-').replace(' ', '-')}.mmd").write_text(mermaid([code]))
     (dd / "05-full-scenario.mmd").write_text(mermaid([p[0] for p in PHASES]))
     (DOCS / "scenario-SPEC-0001.md").write_text(markdown())
+    (dd / "layers.svg").write_text(layers_svg(), encoding="utf-8", newline="\n")
     print(f"steps={len(S)} svg={W}x{H}")
