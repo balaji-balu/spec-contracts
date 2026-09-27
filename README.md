@@ -162,7 +162,7 @@ specs/
 
 ## Contributing
 
-The project is looking for builders. Good places to start: eval cases from real specs that went wrong, lint rules, small agent tools, the governance and observability features in the [features register](docs/platform/features.md), and the code side of the loop. [CONTRIBUTING.md](CONTRIBUTING.md) explains how, and issues labelled `good first issue` are a good first step.
+The project is looking for builders. Good places to start: eval cases from real specs that went wrong, lint rules, small agent tools, the governance and observability features in the [features register](docs/platform/features.md), and the code side of the loop. [CONTRIBUTING.md](CONTRIBUTING.md) explains how, and issues labelled `good first issue` are a good first step. Questions and ideas are welcome in [Discussions](https://github.com/balaji-balu/spec-contracts/discussions).
 
 If the idea is useful to you, a star helps others find it. To report a vulnerability, see [SECURITY.md](SECURITY.md); everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
 

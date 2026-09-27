@@ -6,6 +6,7 @@ Thanks for helping build a spec-driven, AI-native SDLC. This project is early: i
 
 - Run the [Quickstart](README.md#quickstart). Everything in it except a real agent run works without a model key.
 - Read [`CLAUDE.md`](CLAUDE.md) for where things are and the working rules. It is written for AI coding agents, but it is the most complete map of the repo for people too.
+- Questions, ideas and show-and-tell go to [Discussions](https://github.com/balaji-balu/spec-contracts/discussions). Issues are for bugs, proposals and eval cases.
 - For anything bigger than a fix, **open an issue first** so we can agree on the approach before you write code.
 
 ## Ways to contribute

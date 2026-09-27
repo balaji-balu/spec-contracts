@@ -3,3 +3,6 @@ contact_links:
   - name: Report a security vulnerability
     url: https://github.com/balaji-balu/spec-contracts/security/advisories/new
     about: Please report security issues privately, not as public issues.
+  - name: Ask a question or share an idea
+    url: https://github.com/balaji-balu/spec-contracts/discussions
+    about: Questions, ideas and show-and-tell go to Discussions; issues are for bugs, proposals and eval cases.
