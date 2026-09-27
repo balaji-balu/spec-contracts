@@ -11,7 +11,7 @@ Every artifact is validated by a deterministic linter, scored by evals, and appr
 
 This repo holds the platform's contracts (artifact format, validation rules, workflow), the linter, the agent tools and the eval harness. Every other part of the platform consumes only what these contracts define.
 
-> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done. Spec-to-code (plan → code → QA) and code-to-spec feedback are planned, not built yet; see the [roadmap](spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
+> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done. Spec-to-code (plan → code → QA) and code-to-spec feedback are planned, not built yet; see the [roadmap](https://balaji-balu.github.io/spec-contracts/spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
 
 <p align="center"><img src="docs/diagrams/overview.svg" alt="User intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code); what the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval." width="100%"></p>
 
@@ -83,6 +83,8 @@ spec-pipeline-roadmap.html       # the roadmap: milestones and the decisions the
 
 runs/                            # run outputs, gitignored: spec files, session JSONL, lint.json, run.json
 ```
+
+The HTML pages are published with GitHub Pages, since GitHub shows `.html` files as source: the [roadmap](https://balaji-balu.github.io/spec-contracts/spec-pipeline-roadmap.html) and the [SPEC-0001 walkthrough](https://balaji-balu.github.io/spec-contracts/docs/scenario/spec-pipeline-walkthrough.html).
 
 ### A spec project
 
