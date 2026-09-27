@@ -50,5 +50,12 @@ Design decisions are tracked in the [decisions log](README.md#decisions-log), ea
 ## Environment notes
 
 - Node 20+ is required; CI uses Node 22.
-- Python 3 (`pyyaml`, `jsonschema`) is needed only for the prototypes. On Windows, run them with `PYTHONUTF8=1`.
+- Python 3 (`pyyaml`, `jsonschema`) is needed only for the prototypes. On Windows, run them with `PYTHONUTF8=1`, or Python misreads the `·` separator and the linter finds no blocks. To compare the prototype with the TypeScript linter:
+
+  ```
+  PYTHONUTF8=1 python tools/spec-lint-prototype.py examples examples/specs/SPEC-0001 contracts/header.schema.json
+  npm run parity:check -w spec-lint
+  ```
+
+- The worked example lints clean apart from one warning (C4 on SC-2). The spec-lint tests check parity with the prototype on every fixture and on 36 planted defects, plus the git-aware rules in temp repositories. Linter options are in `contracts/validation-rules.md` §8.
 - If you use Claude Code, put notes about your own machine in `CLAUDE.local.md` (gitignored), not in `CLAUDE.md`.
