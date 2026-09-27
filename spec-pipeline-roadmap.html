@@ -98,9 +98,22 @@ code{font:13px var(--mono);color:var(--ink)}
 .later b{display:block;color:var(--ink);font-weight:600}
 .note{font-size:13px;color:var(--muted);max-width:74ch}
 :focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+/* ---------- site nav (shared by every page) */
+.topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding:14px 0;border-bottom:1px solid var(--line);font:500 14px/1.4 var(--body)}
+.topnav .brand{font:750 17px/1 var(--display);font-stretch:88%;color:var(--ink);text-decoration:none;margin-right:auto}
+.topnav a{color:var(--ink2);text-decoration:none}
+.topnav a:hover{color:var(--sys);text-decoration:underline}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600}
 </style>
 
 <div class="wrap">
+<nav class="topnav" aria-label="Site">
+  <a class="brand" href="./">Spec Contracts</a>
+  <a href="./">Home</a>
+  <a href="spec-pipeline-roadmap.html" aria-current="page">Roadmap</a>
+  <a href="docs/scenario/spec-pipeline-walkthrough.html">Walkthrough</a>
+  <a href="https://github.com/balaji-balu/spec-contracts">GitHub ↗</a>
+</nav>
 <header>
   <div class="eyebrow">spec-contracts · intent → requirements → design</div>
   <h1>Spec Pipeline Roadmap</h1>
