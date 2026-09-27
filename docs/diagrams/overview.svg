@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 392" width="960" height="392" role="img" aria-labelledby="t d">
+<title id="t">Spec Contracts platform overview</title>
+<desc id="d">A user's intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code). What the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval.</desc>
+<style>
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --band:#F1F3F0;
+    --ink:#18211D; --ink2:#46524C; --muted:#78837D; --line:#C9D0CB;
+    --sys:#2B6A8A; --sys-t:#E1EDF3; --human:#A15F12; --human-t:#F7EBDA;
+    --agent:#6450A6; --agent-t:#ECE8F6; --gate:#3E4A44; --gate-t:#E5E9E6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#111513; --surface:#1A201D; --band:#1F2623;
+      --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+      --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --human-t:#33281A;
+      --agent:#AA99E2; --agent-t:#29243A; --gate:#B0BBB5; --gate-t:#252C28;
+    }
+  }
+  text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .bg{fill:var(--bg)}
+  .band{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:4 4}
+  .gt{font-size:12.5px;font-weight:600;fill:var(--muted)}
+  .gbox{fill:var(--surface);stroke:var(--line);stroke-width:1}
+  .gh{font-size:13px;font-weight:600;fill:var(--ink2);text-anchor:middle}
+  .gs{font-weight:400;fill:var(--muted)}
+  .garr{fill:none;stroke:var(--line);stroke-width:1.4}
+  .mk-g{fill:var(--line)}
+  .h{font-size:17px;font-weight:700;fill:var(--ink);text-anchor:middle}
+  .s{font-size:13px;fill:var(--ink2);text-anchor:middle}
+  .tag{font-size:11.5px;font-style:italic;fill:var(--muted);text-anchor:middle}
+  .bt{font-size:13.5px;font-weight:700;fill:var(--ink)}
+  .lbl{font-size:13px;font-weight:600;fill:var(--ink2);text-anchor:middle}
+  .foot{font-size:12.5px;fill:var(--muted);text-anchor:middle}
+  .human{fill:var(--human-t);stroke:var(--human);stroke-width:1.5}
+  .agent{fill:var(--agent-t);stroke:var(--agent);stroke-width:1.5}
+  .spec{fill:var(--sys-t);stroke:var(--sys);stroke-width:2.5}
+  .gate{fill:var(--gate-t);stroke:var(--gate);stroke-width:1.5}
+  .planned{fill:var(--surface);stroke:var(--ink2);stroke-width:1.5;stroke-dasharray:5 4}
+  .arr{fill:none;stroke:var(--ink2);stroke-width:1.8}
+  .loop{fill:none;stroke:var(--human);stroke-width:1.8;stroke-dasharray:6 5}
+  .mk{fill:var(--ink2)} .mk-l{fill:var(--human)}
+</style>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk"/></marker>
+  <marker id="l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-l"/></marker>
+  <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-g"/></marker>
+</defs>
+
+<rect class="bg" x="0" y="0" width="960" height="392" rx="14"/>
+
+<!-- code-to-spec loop, over the top -->
+<path class="loop" d="M875 110 V62 H249 V104" marker-end="url(#l)"/>
+<rect class="bg" x="352" y="40" width="416" height="26"/>
+<text class="lbl" x="560" y="58" style="fill:var(--human)">code-to-spec: what the code teaches us → proposed spec changes</text>
+
+<!-- main row -->
+<rect class="human" x="20" y="110" width="104" height="80" rx="40"/>
+<text class="h" x="72" y="146">User</text>
+<text class="s" x="72" y="165">intent</text>
+
+<path class="arr" d="M124 150 H158" marker-end="url(#a)"/>
+
+<rect class="agent" x="164" y="110" width="170" height="80" rx="10"/>
+<text class="h" x="249" y="140">Spec agents</text>
+<text class="s" x="249" y="160">requirements · design</text>
+<text class="tag" x="249" y="178">built: requirements analysis</text>
+
+<path class="arr" d="M334 150 H384" marker-end="url(#a)"/>
+
+<rect class="spec" x="390" y="102" width="150" height="96" rx="12"/>
+<text class="h" x="465" y="140" style="font-size:19px">Spec</text>
+<text class="s" x="465" y="160" style="font-weight:600;fill:var(--sys)">source of truth</text>
+<text class="tag" x="465" y="178">in git</text>
+
+<path class="arr" d="M540 150 H590" marker-end="url(#a)"/>
+<text class="lbl" x="565" y="218">spec-to-code</text>
+
+<rect class="planned" x="596" y="110" width="170" height="80" rx="10"/>
+<text class="h" x="681" y="140">Code agents</text>
+<text class="s" x="681" y="160">plan · code · tests</text>
+<text class="tag" x="681" y="178">planned</text>
+
+<path class="arr" d="M766 150 H804" marker-end="url(#a)"/>
+
+<rect class="planned" x="810" y="110" width="130" height="80" rx="10"/>
+<text class="h" x="875" y="140">Code</text>
+<text class="s" x="875" y="160">the running app</text>
+<text class="tag" x="875" y="178">planned</text>
+
+<!-- gates: kept quiet so the main row leads -->
+<rect class="band" x="20" y="244" width="920" height="84" rx="12"/>
+<text class="gt" x="36" y="266">Every change, in both directions, passes the same gates</text>
+
+<rect class="gbox" x="110" y="278" width="210" height="38" rx="8"/>
+<text class="gh" x="215" y="302">Verify <tspan class="gs">· spec-lint</tspan></text>
+
+<path class="garr" d="M320 297 H369" marker-end="url(#g)"/>
+
+<rect class="gbox" x="375" y="278" width="210" height="38" rx="8"/>
+<text class="gh" x="480" y="302">Eval <tspan class="gs">· LLM judge</tspan></text>
+
+<path class="garr" d="M585 297 H634" marker-end="url(#g)"/>
+
+<rect class="gbox" x="640" y="278" width="210" height="38" rx="8"/>
+<text class="gh" x="745" y="302">Human approval <tspan class="gs">· PR</tspan></text>
+
+<text class="foot" x="480" y="368">pi agents, one session per step · a stateless reconciler drives the workflow · git holds all the state</text>
+</svg>
