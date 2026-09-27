@@ -7,6 +7,8 @@ AI coding agents are good at writing code and poor at knowing what to build. Spe
 - **Spec-to-code.** Agents turn a user's intent into requirements, then a design, then a plan, code and tests, one small, reviewable step at a time. Code is generated from an approved spec, never the other way round.
 - **Code-to-spec.** What the code teaches us (a failing test, a design that doesn't fit, a production incident, a hand-made change) comes back as a proposed change to the spec. It goes through the same gates, and the code is regenerated from the updated spec.
 
+This is not waterfall. Nobody can fully specify a system before building it: the first spec is a hypothesis, design is discovered through implementation, and business needs keep changing ([Fowler and Joshi](https://martinfowler.com/articles/convo-llm-abstractions.html); [Joshi on DSLs and LLMs](https://martinfowler.com/articles/llm-and-dsls.html)). So the spec grows in small, reviewed steps and changes whenever implementation or the business teaches something new. It is the current, agreed truth, not the first guess.
+
 Every artifact is validated by a deterministic linter, scored by evals, and approved by a human (business analyst, senior architect) through a pull request. **pi** agents do the work one step at a time, and a **git reconciler** drives the workflow, with git as the only state.
 
 This repo holds the platform's contracts (artifact format, validation rules, workflow), the linter, the agent tools and the eval harness. Every other part of the platform consumes only what these contracts define.
@@ -43,13 +45,14 @@ Next: read the worked example in [`examples/specs/SPEC-0001`](examples/specs/SPE
 
 ## Principles
 
-1. **The workflow owns control flow; agents own judgment inside one step.** No agent picks the next step.
-2. **Git is the state.** An artifact's header `status` plus its branch/PR is the entire workflow state. The reconciler is stateless.
-3. **Markdown with strict blocks.** Humans read it, the parser validates it. Unknown keys fail validation.
-4. **`trace.yaml` is the only link layer.** Artifacts never reference other artifacts' IDs in their body.
+1. **The spec is a living hypothesis.** It grows in small PRs (intent, analysis, requirements, design) and changes when implementation or the business proves it wrong. Every change is a diff that is linted, traced and approved, and the code follows it. Nothing is specified up front for its own sake.
+2. **The workflow owns control flow; agents own judgment inside one step.** No agent picks the next step.
+3. **Git is the state.** An artifact's header `status` plus its branch/PR is the entire workflow state. The reconciler is stateless.
+4. **Markdown with strict blocks.** Humans read it, the parser validates it. Unknown keys fail validation.
+5. **`trace.yaml` is the only link layer.** Artifacts never reference other artifacts' IDs in their body.
    Domain *vocabulary* (`context:`, `terms:`) is not a trace link. It is checked against the domain model.
-5. **Constitution owns org-wide rules, glossary owns language, CML owns boundaries.** Glossary and CML are shared across specs under `domain/`; the constitution lives in the org KB and is pinned by version.
-6. **Every artifact pins what it was built from** (`upstream`) **and who built it** (`produced_by`). Staleness and agent drift are detectable mechanically.
+6. **Constitution owns org-wide rules, glossary owns language, CML owns boundaries.** Glossary and CML are shared across specs under `domain/`; the constitution lives in the org KB and is pinned by version.
+7. **Every artifact pins what it was built from** (`upstream`) **and who built it** (`produced_by`). Staleness and agent drift are detectable mechanically.
 
 ## Repository layout
 
