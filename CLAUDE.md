@@ -38,7 +38,7 @@ The plan → code → QA loop comes later and consumes only tagged, approved spe
 - Decisions D6–D13 in `README.md` are still *proposed*.
 
 ## Current milestone: M1 "One real agent"
-Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
+Details are in `spec-pipeline-roadmap.html` and `docs/milestones/M1-kickoff.md`. In short:
 1. Port `spec-lint` to **TypeScript**: the full rule set from `contracts/validation-rules.md`, with a CLI plus a pi extension `validate_artifact`.
 2. pi extensions: `trace_link`, `term_lookup`, and `kb_search`/`kb_get` over a file-based KB.
 3. A req-analysis prompt and skill, and the first `pipeline.lock.yaml`.
@@ -59,10 +59,11 @@ Details are in `spec-pipeline-roadmap.html` and `M1-KICKOFF.md`. In short:
 - Rule codes (for example `D9`, `L2`) must appear in the linter output exactly as in `validation-rules.md`.
 - Keep pi extensions small and dependency-light. pi's value is minimalism.
 - **Features carry IDs.** Work that implements or changes a register feature cites its ID in the commit message and PR title (`GOV-06: …`) and updates that row's Status and Evidence in `docs/platform/features.md` in the same PR. Never add a feature without an ID, and never renumber or reuse one.
-- Ask before choosing: the generator or judge models, the git host, or anything listed under "Decisions and when they're due" in the roadmap.
+- Ask the maintainer before choosing: the generator or judge models, the git host, or anything listed under "Decisions and when they're due" in the roadmap.
 
 ## Environment
-- Windows, running Claude Code in the terminal. pi is installed (`~/.pi`). Prefer cross-platform Node/TypeScript scripts over bash.
+- Contributors work on Windows, macOS and Linux. Prefer cross-platform Node/TypeScript scripts over bash.
+- Your own machine's setup (OS, where pi is installed, local paths) goes in `CLAUDE.local.md`, which is gitignored; never in this file.
 - Python 3 is needed only for the prototypes (`pyyaml`, `jsonschema`). Always run them with `PYTHONUTF8=1`: without it, Windows reads the `·` separator as cp1252 and the linter silently finds 0 blocks.
 - The repo keeps LF line endings (`.gitattributes`), and the parsers also accept CRLF.
 

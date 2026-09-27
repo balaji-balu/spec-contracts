@@ -4,3 +4,4 @@ dist/
 __pycache__/
 runs/
 gateway/litellm/.env
+CLAUDE.local.md

@@ -59,7 +59,7 @@ The control plane decides; every point where the data plane touches something en
 | GOV-17 | Generated-app security: model weight provenance, update integrity on device | CI, KB | S2 | Planned | |
 | GOV-18 | Human roles (BA, architect, approver) and multi-user tenancy | CP-ID | S2 | Planned | K3 maps owners to people in `spec-lint.config.yaml` (D16) |
 | GOV-19 | CI never exposes secrets to pull requests from forks | CI, GW | S1 | Built (partial) | CI uses no secrets today; keep it so when model-backed jobs are added |
-| GOV-20 | Community files: licence, `CONTRIBUTING.md`, `GOVERNANCE.md`, `SECURITY.md`, `CODEOWNERS` covering `.claude/`, `AGENTS.md`, `agents/`, `skills/`, `contracts/` | CI, XC-EVD | S1 | Planned | No licence yet; choose before the first outside contribution |
+| GOV-20 | Community files: licence, `CONTRIBUTING.md`, `GOVERNANCE.md`, `SECURITY.md`, `CODEOWNERS` covering `.claude/`, `AGENTS.md`, `agents/`, `skills/`, `contracts/` | CI, XC-EVD | S1 | Built (partial) | MIT licence, CONTRIBUTING, SECURITY, code of conduct, PR and issue templates added; GOVERNANCE and CODEOWNERS still to do |
 
 ## Observability (cross-cutting)
 
@@ -102,4 +102,5 @@ The platform is at `S0` (milestone M1). S1 lines up with M3, when the reconciler
 
 | Date | Change |
 | --- | --- |
+| 2026-09-26 | GOV-20 partly built: licence and contribution files |
 | 2026-09-26 | Created: architecture map, GOV-01 to GOV-20, OBS-01 to OBS-10; statuses checked against this repo |

@@ -1,0 +1,27 @@
+name: Proposal
+description: Propose a feature, a contract change, or a decision (D-number)
+labels: [proposal]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard or missing today, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should change? Name the contracts, packages or feature IDs (GOV-nn, OBS-nn) it touches.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: input
+    id: decision
+    attributes:
+      label: Related decision
+      placeholder: "e.g. D7, D21, or new"

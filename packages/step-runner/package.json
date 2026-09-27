@@ -1,6 +1,7 @@
 {
   "name": "step-runner",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "Runs one agent step in a clean workspace, pinned by pipeline.lock.yaml (M1: no reconciler yet; the suite runner builds on it).",
   "type": "module",
   "bin": {

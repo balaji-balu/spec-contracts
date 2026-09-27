@@ -1,9 +1,77 @@
 # Spec Contracts — Intent → Requirements → Design
 
+AI coding agents are good at writing code and poor at knowing what to build. Specs written up front go stale, and agent output drifts from what the business meant. This repo is the front half of an agentic, spec-driven SDLC platform. AI agents turn a user's intent into requirements and a design, one small, reviewable step at a time. Every artifact is validated by a linter, scored by evals, and approved by a human through a pull request. Only approved specs move on to plan → code → QA.
+
 Contracts for a spec-driven pipeline in which **pi** agents produce artifacts, a
 **git reconciler** drives the workflow, and humans (business analyst, senior architect)
 approve through pull requests. Everything downstream (plan → code → QA) consumes only
 what these contracts define.
+
+> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done; see the [roadmap](spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
+
+```mermaid
+flowchart LR
+  user((User)) --> UI
+  rev((BA / Sr. architect)) --> UI
+  UI["UI<br/>thin client"] -->|commands, chat relay| R
+  subgraph ENG[Orchestrator / engine]
+    R["Reconciler<br/>stateless loop"]
+    V["Verify<br/>spec-lint"]
+    EV["Eval gate<br/>LLM judge"]
+  end
+  R <-->|branches, commits, PRs| GIT[("Git repo<br/>specs/ + domain/<br/>= workflow state")]
+  R -->|one pi session per step| AG
+  R --> V
+  R --> EV
+  subgraph AG[pi agent steps]
+    IA[Intent] --> RA[Requirement analysis] --> RG[Requirement generation] --> DA[Design analysis] --> DG[Design generation]
+    DDD[DDD agent]
+    RA -.->|route: ddd| DDD
+    DA -.->|route: ddd| DDD
+    IA -.->|seed terms| DDD
+  end
+  subgraph CFG[Pinned per step]
+    AGM[AGENTS.md]
+    SK["skill(s)"]
+    TP["template(s)"]
+    PR[prompts]
+  end
+  CFG -.-> AG
+  subgraph KB[Org KB - read only]
+    CON[constitution.md]
+    DOCS[policies, systems, provider docs]
+  end
+  AG -->|kb_search / kb_get| KB
+  EV -.->|scores articles| CON
+  GIT -->|tag SPEC-n ready| EXE["plan → code → QA<br/>execution loop"]
+  EXE -.->|lagging signals| EV
+```
+
+<sub>Source: [docs/diagrams/00-architecture.mmd](docs/diagrams/00-architecture.mmd). Steps other than requirement analysis are still planned.</sub>
+
+## Quickstart
+
+You need Node 20 or later and git. The first three steps need no model key, no Docker and no spend.
+
+```
+git clone https://github.com/balaji-balu/spec-contracts.git
+cd spec-contracts
+npm install
+
+npm run demo -w step-runner -- --verbose   # watch one agent step end to end with a scripted model
+npx spec-lint examples examples/specs/SPEC-0001 --kb evals/cases/golden/G-0001-refund/inputs/kb   # lint the worked example
+npm test --workspaces                      # linter, pi tools, step runner and scorer tests (pi's faux model, no key)
+```
+
+A **real** agent run needs a model key and the litellm gateway (Docker). It costs about $1 and takes about 3 minutes:
+
+```
+cp gateway/litellm/.env.example gateway/litellm/.env      # then add your keys to .env
+docker compose -f gateway/litellm/docker-compose.yml up -d
+npx run-step evals/cases/seeded/SD-RA-0001-refund --verbose
+```
+
+Next: read the worked example in [`examples/specs/SPEC-0001`](examples/specs/SPEC-0001), then [`contracts/`](contracts). To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Principles
 
@@ -106,3 +174,9 @@ then **eval gate** (rubric/judge; thresholds defined when we design the eval har
 | D19 | The M1 `req-analysis` generator is `openai/gpt-5.5` (thinking: high). It is provisional: step 7 compares at least two models before the choice is final | decided |
 | D20 | All model calls go through a local litellm proxy (`gateway/litellm`, pinned image, spend logs in its own Postgres). Each call is tagged with its step, run and case; `run-step` records litellm's tokens and spend in `run.json`, and stops if the gateway is down unless `--direct` is given. ADR: [docs/adr/0001-llm-routing.md](docs/adr/0001-llm-routing.md) | decided |
 | D21 | Runs are observable as traces once the reconciler exists (M3): one OpenTelemetry span tree per step run (run → attempt → model turn → tool call), with run_id, step, case, model, tokens, cost, lint counts and guard blocks as attributes. litellm call records join it on run_id. The run-step console narration and `npm run demo -w step-runner` are demo aids until then. The trace backend is chosen in M3 | proposed |
+
+## Contributing and licence
+
+Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes, and [SECURITY.md](SECURITY.md) to report a vulnerability privately. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+
+Released under the [MIT licence](LICENSE).
