@@ -3,8 +3,9 @@
 Context for Claude Code working in this repo. Read this first, then `README.md`.
 
 ## What this is
-The contracts, templates, examples and eval harness for the **intent → requirements → design**
-half of an agentic, spec-driven SDLC platform. Agents run on **pi** (pi.dev, `@earendil-works/pi-coding-agent`, 0.85.1 installed),
+The contracts, templates, examples and eval harness for an agentic, AI-native, spec-driven development
+platform. The spec is the source of truth: code is generated from it (spec-to-code), and what the code
+teaches us comes back as proposed spec changes (code-to-spec). This repo covers the **intent → requirements → design** part today. Agents run on **pi** (pi.dev, `@earendil-works/pi-coding-agent`, 0.85.1 installed),
 orchestrated by a **git-as-state reconciler**. Humans (BA, senior architect) approve through PRs.
 The plan → code → QA loop comes later and consumes only tagged, approved specs.
 
