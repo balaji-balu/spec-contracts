@@ -14,23 +14,24 @@ Every platform feature appears here once, with a stable ID, the component it liv
 
 ## Architecture map
 
-Three layers (control plane, orchestration, execution) plus cross-cutting elements that touch both control and data planes. `CP-ID` and `ORC-RUN` are new and not yet in the blueprint.
+Four layers (UI, control plane, orchestration, execution) plus cross-cutting elements that touch every layer; see [architecture.md](../architecture.md) and [Discussion #21](https://github.com/balaji-balu/spec-contracts/discussions/21). `CP-ID`, `ORC-RUN` and `EXE-GRAPH` are new and not yet in the blueprint.
 
 | ID | Component | Layer | In this repo |
 | --- | --- | --- | --- |
 | CP-API | Control plane API: request intake, CLI, chat via API | Control plane | Not yet |
-| CP-UI | Support UI | Control plane | Not yet (D10, proposed) |
+| CP-UI | UI: thin client for users, BA and architect; talks only to the control plane | UI | Not yet (D10, proposed) |
 | CP-POL | Policy and permissions (decision point) | Control plane | Not yet |
 | CP-REG | Agent registry and project details | Control plane | `pipeline.lock.yaml` pins each step's model, prompt, skills and extensions |
 | CP-ID | Identity and credentials for humans and agents | Control plane | Not yet |
-| GW | litellm LLM gateway | Control plane (shared service) | `gateway/litellm/` (D20) |
+| GW | litellm LLM gateway | Control plane (shared service; placement open in #21) | `gateway/litellm/` (D20) |
 | ORC | Orchestrator: reconciler, planning, scheduling, agent pool and lifecycle | Orchestration | `contracts/workflow.md`; reconciler v0 is M3 |
 | ORC-RUN | Agent runner: local, container or microVM | Orchestration | `packages/step-runner/` stands in for M1 |
-| EXE | Execution agents on pi, with hooks and extensions | Execution | `agents/`, `packages/pi-spec-tools/` |
-| MCP | Outer harness: tools and skills | Execution | `skills/`, pi extensions |
+| EXE-GRAPH | Graph engine: the workflow as a graph, nodes are actions and edges are transitions and routes | Execution | Step order and `route:` values in `contracts/workflow.md`; no engine yet. Its split from ORC is open in #21 |
+| EXE | Loop engine and harness: the pi agent loop inside one action, with hooks, guards and extensions | Execution | `agents/`, `packages/pi-spec-tools/`, step-runner guard and lint-repair loop |
+| MCP | Skills, tools and MCP servers | Execution | `skills/`, pi extensions |
 | XC-EVD | Evidence and provenance (git) | Cross-cutting | Artifact headers (`upstream`, `produced_by`), `trace.yaml` |
 | XC-MON | Monitoring and observability | Cross-cutting | `run.json`, suite reports; traces are D21 |
-| XC-KG | Knowledge graph and memory | Cross-cutting | File-based KB behind `KbStore` (D18); Typegraph later |
+| XC-KG | Knowledge graph and memory | Cross-cutting (or execution; open in #21) | File-based KB behind `KbStore` (D18); Typegraph later |
 | KB | Org knowledge base, incl. `constitution.md` | Data | `examples/org/constitution.md`, eval case KBs |
 | CI | CI gates | Pipeline | `.github/workflows/ci.yml` |
 
@@ -102,5 +103,6 @@ The platform is at `S0` (milestone M1). S1 lines up with M3, when the reconciler
 
 | Date | Change |
 | --- | --- |
+| 2026-09-27 | Architecture map in layers (D23): UI layer for CP-UI, new EXE-GRAPH, EXE is the loop engine and harness; GW and XC-KG placement open in Discussion #21 |
 | 2026-09-26 | GOV-20 partly built: licence and contribution files |
 | 2026-09-26 | Created: architecture map, GOV-01 to GOV-20, OBS-01 to OBS-10; statuses checked against this repo |

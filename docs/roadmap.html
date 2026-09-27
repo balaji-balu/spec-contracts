@@ -98,6 +98,7 @@ code{font:13px var(--mono);color:var(--ink)}
 .later b{display:block;color:var(--ink);font-weight:600}
 .note{font-size:13px;color:var(--muted);max-width:74ch}
 :focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+.block a{color:var(--sys)}
 /* ---------- site nav (shared by every page) */
 .topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding:14px 0;border-bottom:1px solid var(--line);font:500 14px/1.4 var(--body)}
 .topnav .brand{font:750 17px/1 var(--display);font-stretch:88%;color:var(--ink);text-decoration:none;margin-right:auto}
@@ -124,7 +125,7 @@ code{font:13px var(--mono);color:var(--ink)}
     <li><b>7</b><span>milestones, M0–M6</span></li>
     <li><b>1</b><span>done (M0 contracts + evals)</span></li>
     <li class="f-next"><b>M1</b><span>now: 6 of 7 steps merged</span></li>
-    <li><b>6</b><span>decisions to make along the way</span></li>
+    <li><b>9</b><span>decisions to make along the way</span></li>
   </ul>
 </header>
 
@@ -157,7 +158,7 @@ code{font:13px var(--mono);color:var(--ink)}
   <g class="fl plan"><rect x="668" y="40" width="140" height="76" rx="10"/><text x="682" y="62" class="fc">M5</text><text x="682" y="84" class="ft">Pilot</text><text x="682" y="102" class="fs">real specs, one team</text></g>
   <g class="fl plan"><rect x="832" y="40" width="190" height="76" rx="10"/><text x="846" y="62" class="fc">M6</text><text x="846" y="84" class="ft">Execution handoff</text><text x="846" y="102" class="fs">plan → code → QA, lagging loop</text></g>
   <g class="fl later"><rect x="504" y="170" width="518" height="100" rx="12"/><text x="520" y="194" class="fc">LATER · PLATFORM HORIZON</text>
-    <text x="520" y="218" class="fs">Control plane · Typegraph KG as trace store · product loop (drift)</text>
+    <text x="520" y="218" class="fs">Full control layer · knowledge graph + memory · product loop (drift)</text>
     <text x="520" y="238" class="fs">Reverse engineering (code → spec) · live C4 views · multi-team domain</text>
     <text x="520" y="258" class="fs">Enterprise level (deferred by choice)</text></g>
   <path class="fa" d="M146 78 H160" marker-end="url(#ar)"/>
@@ -174,6 +175,24 @@ code{font:13px var(--mono);color:var(--ink)}
   <p class="hint">Scroll sideways on narrow screens.</p>
 </section>
 
+<section class="block" id="layers">
+  <h2>Layers by milestone</h2>
+  <p class="sub">The platform is built in layers (decision D23, proposed; see <a href="https://github.com/balaji-balu/spec-contracts/blob/main/docs/architecture.md">architecture</a> and <a href="https://github.com/balaji-balu/spec-contracts/discussions/21">Discussion #21</a>). Each milestone adds a slice of each layer it needs, never a whole layer at once.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Layer</th><th>Now (M1)</th><th>Next (M2–M4)</th><th>Later (M5 on)</th></tr></thead>
+    <tbody>
+      <tr><td><b>UI</b><br>thin client, talks only to the control plane</td><td>None. The CLI and PRs stand in</td><td>M3: PR comments plus a chat CLI</td><td>M5: UI v1, where buttons map to PR actions</td></tr>
+      <tr><td><b>Control</b><br>governance, registries, API</td><td><code>pipeline.lock.yaml</code> as the registry; litellm gateway</td><td>M3: command API (<code>/answer</code>, <code>/revise</code>…), CODEOWNERS gates</td><td>Policy decision point, identity per agent and human</td></tr>
+      <tr><td><b>Orchestration</b><br>reconciler, runner, gates</td><td><code>step-runner</code> stands in: clean workspace, verify, repair</td><td>M2: calibrated eval gate. M3: reconciler v0 with loop limits</td><td>Containers, then microVMs; concurrency and kill switch</td></tr>
+      <tr><td><b>Execution · graph engine</b><br>actions as nodes, transitions and routes as edges</td><td>Step order and <code>route:</code> values on paper (<code>workflow.md</code>)</td><td>M3: v0 for the requirements phase. M4: design phase and back-edges</td><td>Execution-loop graphs (plan → code → QA)</td></tr>
+      <tr><td><b>Execution · loop engine + harness</b><br>the pi loop inside one action</td><td>pi sessions with guards, lint repair, pinned AGENTS.md. <b>Done</b></td><td>M3: pi RPC for the intent chat (<code>ask_user</code>)</td><td>Shell-command guard, per-run credentials</td></tr>
+      <tr><td><b>Execution · skills, tools, MCP</b></td><td><code>validate_artifact</code>, <code>trace_link</code>, <code>term_lookup</code>, <code>kb_search</code>/<code>kb_get</code>. <b>Done</b></td><td>M3: <code>cml_check</code>. M4: design skills</td><td>MCP servers with tool allowlists</td></tr>
+      <tr><td><b>Cross-cutting · evidence</b></td><td>Artifact headers, <code>trace.yaml</code>, run folders</td><td>M3: commit trailers, one PR per phase, tags</td><td>Signed commits per agent</td></tr>
+      <tr><td><b>Cross-cutting · observability</b></td><td><code>run_id</code> and cost on every call</td><td>M3: OpenTelemetry traces (D21)</td><td>M5: metrics dashboard, alerts</td></tr>
+      <tr><td><b>Knowledge + memory</b><br>placement open in #21</td><td>File-based org KB (D18)</td><td>No change</td><td>Knowledge graph behind the same <code>kb_search</code> interface</td></tr>
+    </tbody>
+  </table></div>
+</section>
 <section class="block" id="milestones">
   <h2>Milestones</h2>
   <p class="sub">Effort figures are rough, in focused weeks for two engineers. They're there to size the milestones against each other, not to commit to dates.</p>
@@ -244,6 +263,7 @@ code{font:13px var(--mono);color:var(--ink)}
     <div class="cols">
       <div><h4>Build</h4><ul>
         <li>Reconciler v0: state derivation, next-step rules 0–11, branches and PRs, commit trailers, loop limits</li>
+        <li>Graph engine v0: the requirements phase as a graph, with actions as nodes and transitions and routes as edges. Its split from the reconciler is settled in <a href="https://github.com/balaji-balu/spec-contracts/discussions/21">Discussion #21</a> first</li>
         <li>Comment commands (<code>/answer</code>, <code>/accept-risk</code>, <code>/revise</code>…) and CODEOWNERS gates</li>
         <li>Intent agent over pi RPC with <code>ask_user</code>. The first UI is PR comments plus a chat CLI</li>
         <li>DDD agent (strategic) with <code>cml_check</code> running ContextMapper in CI</li>
@@ -255,7 +275,7 @@ code{font:13px var(--mono);color:var(--ink)}
         <li>One new real spec, not the refund case, taken to approved requirements with your BA</li>
       </ul></div>
     </div>
-    <div class="people"><span><b>BA</b> ≈ 1 day: drive a real spec through PRs</span><span><b>Decide:</b> git host, one PR per phase vs per spec (D7), stale pins block or warn</span></div>
+    <div class="people"><span><b>BA</b> ≈ 1 day: drive a real spec through PRs</span><span><b>Decide:</b> git host, one PR per phase vs per spec (D7), stale pins block or warn, graph engine vs reconciler (#21)</span></div>
   </article>
 
   <article class="card">
@@ -264,7 +284,7 @@ code{font:13px var(--mono);color:var(--ink)}
     <div class="cols">
       <div><h4>Build</h4><ul>
         <li>Design-analysis, DDD (tactical) and design-generation agents</li>
-        <li>Back-edges: <code>/confirm</code>, blocked-by labels, change-request mode, re-run on stale pins</li>
+        <li>Back-edges as graph edges: <code>/confirm</code>, blocked-by labels, change-request mode, re-run on stale pins</li>
         <li>Boundary check (D9) and CML generators (PlantUML) for review</li>
         <li>Design and design-analysis rubrics calibrated with the architect</li>
       </ul></div>
@@ -330,6 +350,9 @@ code{font:13px var(--mono);color:var(--ink)}
       <tr><td>Git host</td><td class="m">M3</td><td>GitHub · GitLab · self-hosted</td><td>Whatever your teams already review in</td></tr>
       <tr><td>PR granularity (D7)</td><td class="m">M3</td><td>One PR per phase · one per spec with labels</td><td>Per phase, for clean approvals and history</td></tr>
       <tr><td>Stale pins (H4)</td><td class="m">M3</td><td>Block review · warn only</td><td>Warn during M3 and block from the pilot on</td></tr>
+      <tr><td>Graph engine vs reconciler (D23, <a href="https://github.com/balaji-balu/spec-contracts/discussions/21">Discussion #21</a>)</td><td class="m">M3</td><td>The graph is a pinned definition the reconciler walks · the graph engine drives and orchestration only schedules and runs</td><td>Open</td></tr>
+      <tr><td>LLM gateway placement (D23, #21)</td><td class="m">M3</td><td>Control-plane shared service · execution infrastructure</td><td>Control plane: it holds budgets and routing policy</td></tr>
+      <tr><td>Knowledge and memory placement (D23, #21)</td><td class="m">Before the KG</td><td>Cross-cutting · execution · split (store cross-cutting, access through execution tools)</td><td>Open; the split is on the table</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -352,8 +375,8 @@ code{font:13px var(--mono);color:var(--ink)}
   <h2>Later: the platform horizon</h2>
   <p class="sub">These come from the wider platform vision and follow once the spec pipeline is proven. Each gets its own contracts-first pass.</p>
   <ul class="later">
-    <li><b>Control plane</b>Policy, permissions, agent registry and governance above the reconciler.</li>
-    <li><b>Typegraph as the trace store</b><code>trace.yaml</code> stays the source, synced into the knowledge graph for querying intent-to-code links.</li>
+    <li><b>The full control layer</b>Policy decision point, permissions, identity and the agent registry, above the orchestration layer.</li>
+    <li><b>Knowledge graph and memory</b>Typegraph as the trace store: <code>trace.yaml</code> stays the source, synced into the graph for querying intent-to-code links. Where it sits in the layers is open in #21.</li>
     <li><b>Product loop</b>The long-running agent that watches requirements, design and code for drift and flags it to a human.</li>
     <li><b>Reverse engineering</b>Code → spec, using the same contracts, so existing systems can join the pipeline.</li>
     <li><b>Live architecture views</b>C4 and deployment diagrams generated from CML and design artifacts.</li>

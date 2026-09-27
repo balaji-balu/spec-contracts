@@ -160,16 +160,16 @@ a{color:var(--sys)}
 
 <section class="block" id="platform">
   <h2>The platform</h2>
-  <p class="sub">Your redrawn sketch, with the wiring the scenario relies on. The engine owns control flow, pi agents own judgment inside a step, and git holds the state.</p>
+  <p class="sub">The target architecture in layers: UI, control, orchestration and execution, with evidence, observability and knowledge cutting across them. Dashed boxes are still being placed in <a href="https://github.com/balaji-balu/spec-contracts/discussions/21">Discussion #21</a>.</p>
   <div class="scroll">{{ARCH}}</div>
   <p class="hint">Scroll sideways on narrow screens.</p>
   <ul class="changes">
-    <li><b>Every agent runs on pi.</b> The sketch still labels Requirement analysis and DDD as hermes.</li>
-    <li><b>The UI talks to the engine, not to the Intent agent.</b> The intent chat is a pi RPC session the reconciler hosts. The UI only relays it.</li>
-    <li><b>BA and architect act through the UI.</b> Every button is a PR approval or a comment command such as <code>/answer RAF-1</code>.</li>
-    <li><b>Verify and eval are separate gates.</b> The deterministic lint runs first and triggers repair. The judge runs second and triggers revise.</li>
-    <li><b>Git is on the drawing.</b> It is the workflow state. The engine keeps none of its own.</li>
-    <li><b>AGENTS.md joins skills, templates and prompts</b> as pinned per-step config. The constitution stays in the org KB, pinned by version.</li>
+    <li><b>The UI is its own layer and talks only to the control plane.</b> The intent chat is a pi RPC session the reconciler hosts; the UI relays it. BA and architect buttons are PR approvals or comment commands such as <code>/answer RAF-1</code>.</li>
+    <li><b>Control holds the rules and the registries.</b> Policy and identity, plus <code>pipeline.lock.yaml</code>, which pins each action's model, prompt, skills and AGENTS.md.</li>
+    <li><b>Orchestration owns control flow.</b> The reconciler reads git, starts one runner per action and calls the gates: deterministic verify first (triggers repair), the LLM judge second (triggers revise).</li>
+    <li><b>Execution splits in three.</b> The graph engine holds the workflow as a graph (nodes are actions, edges are transitions and <code>route: ddd</code>). The loop engine and harness run the pi agent loop inside one action. Skills, tools and MCP servers are what the agent can call.</li>
+    <li><b>Git is the evidence and the workflow state.</b> Specs, <code>domain/</code>, PRs, artifact headers and <code>trace.yaml</code>. The engine keeps no state of its own.</li>
+    <li><b>Every agent runs on pi</b>, every model call goes through the litellm gateway, and every call carries the run's <code>run_id</code>.</li>
   </ul>
 </section>
 

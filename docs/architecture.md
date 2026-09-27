@@ -2,6 +2,72 @@
 
 The detailed view of the platform. For the one-screen overview, see the [README](../README.md).
 
+## Layers
+
+The target architecture has four layers and a set of cross-cutting concerns (decision D23, proposed). The shape is being settled in [Discussion #21](https://github.com/balaji-balu/spec-contracts/discussions/21); boxes marked "placement open" are still being decided there.
+
+```mermaid
+flowchart TB
+  P((User, BA,<br/>Sr. architect)) --> L0
+  subgraph L0[UI layer]
+    UI["UI<br/>thin client, no state"]
+  end
+  subgraph L1[Control layer]
+    direction LR
+    API["API<br/>requests, commands"]
+    GOV["Governance<br/>policy, identity"]
+    REG["Registries<br/>pipeline.lock.yaml"]
+    GW["LLM gateway<br/>litellm (placement open)"]
+    API ~~~ GOV ~~~ REG ~~~ GW
+  end
+  subgraph L2[Orchestration layer]
+    direction LR
+    R["Reconciler<br/>stateless loop"]
+    RUN["Runner<br/>clean workspace"]
+    V["Verify<br/>spec-lint"]
+    EV["Eval gate<br/>LLM judge"]
+    R ~~~ RUN ~~~ V ~~~ EV
+  end
+  subgraph L3[Execution layer]
+    direction LR
+    GE["Graph engine<br/>nodes = actions<br/>edges = transitions, routes"]
+    LE["Loop engine + harness<br/>pi loop in one action<br/>guards, lint repair"]
+    ST["Skills, tools,<br/>MCP servers"]
+    GE ~~~ LE ~~~ ST
+  end
+  subgraph XC[Cross-cutting]
+    direction LR
+    EVD["Evidence + provenance<br/>git, headers, trace.yaml"]
+    OBS["Observability<br/>run_id, cost, traces"]
+    KG["Knowledge + memory<br/>org KB, constitution<br/>(placement open)"]
+    EVD ~~~ OBS ~~~ KG
+  end
+  L0 -->|commands| L1
+  L1 -->|start, approve| L2
+  L2 -->|run action| L3
+  L3 -.-> XC
+  XC -->|tag SPEC-n ready| EXE["plan → code → QA<br/>spec-to-code loop"]
+  EXE -.->|code-to-spec: proposed spec changes| L2
+```
+
+<sub>Source: [diagrams/00-layers.mmd](diagrams/00-layers.mmd); edit that file and copy it here. Component IDs are in the [features register](platform/features.md#architecture-map).</sub>
+
+| Layer | What it holds | In this repo today |
+| --- | --- | --- |
+| **UI** | Thin client for users, the BA and the architect. Talks only to the control plane; holds no workflow state. | Not yet: PR comments and a chat CLI come first (M3) |
+| **Control** | Governance (policy, permissions, identity), registries (agents, skills, models, projects) and the API. | `pipeline.lock.yaml` is the registry for now |
+| **Orchestration** | The reconciler, the runner that gives each action a clean workspace, and the gates it calls: verify, then eval. | `packages/step-runner` stands in for the reconciler (M1); `spec-lint`; the judge |
+| **Execution** | **Graph engine:** the workflow as a graph, with actions as nodes and transitions and routes as edges. **Loop engine and harness:** the pi agent loop inside one action, with guards, lint repair and pinned `AGENTS.md`. **Skills, tools and MCP servers:** what an agent can call. | Step order and routes in `contracts/workflow.md`; pi plus the step-runner guard; `packages/pi-spec-tools`, `skills/` |
+| **Cross-cutting** | **Evidence and provenance:** git, artifact headers, `trace.yaml`, PRs and tags. **Observability:** `run_id` on every call, cost, traces. **Knowledge and memory:** the org KB and constitution, later a knowledge graph. | Headers and `trace.yaml`; `run.json` and litellm tags; the file-based KB (D18) |
+
+Open in #21:
+
+1. **Knowledge and memory: cross-cutting or execution?** One option is to split them: the store is cross-cutting, agents reach it through execution tools, and the control plane enforces the scopes (GOV-11).
+2. **Graph engine vs reconciler.** Either the graph is a versioned definition that the reconciler walks, or the graph engine drives execution and orchestration only schedules and runs. This is due before the reconciler is built in M3.
+3. **The litellm gateway:** a control-plane shared service, or execution infrastructure.
+
+## How a spec flows
+
 ```mermaid
 flowchart LR
   user((User)) --> UI
