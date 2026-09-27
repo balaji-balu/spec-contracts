@@ -2,6 +2,8 @@
 
 **An AI-native, spec-driven development platform. The spec is the source of truth: agents generate code from it and feed changes back into it (spec ⇄ code), with every step validated, evaluated and human-approved.**
 
+**[Website](https://balaji-balu.github.io/spec-contracts/)** · [Roadmap](https://balaji-balu.github.io/spec-contracts/spec-pipeline-roadmap.html) · [Walkthrough](https://balaji-balu.github.io/spec-contracts/docs/scenario/spec-pipeline-walkthrough.html) · [Architecture](docs/architecture.md) · [Contributing](CONTRIBUTING.md)
+
 AI coding agents are good at writing code and poor at knowing what to build. Specs written up front go stale, code drifts from what the business meant, and nobody can say which is right. This platform makes the spec the one source of truth and keeps code and spec in step in both directions:
 
 - **Spec-to-code.** Agents turn a user's intent into requirements, then a design, then a plan, code and tests, one small, reviewable step at a time. Code is generated from an approved spec, never the other way round.
@@ -83,6 +85,7 @@ docs/scenario-SPEC-0001.md       # end-to-end walkthrough of one spec (as a page
 docs/milestones/                 # milestone kickoff notes
 docs/diagrams/                   # diagram sources
 spec-pipeline-roadmap.html       # the roadmap: milestones and the decisions they need
+index.html                       # the website home page (GitHub Pages); every page shares its top navigation
 
 runs/                            # run outputs, gitignored: spec files, session JSONL, lint.json, run.json
 ```

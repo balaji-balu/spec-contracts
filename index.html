@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec Contracts</title>
+<meta name="description" content="AI-native, spec-driven development platform. The spec is the source of truth: agents generate code from it and feed changes back into it, with every step validated, evaluated and human-approved.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --band:#E8EBE6;
+  --ink:#18211D; --ink2:#46524C; --muted:#78837D; --line:#C9D0CB;
+  --sys:#2B6A8A; --sys-t:#E1EDF3; --human:#A15F12; --agent:#6450A6; --agent-t:#ECE8F6;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111513; --surface:#1A201D; --band:#1F2623;
+    --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+    --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --agent:#AA99E2; --agent-t:#29243A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111513; --surface:#1A201D; --band:#1F2623;
+  --ink:#E3E9E5; --ink2:#B4BFB9; --muted:#86928C; --line:#38423D;
+  --sys:#72B3D4; --sys-t:#1B2C35; --human:#E2A45C; --agent:#AA99E2; --agent-t:#29243A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto}
+header{padding-block:44px 28px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.06em;color:var(--sys);text-transform:uppercase}
+h1{font:800 clamp(38px,7vw,64px)/1.02 var(--display);font-stretch:82%;letter-spacing:-.01em;margin:14px 0 16px;text-wrap:balance}
+.lede{max-width:62ch;color:var(--ink2);font-size:19px;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 0}
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font-weight:600;background:var(--surface)}
+.btn.primary{background:var(--sys);border-color:var(--sys);color:#fff}
+.btn:hover{text-decoration:underline}
+.figure{margin:8px 0 0;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px;overflow:hidden}
+.figure img{display:block;width:100%;height:auto}
+section{padding-block:36px 0}
+h2{font:750 26px/1.15 var(--display);font-stretch:88%;margin:0 0 10px}
+p{max-width:68ch;color:var(--ink2);margin:0 0 12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0 0;padding:0;list-style:none}
+.cards a{display:block;height:100%;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);text-decoration:none}
+.cards a:hover{border-color:var(--sys)}
+.cards b{display:block;font:700 17px/1.3 var(--display);font-stretch:92%;margin-bottom:4px}
+.cards span{font-size:14px;color:var(--ink2)}
+.cards .where{display:block;margin-top:8px;font:500 11px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.status{border-left:3px solid var(--human);padding:4px 0 4px 14px}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer a{color:var(--muted)}
+a{color:var(--sys)}
+:focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+/* ---------- site nav (shared by every page) */
+.topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding:14px 0;border-bottom:1px solid var(--line);font:500 14px/1.4 var(--body)}
+.topnav .brand{font:750 17px/1 var(--display);font-stretch:88%;color:var(--ink);text-decoration:none;margin-right:auto}
+.topnav a{color:var(--ink2);text-decoration:none}
+.topnav a:hover{color:var(--sys);text-decoration:underline}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav" aria-label="Site">
+  <a class="brand" href="./">Spec Contracts</a>
+  <a href="./" aria-current="page">Home</a>
+  <a href="spec-pipeline-roadmap.html">Roadmap</a>
+  <a href="docs/scenario/spec-pipeline-walkthrough.html">Walkthrough</a>
+  <a href="https://github.com/balaji-balu/spec-contracts">GitHub ↗</a>
+</nav>
+
+<header>
+  <div class="eyebrow">Open source · MIT · early and moving fast</div>
+  <h1>The spec is the source of truth</h1>
+  <p class="lede">An AI-native, spec-driven development platform. Agents generate code from the spec and feed what the code teaches back into it, with every step validated, evaluated and approved by a person.</p>
+  <div class="actions">
+    <a class="btn primary" href="https://github.com/balaji-balu/spec-contracts">View on GitHub</a>
+    <a class="btn" href="https://github.com/balaji-balu/spec-contracts#quickstart">Quickstart</a>
+    <a class="btn" href="docs/scenario/spec-pipeline-walkthrough.html">See one spec end to end</a>
+  </div>
+</header>
+
+<div class="figure">
+  <img src="docs/diagrams/overview.svg" alt="User intent goes to spec agents, which write the spec, the source of truth. Code agents generate code from the spec (spec-to-code); what the code teaches us comes back as proposed spec changes (code-to-spec). Every change passes verify, eval and human approval.">
+</div>
+
+<section>
+  <h2>Not waterfall: a living spec</h2>
+  <p>Nobody can fully specify a system before building it. The first spec is a hypothesis, design is discovered through implementation, and business needs keep changing (<a href="https://martinfowler.com/articles/convo-llm-abstractions.html">Fowler and Joshi</a>; <a href="https://martinfowler.com/articles/llm-and-dsls.html">Joshi on DSLs and LLMs</a>).</p>
+  <p>So the spec grows in small, reviewed steps and changes whenever the code or the business teaches something new. Every change is linted, traced and approved, and the code follows it.</p>
+</section>
+
+<section>
+  <h2>Explore</h2>
+  <ul class="cards">
+    <li><a href="spec-pipeline-roadmap.html"><b>Roadmap</b><span>Milestones from contracts on paper to specs teams build from, and the decisions each one needs.</span><span class="where">This site</span></a></li>
+    <li><a href="docs/scenario/spec-pipeline-walkthrough.html"><b>SPEC-0001 walkthrough</b><span>One spec followed from a user's words to an approved design: every agent step, gate and human decision.</span><span class="where">This site</span></a></li>
+    <li><a href="https://github.com/balaji-balu/spec-contracts#readme"><b>README and quickstart</b><span>What the platform is, and how to run the demo, the linter and the tests in minutes, with no key or spend.</span><span class="where">GitHub</span></a></li>
+    <li><a href="https://github.com/balaji-balu/spec-contracts/blob/main/docs/architecture.md"><b>Architecture</b><span>The detailed component diagram and what each part does.</span><span class="where">GitHub</span></a></li>
+    <li><a href="https://github.com/balaji-balu/spec-contracts/tree/main/contracts"><b>Contracts</b><span>The artifact format, validation rules and workflow everything else is built on.</span><span class="where">GitHub</span></a></li>
+    <li><a href="https://github.com/balaji-balu/spec-contracts/blob/main/CONTRIBUTING.md"><b>Contribute</b><span>Eval cases, lint rules, agent tools, platform features, and the code side of the loop.</span><span class="where">GitHub</span></a></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Status</h2>
+  <p class="status">Milestone M1, one real agent (requirements analysis), is nearly done. Spec-to-code and code-to-spec are planned, not built yet. Interfaces will change.</p>
+</section>
+
+<footer>
+  Spec Contracts is released under the <a href="https://github.com/balaji-balu/spec-contracts/blob/main/LICENSE">MIT licence</a> · <a href="https://github.com/balaji-balu/spec-contracts">github.com/balaji-balu/spec-contracts</a>
+</footer>
+</div>
+</body>
+</html>

@@ -127,9 +127,22 @@ code{font:13px var(--mono);color:var(--ink)}
 @media (max-width:640px){ .files li{grid-template-columns:1fr} header{padding-block:28px 22px} }
 a{color:var(--sys)}
 :focus-visible{outline:2px solid var(--sys);outline-offset:2px}
+/* ---------- site nav (shared by every page) */
+.topnav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;padding:14px 0;border-bottom:1px solid var(--line);font:500 14px/1.4 var(--body)}
+.topnav .brand{font:750 17px/1 var(--display);font-stretch:88%;color:var(--ink);text-decoration:none;margin-right:auto}
+.topnav a{color:var(--ink2);text-decoration:none}
+.topnav a:hover{color:var(--sys);text-decoration:underline}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600}
 </style>
 
 <div class="wrap">
+<nav class="topnav" aria-label="Site">
+  <a class="brand" href="../../">Spec Contracts</a>
+  <a href="../../">Home</a>
+  <a href="../../spec-pipeline-roadmap.html">Roadmap</a>
+  <a href="spec-pipeline-walkthrough.html" aria-current="page">Walkthrough</a>
+  <a href="https://github.com/balaji-balu/spec-contracts">GitHub ↗</a>
+</nav>
 <header>
   <div class="eyebrow">SPEC-0001 · automatic refund on pre-shipment cancellation</div>
   <h1>Spec Pipeline Walkthrough</h1>
@@ -452,8 +465,8 @@ a{color:var(--sys)}
 <text x="737.2" y="2165" class="ct">Round 1</text></g>
 <g class="num"><circle cx="24" cy="2161" r="10"/><text x="24" y="2165">46</text></g>
 <line class="arr a-msg" x1="824" y1="2214" x2="1289" y2="2214" marker-end="url(#mk-sys)"/>
-<g class="chip c-msg"><rect x="912.3" y="2190" width="287.3" height="18" rx="9"/>
-<rect class="tag" x="915.3" y="2193" width="118.5" height="12" rx="6"/><text x="974.6" y="2202.5" class="tagt">DESIGN ANALYSIS</text>
+<g class="chip c-msg"><rect x="912.4" y="2190" width="287.3" height="18" rx="9"/>
+<rect class="tag" x="915.4" y="2193" width="118.5" height="12" rx="6"/><text x="974.6" y="2202.5" class="tagt">DESIGN ANALYSIS</text>
 <text x="1041.8" y="2203" class="ct">kb_get provider doc v7</text></g>
 <g class="num"><circle cx="24" cy="2199" r="10"/><text x="24" y="2203">47</text></g>
 <line class="arr a-reply" x1="1288" y1="2252" x2="823" y2="2252" marker-end="url(#mk-sys)"/>
