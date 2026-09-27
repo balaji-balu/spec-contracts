@@ -108,14 +108,14 @@ code{font:13px var(--mono);color:var(--ink)}
 
 <div class="wrap">
 <nav class="topnav" aria-label="Site">
-  <a class="brand" href="./">Spec Contracts</a>
-  <a href="./">Home</a>
-  <a href="spec-pipeline-roadmap.html" aria-current="page">Roadmap</a>
-  <a href="docs/scenario/spec-pipeline-walkthrough.html">Walkthrough</a>
+  <a class="brand" href="../">Spec Contracts</a>
+  <a href="../">Home</a>
+  <a href="roadmap.html" aria-current="page">Roadmap</a>
+  <a href="scenario/spec-pipeline-walkthrough.html">Walkthrough</a>
   <a href="https://github.com/balaji-balu/spec-contracts">GitHub ↗</a>
 </nav>
 <header>
-  <div class="eyebrow">spec-contracts · intent → requirements → design</div>
+  <div class="eyebrow">spec-contracts · roadmap · updated 27 Sep 2026</div>
   <h1>Spec Pipeline Roadmap</h1>
   <p class="lede">How the pipeline goes from contracts on paper to specs your teams build from. Each milestone is a thin slice
   that ends in something running and evaluated on real cases, so every step can change the next. Nothing is built that
@@ -123,7 +123,7 @@ code{font:13px var(--mono);color:var(--ink)}
   <ul class="facts">
     <li><b>7</b><span>milestones, M0–M6</span></li>
     <li><b>1</b><span>done (M0 contracts + evals)</span></li>
-    <li class="f-next"><b>M1</b><span>next: one real agent</span></li>
+    <li class="f-next"><b>M1</b><span>now: 6 of 7 steps merged</span></li>
     <li><b>6</b><span>decisions to make along the way</span></li>
   </ul>
 </header>
@@ -150,7 +150,7 @@ code{font:13px var(--mono);color:var(--ink)}
   </defs>
   <g class="fl done"><rect x="16" y="40" width="130" height="76" rx="10"/><text x="30" y="62" class="fc">M0 · DONE</text><text x="30" y="84" class="ft">Contracts</text><text x="30" y="102" class="fs">+ eval harness</text></g>
   <text x="166" y="30" class="now">NOW ▾</text>
-  <g class="fl next"><rect x="166" y="40" width="140" height="76" rx="10"/><text x="180" y="62" class="fc">M1 · NEXT</text><text x="180" y="84" class="ft">One real agent</text><text x="180" y="102" class="fs">req-analysis on pi</text></g>
+  <g class="fl next"><rect x="166" y="40" width="140" height="76" rx="10"/><text x="180" y="62" class="fc">M1 · NOW</text><text x="180" y="84" class="ft">One real agent</text><text x="180" y="102" class="fs">req-analysis on pi</text></g>
   <g class="fl side"><rect x="166" y="170" width="140" height="76" rx="10"/><text x="180" y="192" class="fc">M2 · PARALLEL</text><text x="180" y="214" class="ft">Trusted judge</text><text x="180" y="232" class="fs">calibration round 1</text></g>
   <g class="fl plan"><rect x="330" y="40" width="150" height="76" rx="10"/><text x="344" y="62" class="fc">M3</text><text x="344" y="84" class="ft">Requirements</text><text x="344" y="102" class="fs">phase end to end · reconciler v0</text></g>
   <g class="fl plan"><rect x="504" y="40" width="140" height="76" rx="10"/><text x="518" y="62" class="fc">M4</text><text x="518" y="84" class="ft">Design phase</text><text x="518" y="102" class="fs">+ back-edges</text></g>
@@ -180,7 +180,7 @@ code{font:13px var(--mono);color:var(--ink)}
   <div class="ms">
 
   <article class="card">
-    <div class="card-h"><span class="code">M0</span><h3>Contracts and eval harness</h3><span class="pill p-done">done</span><span class="effort">this conversation</span></div>
+    <div class="card-h"><span class="code">M0</span><h3>Contracts and eval harness</h3><span class="pill p-done">done</span></div>
     <p class="proves"><b>Proves</b> the pipeline can be specified precisely enough to verify mechanically and evaluate consistently.</p>
     <div class="cols">
       <div><h4>Delivered</h4><ul>
@@ -193,30 +193,31 @@ code{font:13px var(--mono);color:var(--ink)}
       <div><h4>Carried forward</h4><ul>
         <li>D6, D7 and D8–D13 are still "proposed"</li>
         <li>Prototypes are throwaway. The real tools are TypeScript pi extensions</li>
-        <li>Nothing has run against a real model yet</li>
+        <li>Nothing had run against a real model yet; M1 changed that</li>
       </ul></div>
     </div>
   </article>
 
   <article class="card next">
-    <div class="card-h"><span class="code">M1</span><h3>One real agent</h3><span class="pill p-next">next</span><span class="effort">≈ 2–3 weeks</span></div>
+    <div class="card-h"><span class="code">M1</span><h3>One real agent</h3><span class="pill p-next">in progress</span><span class="effort">6 of 7 steps merged</span></div>
     <p class="proves"><b>Proves</b> a pi agent can do real requirements analysis inside the contracts, and that we can measure how well it does. No reconciler yet: the agent is driven straight from the pi SDK.</p>
     <div class="cols">
       <div><h4>Build</h4><ul>
-        <li><code>spec-lint</code> in TypeScript: the full rule set, git-aware pins (H3/H4), shipped both as the <code>validate_artifact</code> pi extension and as a CLI</li>
-        <li>pi extensions: <code>trace_link</code>, <code>term_lookup</code>, and <code>kb_search</code>/<code>kb_get</code> over a file-based KB</li>
-        <li>req-analysis prompt and skill, AGENTS.md, and the first <code>pipeline.lock.yaml</code></li>
-        <li>litellm gateway in front of every call, with traces and cost per run</li>
-        <li>Scorer ported to TypeScript and a suite runner for k = 3</li>
+        <li><code>spec-lint</code> in TypeScript: the full rule set, git-aware pins (H3/H4), shipped both as the <code>validate_artifact</code> pi extension and as a CLI. <b>Done</b></li>
+        <li>pi extensions: <code>trace_link</code>, <code>term_lookup</code>, and <code>kb_search</code>/<code>kb_get</code> over a file-based KB. <b>Done</b></li>
+        <li>req-analysis prompt and skill, AGENTS.md, and the first <code>pipeline.lock.yaml</code>. <b>Done</b></li>
+        <li>litellm gateway in front of every call, with traces and cost per run. <b>Done</b></li>
+        <li>Cost tiers: a local Ollama model ($0), free OpenRouter models, Anthropic models. <b>In review</b></li>
+        <li>Scorer ported to TypeScript and a suite runner for k = 3. <b>Done</b></li>
       </ul></div>
       <div class="exit"><h4>Exit criteria</h4><ul>
-        <li>SD-RA-0001 at release thresholds: blocker recall 1.0 on the worst of 3 runs, recall.all ≥ 0.85 on the mean</li>
-        <li>One more seeded case written from a real past spec</li>
-        <li>A baseline report committed, with cost and tokens per run</li>
-        <li>Lint prototype retired</li>
+        <li>SD-RA-0001 at release thresholds: blocker recall 1.0 on the worst of 3 runs, recall.all ≥ 0.85 on the mean. <b>Open:</b> step 7 runs the suite</li>
+        <li>One more seeded case written from a real past spec. <b>Open:</b> waiting on the BA</li>
+        <li>A baseline report committed, with cost and tokens per run. <b>Open:</b> step 7</li>
+        <li>Lint prototype retired. <b>Open:</b> TypeScript parity is proven on every fixture; retirement waits for the parity review</li>
       </ul></div>
     </div>
-    <div class="people"><span><b>BA</b> ≈ ½ day: write the second seeded case from a spec they know went wrong</span><span><b>Decide:</b> generator model, KB location</span></div>
+    <div class="people"><span><b>BA</b> ≈ ½ day: write the second seeded case from a spec they know went wrong</span><span><b>Decide:</b> generator model, by the step 7 suite results. KB location is decided (D18)</span></div>
   </article>
 
   <article class="card">
@@ -323,8 +324,8 @@ code{font:13px var(--mono);color:var(--ink)}
   <div class="tablewrap"><table>
     <thead><tr><th>Decision</th><th>Due</th><th>Options</th><th>Current lean</th></tr></thead>
     <tbody>
-      <tr><td>Generator model(s) per step</td><td class="m">M1</td><td>One model everywhere, or per step (a stronger model for analysis)</td><td>Per step, all through litellm, chosen by suite results</td></tr>
-      <tr><td>KB location</td><td class="m">M1</td><td>Files in a KB repo · Typegraph · both</td><td>Files first, with Typegraph behind the same <code>kb_search</code> interface later</td></tr>
+      <tr><td>Generator model(s) per step</td><td class="m">M1</td><td>One model everywhere, or per step (a stronger model for analysis)</td><td>Per step, all through litellm. A provisional pick is recorded (D19); step 7 chooses by suite results</td></tr>
+      <tr><td>KB location</td><td class="m">M1</td><td>Files in a KB repo · Typegraph · both</td><td><b>Decided (D18):</b> plain Markdown files; Typegraph can sit behind the same <code>kb_search</code> interface later</td></tr>
       <tr><td>Judge model</td><td class="m">M2</td><td>Any model outside the generator's family</td><td>Pick by calibration κ, not by leaderboard</td></tr>
       <tr><td>Git host</td><td class="m">M3</td><td>GitHub · GitLab · self-hosted</td><td>Whatever your teams already review in</td></tr>
       <tr><td>PR granularity (D7)</td><td class="m">M3</td><td>One PR per phase · one per spec with labels</td><td>Per phase, for clean approvals and history</td></tr>
