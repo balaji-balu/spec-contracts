@@ -15,13 +15,9 @@ This repo holds the platform's contracts (artifact format, validation rules, wor
 
 ```mermaid
 flowchart LR
-  U((User intent)) --> SA
-  SA["Spec agents<br/>requirements · design"] --> G{{"Lint + evals<br/>+ human approval"}}
-  G --> S[("Spec<br/>source of truth")]
-  S -->|spec-to-code| CA["Code agents<br/>plan · code · tests"]
-  CA --> G2{{"Tests + evals<br/>+ human approval"}}
-  G2 --> C[("Code")]
-  C -.->|code-to-spec<br/>proposed changes| SA
+  I((User<br/>intent)) -->|"spec agents<br/>requirements · design"| S[("<b>Spec</b><br/>source of truth<br/><small>linted · evaluated · human-approved</small>")]
+  S -->|"code agents<br/>plan · code · tests<br/>(spec-to-code)"| C[("<b>Code</b><br/><small>tested · evaluated · human-approved</small>")]
+  C -.->|"code-to-spec<br/>proposed spec changes"| S
 ```
 
 <sub>Agents work one small step at a time; git holds all the state. The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
