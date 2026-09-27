@@ -1,53 +1,30 @@
-# Spec Contracts — Intent → Requirements → Design
+# Spec Contracts
 
-AI coding agents are good at writing code and poor at knowing what to build. Specs written up front go stale, and agent output drifts from what the business meant. This repo is the front half of an agentic, spec-driven SDLC platform. AI agents turn a user's intent into requirements and a design, one small, reviewable step at a time. Every artifact is validated by a linter, scored by evals, and approved by a human through a pull request. Only approved specs move on to plan → code → QA.
+**An AI-native, spec-driven development platform. The spec is the source of truth: agents generate code from it and feed changes back into it (spec ⇄ code), with every step validated, evaluated and human-approved.**
 
-Contracts for a spec-driven pipeline in which **pi** agents produce artifacts, a
-**git reconciler** drives the workflow, and humans (business analyst, senior architect)
-approve through pull requests. Everything downstream (plan → code → QA) consumes only
-what these contracts define.
+AI coding agents are good at writing code and poor at knowing what to build. Specs written up front go stale, code drifts from what the business meant, and nobody can say which is right. This platform makes the spec the one source of truth and keeps code and spec in step in both directions:
 
-> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done; see the [roadmap](spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
+- **Spec-to-code.** Agents turn a user's intent into requirements, then a design, then a plan, code and tests, one small, reviewable step at a time. Code is generated from an approved spec, never the other way round.
+- **Code-to-spec.** What the code teaches us (a failing test, a design that doesn't fit, a production incident, a hand-made change) comes back as a proposed change to the spec. It goes through the same gates, and the code is regenerated from the updated spec.
+
+Every artifact is validated by a deterministic linter, scored by evals, and approved by a human (business analyst, senior architect) through a pull request. **pi** agents do the work one step at a time, and a **git reconciler** drives the workflow, with git as the only state.
+
+This repo holds the platform's contracts (artifact format, validation rules, workflow), the linter, the agent tools and the eval harness. Every other part of the platform consumes only what these contracts define.
+
+> **Status:** early and moving fast. Milestone M1 ("one real agent": requirements analysis) is nearly done. Spec-to-code (plan → code → QA) and code-to-spec feedback are planned, not built yet; see the [roadmap](spec-pipeline-roadmap.html) and the [platform features register](docs/platform/features.md). Interfaces will change.
 
 ```mermaid
 flowchart LR
-  user((User)) --> UI
-  rev((BA / Sr. architect)) --> UI
-  UI["UI<br/>thin client"] -->|commands, chat relay| R
-  subgraph ENG[Orchestrator / engine]
-    R["Reconciler<br/>stateless loop"]
-    V["Verify<br/>spec-lint"]
-    EV["Eval gate<br/>LLM judge"]
-  end
-  R <-->|branches, commits, PRs| GIT[("Git repo<br/>specs/ + domain/<br/>= workflow state")]
-  R -->|one pi session per step| AG
-  R --> V
-  R --> EV
-  subgraph AG[pi agent steps]
-    IA[Intent] --> RA[Requirement analysis] --> RG[Requirement generation] --> DA[Design analysis] --> DG[Design generation]
-    DDD[DDD agent]
-    RA -.->|route: ddd| DDD
-    DA -.->|route: ddd| DDD
-    IA -.->|seed terms| DDD
-  end
-  subgraph CFG[Pinned per step]
-    AGM[AGENTS.md]
-    SK["skill(s)"]
-    TP["template(s)"]
-    PR[prompts]
-  end
-  CFG -.-> AG
-  subgraph KB[Org KB - read only]
-    CON[constitution.md]
-    DOCS[policies, systems, provider docs]
-  end
-  AG -->|kb_search / kb_get| KB
-  EV -.->|scores articles| CON
-  GIT -->|tag SPEC-n ready| EXE["plan → code → QA<br/>execution loop"]
-  EXE -.->|lagging signals| EV
+  U((User intent)) --> SA
+  SA["Spec agents<br/>requirements · design"] --> G{{"Lint + evals<br/>+ human approval"}}
+  G --> S[("Spec<br/>source of truth")]
+  S -->|spec-to-code| CA["Code agents<br/>plan · code · tests"]
+  CA --> G2{{"Tests + evals<br/>+ human approval"}}
+  G2 --> C[("Code")]
+  C -.->|code-to-spec<br/>proposed changes| SA
 ```
 
-<sub>Source: [docs/diagrams/00-architecture.mmd](docs/diagrams/00-architecture.mmd). Steps other than requirement analysis are still planned.</sub>
+<sub>Agents work one small step at a time; git holds all the state. The detailed view is in [docs/architecture.md](docs/architecture.md). Today only the spec side (requirements analysis) is built.</sub>
 
 ## Quickstart
 
@@ -103,6 +80,7 @@ AGENTS.md                        # behaviour rules every pi session loads (pinne
 contracts/                       # this folder: schema, rules, workflow
 templates/                       # what agents fill in
 examples/                        # a worked SPEC-0001 (+ sample org/constitution.md), used as a parser fixture and eval seed
+docs/architecture.md             # the detailed architecture diagram and what each part does
 docs/platform/features.md        # platform features register: governance and observability, by ID, stage and status
 docs/scenario-SPEC-0001.md       # end-to-end walkthrough: user → UI → reconciler → agents → verify → eval → approve → handoff
 evals/                           # eval harness: suites, rubrics, judge, thresholds, cases, prototype scorer

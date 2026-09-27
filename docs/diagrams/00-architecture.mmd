@@ -33,3 +33,4 @@ flowchart LR
   EV -.->|scores articles| CON
   GIT -->|tag SPEC-n ready| EXE["plan → code → QA<br/>execution loop"]
   EXE -.->|lagging signals| EV
+  EXE -.->|code-to-spec: proposed spec changes| R
